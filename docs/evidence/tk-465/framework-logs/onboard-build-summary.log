@@ -1,0 +1,14 @@
+Consumer: onboard
+Phase: final core-only offline refresh
+Command: npm run build (tsc --noEmit && vite build)
+Exit status: 0
+This is an extracted summary of the full build log; emitted asset lists and repeated directive warning detail are omitted.
+Full original build log SHA-256: 40ad923bb1db252d2ff8cab0ae4431b9e1e17c3aa559fa4afdc2ed4d5ed5e25d
+
+vite v8.3.4 building client environment for production...
+✓ 1649 modules transformed.
+✓ built in 144ms
+npm notice run robinhood-example-onboard@0.1.0 build
+npm notice run tsc --noEmit && vite build
+
+MODULE_LEVEL_DIRECTIVE warning count: 0

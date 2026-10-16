@@ -1,0 +1,13 @@
+✔ packed entrypoints import without a browser or prompting a wallet (85.083625ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (92.472416ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (17.3425ms)
+✔ RainbowKit SSR configuration initializes and checks authorization without window (177.095666ms)
+✔ actual RainbowKit creates the branded connector with its metadata and one UI owner (0.167459ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 421.265459

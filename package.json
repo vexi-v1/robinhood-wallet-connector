@@ -1,0 +1,30 @@
+{
+  "name": "robinhood-wallet-connector-workspace",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build -w @vexi/robinhood-wallet && npm run build -w @vexi/robinhood-wallet-wagmi && npm run build -w @vexi/robinhood-wallet-rainbowkit && npm run build -w @vexi/robinhood-wallet-onboard",
+    "test": "tsx --test tests/*.test.ts",
+    "typecheck": "npm run typecheck --workspaces --if-present"
+  },
+  "devDependencies": {
+    "@rainbow-me/rainbowkit": "^2.2.11",
+    "@types/jsdom": "^27.0.0",
+    "@types/node": "^24.0.0",
+    "@types/qrcode": "1.5.6",
+    "@wagmi/core": "^2.22.1",
+    "@web3-onboard/common": "^2.4.2",
+    "jsdom": "^27.0.0",
+    "tsx": "^4.20.6",
+    "typescript": "5.9.3",
+    "viem": "^2.57.7",
+    "vite": "8.3.4",
+    "wagmi": "^2.19.5"
+  },
+  "engines": {
+    "node": ">=22.12"
+  }
+}

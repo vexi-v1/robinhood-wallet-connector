@@ -1,0 +1,15 @@
+Consumer: wagmi-v3
+Phase: final core-only offline refresh
+Command: npm run build (tsc --noEmit && vite build)
+Exit status: 0
+This is an extracted summary of the full build log; emitted asset lists and repeated directive warning detail are omitted.
+Full original build log SHA-256: 2f9630db731134ca8afafe3678abc64b716ae5f536a631d385e48271af98a158
+
+vite v8.3.4 building client environment for production...
+✓ 2300 modules transformed.
+✓ built in 184ms
+npm notice run robinhood-example-wagmi-v3@0.1.0 build
+npm notice run tsc --noEmit && vite build
+
+MODULE_LEVEL_DIRECTIVE warning count: 85
+Representative warning: [MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "node_modules/@tanstack/react-query/build/modern/useQuery.js" may not be preserved when bundling.

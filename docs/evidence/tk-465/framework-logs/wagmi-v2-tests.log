@@ -1,0 +1,11 @@
+✔ packed entrypoints import without a browser or prompting a wallet (91.514292ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (87.310667ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (17.002417ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 232.976417

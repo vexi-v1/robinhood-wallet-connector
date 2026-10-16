@@ -1,0 +1,15 @@
+Consumer: wagmi-v2
+Phase: final core-only offline refresh
+Command: npm run build (tsc --noEmit && vite build)
+Exit status: 0
+This is an extracted summary of the full build log; emitted asset lists and repeated directive warning detail are omitted.
+Full original build log SHA-256: f19ed92ddc4aa36d15ffc06a5a38aabe7b30433d2c20c7eefb9a7a37dfb212c2
+
+vite v8.3.4 building client environment for production...
+✓ 2293 modules transformed.
+✓ built in 184ms
+npm notice run robinhood-example-wagmi-v2@0.1.0 build
+npm notice run tsc --noEmit && vite build
+
+MODULE_LEVEL_DIRECTIVE warning count: 82
+Representative warning: [MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "node_modules/@tanstack/react-query/build/modern/IsRestoringProvider.js" may not be preserved when bundling.

@@ -1,0 +1,35 @@
+{
+  "name": "@vexi/robinhood-wallet-onboard",
+  "version": "0.1.0",
+  "description": "Robinhood Wallet module for Blocknative Web3-Onboard",
+  "type": "module",
+  "sideEffects": false,
+  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@vexi/robinhood-wallet": "0.1.0"
+  },
+  "peerDependencies": {
+    "@web3-onboard/common": "2.4.2"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vexi-v1/-robinhood-wallet-connector.git",
+    "directory": "packages/web3-onboard"
+  }
+}
