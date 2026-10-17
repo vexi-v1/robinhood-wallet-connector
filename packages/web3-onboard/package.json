@@ -1,7 +1,8 @@
 {
   "name": "@vexi/robinhood-wallet-onboard",
   "version": "0.1.0",
-  "description": "Robinhood Wallet module for Blocknative Web3-Onboard",
+  "description": "Community Robinhood Wallet module for Web3-Onboard",
+  "author": "Vexi Lab",
   "type": "module",
   "sideEffects": false,
   "license": "MIT",

@@ -1,7 +1,8 @@
 {
   "name": "@vexi/robinhood-wallet-rainbowkit",
   "version": "0.1.0",
-  "description": "Robinhood Wallet entry for RainbowKit with dedicated connection UI",
+  "description": "Community Robinhood Wallet adapter for RainbowKit with dedicated connection UI",
+  "author": "Vexi Lab",
   "type": "module",
   "sideEffects": false,
   "license": "MIT",
