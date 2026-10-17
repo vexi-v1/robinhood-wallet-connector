@@ -153,7 +153,7 @@ npm test
 node scripts/framework-matrix.mjs
 ```
 
-The matrix packs the packages, installs real framework dependencies in isolated temporary applications, builds the examples, and runs synthetic lifecycle checks. It does not request real wallet approval. The repository's accepted scope is **TK-465 / RDR-0097 / F-APP-011**, recorded in Vexi spec [PR #327](https://github.com/vexi-v1/vexi-spec/pull/327), merged at `712411a1`. Follow [AGENTS.md](AGENTS.md) when contributing.
+The matrix packs the packages, installs real framework dependencies in isolated temporary applications, builds the examples, and runs synthetic lifecycle checks. It does not request real wallet approval.
 
 See [architecture](docs/architecture.md), [verification](docs/verification.md), and [upstream assessment](docs/upstream-contributions.md). Package publication, upstream inclusion, deployment, and physical-wallet certification are separate delivery stages.
 
