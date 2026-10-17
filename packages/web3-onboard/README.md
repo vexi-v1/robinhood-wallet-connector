@@ -1,8 +1,10 @@
 # Robinhood Wallet for Web3-Onboard
 
-These packages are not published to npm. Follow the [tarball installation guide](https://github.com/vexi-v1/robinhood-wallet-connector#install-from-this-repository) before using this adapter.
+A Robinhood Wallet module for Web3-Onboard with the toolkit's dedicated connection dialog. Web3-Onboard originated at Blocknative and is now maintained at `thirdweb-dev/web3-onboard`.
 
-A standard wallet module for Blocknative Web3-Onboard, now maintained at `thirdweb-dev/web3-onboard`.
+Built and maintained by **[Vexi Lab](https://vexi-protocol.ai) (an onchain options protocol)**. This is an independent community project, **not an official Robinhood SDK**, and is not affiliated with or endorsed by Robinhood.
+
+These packages are not published to npm. Follow the [tarball installation guide](https://github.com/vexi-v1/robinhood-wallet-connector#install-from-this-repository) before using this adapter.
 
 ```ts
 import Onboard from '@web3-onboard/core';
@@ -29,4 +31,4 @@ Robinhood's dedicated native dialog owns remote pairing cancellation. Close it a
 
 Compatibility baseline: `@web3-onboard/core` **2.24.1**, `@web3-onboard/common` **2.4.2**. See the standalone app in `examples/onboard` and the packed-package framework matrix.
 
-This is an independent community connector. It does not imply Robinhood endorsement or support for every configured network. No transaction is sent automatically.
+Configuring a network does not establish wallet support for it. No transaction is sent automatically.

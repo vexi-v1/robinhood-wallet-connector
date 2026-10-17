@@ -2,6 +2,7 @@
   "name": "@vexi/robinhood-wallet",
   "version": "0.1.0",
   "description": "Community Robinhood Wallet EIP-1193 provider and dedicated connection dialog",
+  "author": "Vexi Lab",
   "type": "module",
   "license": "MIT",
   "main": "./dist/index.js",

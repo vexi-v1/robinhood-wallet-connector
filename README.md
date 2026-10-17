@@ -1,8 +1,12 @@
-# Robinhood Wallet connector
+# Robinhood Wallet Connector
 
-An independent Robinhood Wallet SDK with a dedicated connection dialog and adapters for wagmi, RainbowKit, and Web3-Onboard. A matching injected Robinhood provider is used when available; otherwise, the SDK offers a QR code and an explicit **Open Robinhood Wallet** action through WalletConnect.
+**Connect Robinhood Wallet to mainstream frontend wallet SDKs.**
 
-Maintained by Vexi. This is a community project, unaffiliated with and not endorsed by Robinhood.
+An open-source integration toolkit for dApp developers, with adapters for **wagmi v2/v3, RainbowKit, and Web3-Onboard**, plus a framework-independent **EIP-1193 provider**. Use it to add a recognizable Robinhood Wallet entry and a dedicated connection dialog to your application.
+
+Built and maintained by **[Vexi Lab](https://vexi-protocol.ai) (an onchain options protocol)**. This is an independent community project, **not an official Robinhood SDK**, and is not affiliated with or endorsed by Robinhood.
+
+A matching injected Robinhood provider is used when available; otherwise, the SDK offers a QR code and an explicit **Open Robinhood Wallet** action through WalletConnect. Each integration includes usage documentation and a runnable example below.
 
 ## Packages
 

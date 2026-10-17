@@ -1,7 +1,8 @@
 {
   "name": "@vexi/robinhood-wallet-wagmi",
   "version": "0.1.0",
-  "description": "Robinhood Wallet connector for wagmi v2 and v3",
+  "description": "Community Robinhood Wallet connector for wagmi v2 and v3",
+  "author": "Vexi Lab",
   "type": "module",
   "sideEffects": false,
   "license": "MIT",
