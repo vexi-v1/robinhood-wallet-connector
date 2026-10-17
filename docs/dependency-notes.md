@@ -1,5 +1,15 @@
 # Dependency audit notes
 
+## Additional platform baselines — 2026-10-17
+
+The thirdweb adapter pins `thirdweb 5.122.0`. Dynamic's connector pins `@dynamic-labs/ethereum-core` and `@dynamic-labs/wallet-connector-core` `5.12.0`; its example also pins `@dynamic-labs/sdk-react-core 5.12.0`. Privy's helper pins `@privy-io/react-auth 3.50.0`. Dynamic and Privy use `viem 2.57.7`, and all three React examples use React / React DOM `19.3.1`.
+
+Dynamic's published declarations use extensionless re-exports, so its adapter and example use TypeScript bundler module resolution. Dynamic's documentation labels this generation as the legacy React SDK; no compatibility with its newer JavaScript SDK is implied. Privy's dependency tree emits inherited peer warnings, including an internal `@privy-io/ethereum` viem pin. The isolated consumers use ordinary npm resolution with no forced peer overrides. Build and runtime results are recorded separately from those warnings.
+
+These SDKs add substantial framework dependency trees; core-only consumers do not need them. Upstream clients can perform their own configuration, telemetry and service requests. Automated checks stub or block external traffic and never send synthetic authentication material to those services. No new security audit or advisory clearance is claimed; historical counts below do not describe these newly resolved trees.
+
+## Earlier audit scope
+
 The 2026-10-17 verification used actual npm tarballs and the exact framework baselines below. Functional builds and lifecycle tests passed, but the framework consumers do not all have clean dependency audits. This is not a security audit or a production-readiness certification.
 
 The sanitized [audit evidence](evidence/2026-10-17/dependency-audit.json) records versions, package hashes, dependency paths, advisory URLs, and counts from `npm audit --json`. Counts include propagated package entries, not unique vulnerabilities or demonstrated exploits. Framework audits include their development dependencies; the standalone core install includes only its runtime dependencies.
@@ -32,3 +42,9 @@ No force-fix, dependency override, or unsupported major framework upgrade was ap
 The tested Onboard public API has no `connect.disableUD` analytics switch. Its deprecated `connect.disableUDResolution` option concerns optional Unstoppable Domains resolution; the [source declaration](https://github.com/thirdweb-dev/web3-onboard/blob/03b25b0ade48b7cc8d48dd408741c7e211cf22ac/packages/core/src/types.ts#L275) does not describe telemetry control.
 
 The inspected Onboard source uses `bnc-sdk` in type-only imports. A production build of this exact example with source maps enabled produced 18 maps and 803 source entries; none identified `bnc-sdk` or `crypto-es`. That is a limited observation about this example's generated bundle. It neither removes the installed dependency findings nor proves that another consumer cannot reach affected code, and no configuration option is presented as a security mitigation.
+
+## Additional frontend integrations
+
+The AppKit, ConnectKit, ethers v6 and direct viem examples have separate pinned dependency sets and packed-consumer checks; see their [baselines](../README.md#framework-versions). The earlier audit counts above were not refreshed for these new consumers and must not be presented as their audit results. No dependency overrides or force-fixes were added.
+
+AppKit 1.8.24 declares a broad optional `@wagmi/connectors >=5.9.9` dependency. The observed fresh install selected 8.2.0, which requires `@wagmi/core 3.6.5` and imports `@wagmi/core/tempo`. A wagmi v2 consumer failed to bundle that export; the delivered AppKit example uses the already supported wagmi 3.7.7 / core 3.6.5 baseline. ConnectKit 1.9.2 instead declares wagmi v2 and React 17/18 peers, so its example uses React 18.3.1.

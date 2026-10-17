@@ -1,0 +1,273 @@
+$ npm run build
+npm notice run build
+npm notice run npm run build -w @vexi/robinhood-wallet && npm run build -w @vexi/robinhood-wallet-wagmi && npm run build -w @vexi/robinhood-wallet-rainbowkit && npm run build -w @vexi/robinhood-wallet-onboard && npm run build -w @vexi/robinhood-wallet-thirdweb && npm run build -w @vexi/robinhood-wallet-dynamic && npm run build -w @vexi/robinhood-wallet-privy
+npm notice run @vexi/robinhood-wallet@0.1.0 build
+npm notice run tsc -p tsconfig.json
+npm notice run @vexi/robinhood-wallet-wagmi@0.1.0 build
+npm notice run tsc -p tsconfig.json
+npm notice run @vexi/robinhood-wallet-rainbowkit@0.1.0 build
+npm notice run tsc -p tsconfig.json
+npm notice run @vexi/robinhood-wallet-onboard@0.1.0 build
+npm notice run tsc -p tsconfig.json
+npm notice run @vexi/robinhood-wallet-thirdweb@0.1.0 build
+npm notice run tsc -p tsconfig.json
+npm notice run @vexi/robinhood-wallet-dynamic@0.1.0 build
+npm notice run tsc -p tsconfig.json
+npm notice run @vexi/robinhood-wallet-privy@0.1.0 build
+npm notice run tsc -p tsconfig.json
+
+$ npm run typecheck
+npm notice run typecheck
+npm notice run npm run typecheck --workspaces --if-present
+npm notice run @vexi/robinhood-wallet@0.1.0 typecheck
+npm notice run tsc -p tsconfig.json --noEmit
+npm notice run @vexi/robinhood-wallet-dynamic@0.1.0 typecheck
+npm notice run @vexi/robinhood-wallet-privy@0.1.0 typecheck
+npm notice run @vexi/robinhood-wallet-rainbowkit@0.1.0 typecheck
+npm notice run @vexi/robinhood-wallet-thirdweb@0.1.0 typecheck
+npm notice run @vexi/robinhood-wallet-wagmi@0.1.0 typecheck
+npm notice run @vexi/robinhood-wallet-onboard@0.1.0 typecheck
+
+$ npm test
+npm notice run test
+npm notice run tsx --test tests/*.test.ts
+✔ EIP-6963 exact rdns announcement wins over unrelated injected providers without requesting accounts (19.458541ms)
+✔ late discovery inside the bounded discovery window is selected (8.964042ms)
+✔ legacy fallback requires exact published flag and a valid request/event interface (3.85375ms)
+✔ aborted discovery settles promptly and ignores later matching announcements (2.33075ms)
+✔ native app links encode a valid WCv2 URI and reject arbitrary schemes or malformed secrets (0.393208ms)
+✔ opens a named dialog, consumes Escape, cancels once, and restores host focus (61.197458ms)
+✔ keyboard focus wraps across visible controls, skipping hidden ready and error actions (13.098334ms)
+✔ restores an explicit disabled trigger after host settlement, including an idempotent second close (7.734875ms)
+✔ deferred focus restoration cannot steal focus from another control or a newer dialog (16.980916ms)
+✔ opening another connection cancels the previous attempt and keeps one dialog (13.325ms)
+✔ ready exposes a locally rendered QR, native app link, and copy success; failure clears the link (13.505125ms)
+✔ late QR completion cannot update a reopened dialog or retain its old canvas (15.9785ms)
+✔ rejects invalid pairing links before QR rendering or assigning a link (6.640333ms)
+✔ copy failures are actionable and late clipboard completion cannot overwrite a new view (7.5305ms)
+✔ custom-host retry closes and clears the old view before invoking its callback (8.9545ms)
+✔ constructor, getProvider-style reads and unapproved restoration never request accounts (0.719625ms)
+✔ explicit injected connect is single flight and returns actual wallet accounts and chain (2.085334ms)
+✔ cancel settles immediately; late injected approval cannot revive old or replace newer attempt (0.674ms)
+✔ cancel during remote initialization never opens a late pairing; retry reuses initialized transport safely (0.473333ms)
+✔ old remote completion and URI callbacks cannot complete a new attempt (0.793333ms)
+✔ connection rejection preserves the wallet error and releases the retry gate (0.349875ms)
+✔ timeout aborts remote operation and settles outward connection promise (21.248875ms)
+✔ failed QR rendering aborts transport, shows error and rejects instead of remaining pending (0.486333ms)
+✔ event forwarding is scoped to current provider and disconnect removes old listeners (0.268083ms)
+✔ unsupported and rejected switching cannot report a changed chain (0.147334ms)
+✔ initial connection uses the account selected by the wallet after a requested chain switch (0.126875ms)
+✔ session recovery is scoped by marker and cannot win over disconnect during restore (0.395625ms)
+✔ destroy during discovery settles once and forbids later account requests (0.252334ms)
+✔ a connect listener may disconnect without a stale nonempty account event afterward (0.149916ms)
+✔ consumer callback failures do not prevent settlement or later event consumers (0.070792ms)
+✔ disconnect during post-switch chain read prevents stale account or chain writes (0.2805ms)
+✔ remote proposal exposes only a validated local URI and actual authorized account/network result (2.906625ms)
+✔ cancelled late approval is revoked by exact topic and never persisted or exposed (0.412417ms)
+✔ late old approval cannot disconnect or overwrite a newer session (0.424791ms)
+✔ cancel in the approval-to-host-adoption microtask gap revokes the approved session (1.088625ms)
+✔ account event, eth_accounts and restored selection stay consistent and scoped (0.380542ms)
+✔ unapproved accounts and networks disconnect rather than expanding session permissions (0.251709ms)
+✔ chain permission removed while switching is revalidated after wallet response (0.379958ms)
+✔ only the explicitly approved topic may be restored; expired and invalid markers are rejected (0.093209ms)
+✔ disconnect while transport initializes revokes the original stored topic before retry can pair (0.721667ms)
+ℹ tests 40
+ℹ suites 0
+ℹ pass 40
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 670.476542
+
+wagmi-v2: isolated packed install, production build and public type contracts passed
+✔ packed entrypoints import without a browser or prompting a wallet (80.54425ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (81.994209ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (15.660208ms)
+✔ a fresh packed connector restores approval without a permission prompt and clears listeners (3.266709ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 214.095583
+
+wagmi-v3: isolated packed install, production build and public type contracts passed
+✔ packed entrypoints import without a browser or prompting a wallet (80.327416ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (73.756416ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (17.049083ms)
+✔ a fresh packed connector restores approval without a permission prompt and clears listeners (3.523917ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 207.946292
+
+rainbowkit: isolated packed install, production build and public type contracts passed
+✔ packed entrypoints import without a browser or prompting a wallet (84.546334ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (80.626375ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (15.646208ms)
+✔ a fresh packed connector restores approval without a permission prompt and clears listeners (1.961458ms)
+✔ RainbowKit SSR configuration initializes and checks authorization without window (172.771959ms)
+✔ actual RainbowKit creates the branded connector with its metadata and one UI owner (0.153333ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 398.636334
+
+onboard: isolated packed install, production build and public type contracts passed
+✔ packed entrypoints import without a browser or prompting a wallet (3.0845ms)
+✔ Onboard public module creates a lazy EIP-1193 interface and preserves disconnect (2.111542ms)
+✔ actual Onboard core accepts the module and initializes without requesting accounts (268.720417ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 311.604584
+
+appkit: isolated packed install, production build and public type contracts passed
+✔ packed entrypoints import without a browser or prompting a wallet (81.755125ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (196.731ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (16.714708ms)
+✔ a fresh packed connector restores approval without a permission prompt and clears listeners (3.534833ms)
+✔ actual AppKit example config is SSR-safe and its public adapter connects and disconnects (45.90725ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 381.845333
+
+connectkit: isolated packed install, production build and public type contracts passed
+✔ packed entrypoints import without a browser or prompting a wallet (82.193125ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (79.570666ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (15.767875ms)
+✔ a fresh packed connector restores approval without a permission prompt and clears listeners (3.490583ms)
+✔ actual ConnectKit providers accept the example config during SSR without wallet permission (268.781417ms)
+✔ ConnectKit routing hint never relabels or prompts an unrelated injected provider (3.692209ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 490.542833
+
+ethers: isolated packed install, production build and public type contracts passed
+✔ packed SDK and actual client construct without a browser or account request (60.650459ms)
+✔ actual client reads connected state, follows accounts and chains, and releases event listeners (15.71875ms)
+✔ cancellation rejects the client, ignores late approval, and permits a new explicit attempt (33.03ms)
+✔ wallet rejection does not automatically repeat a permission request (4.231417ms)
+✔ new clients recover saved approval without prompting, while disconnect clears recovery (6.825959ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 152.801375
+
+viem: isolated packed install, production build and public type contracts passed
+✔ packed SDK and actual client construct without a browser or account request (84.24775ms)
+✔ actual client reads connected state, follows accounts and chains, and releases event listeners (3.322916ms)
+✔ cancellation rejects the client, ignores late approval, and permits a new explicit attempt (30.792792ms)
+✔ wallet rejection does not automatically repeat a permission request (3.154834ms)
+✔ new clients recover saved approval without prompting, while disconnect clears recovery (3.113ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 156.970833
+
+thirdweb: isolated packed install, production build and public type contracts passed
+✔ packed adapter constructs without a browser, transport, or permission request (341.9515ms)
+✔ real framework adapter follows account and chain events across disconnect and reconnect (29.181958ms)
+✔ cancel ignores late approval and allows an explicit retry (45.850083ms)
+✔ disconnect ignores late approval and allows an explicit retry (45.951708ms)
+✔ a rejected permission request is not retried automatically (24.48425ms)
+✔ destroy preserves approved recovery; disconnect clears it without new permission requests (3.999875ms)
+✔ an arbitrary injected provider is never relabeled as Robinhood (1.81575ms)
+✔ actual React host imports and renders without browser permission requests (184.881167ms)
+✔ cancelling during core adoption clears the partially connected session (3.510625ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 717.100958
+
+dynamic: isolated packed install, production build and public type contracts passed
+✔ packed adapter constructs without a browser, transport, or permission request (266.15775ms)
+✔ real framework adapter follows account and chain events across disconnect and reconnect (26.80725ms)
+✔ cancel ignores late approval and allows an explicit retry (46.222042ms)
+✔ disconnect ignores late approval and allows an explicit retry (44.209334ms)
+✔ a rejected permission request is not retried automatically (25.465875ms)
+✔ destroy preserves approved recovery; disconnect clears it without new permission requests (3.911542ms)
+✔ an arbitrary injected provider is never relabeled as Robinhood (1.758333ms)
+✔ actual React host imports and renders without browser permission requests (1055.312584ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 30365.042167
+
+privy: isolated packed install, production build and public type contracts passed
+✔ packed adapter constructs without a browser, transport, or permission request (67.936792ms)
+✔ real framework adapter follows account and chain events across disconnect and reconnect (26.607416ms)
+✔ cancel ignores late approval and allows an explicit retry (46.5725ms)
+✔ disconnect ignores late approval and allows an explicit retry (45.735875ms)
+✔ a rejected permission request is not retried automatically (25.384375ms)
+✔ destroy preserves approved recovery; disconnect clears it without new permission requests (3.528292ms)
+✔ an arbitrary injected provider is never relabeled as Robinhood (2.070666ms)
+✔ actual React host imports and renders without browser permission requests (235.207542ms)
+✔ headless login requires an existing connection and a separate explicit sign-in action (1.763875ms)
+✔ headless login stops stale cancel completion before signature submission (23.433417ms)
+✔ headless login stops stale account completion before signature submission (23.838875ms)
+✔ headless login stops stale chain completion before signature submission (22.469417ms)
+✔ headless login stops stale disconnect completion before signature submission (23.666167ms)
+✔ late authenticated completion is signed out after cancellation (23.756959ms)
+✔ signature rejection does not submit login and a deliberate retry succeeds (1.776208ms)
+✔ destroy removes login listeners immediately while message generation is pending (23.815375ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 643.403125
+
+$ npm run docs:generate && npm run docs:check
+npm notice run docs:generate
+npm notice run node scripts/llms-docs.mjs generate
+Generated llms-full.txt from 26 source documents.
+npm notice run docs:check
+npm notice run node scripts/llms-docs.mjs check
+Documentation checks passed: 29 documents, generated bundle and local link targets.
+
+$ git diff --check
+Passed.

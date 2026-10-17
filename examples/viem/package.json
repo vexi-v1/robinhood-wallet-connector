@@ -1,0 +1,19 @@
+{
+  "name": "robinhood-example-viem",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@vexi/robinhood-wallet": "file:../../packages/core",
+    "viem": "2.57.7"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vite": "8.3.4"
+  }
+}

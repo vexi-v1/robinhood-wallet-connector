@@ -1,9 +1,9 @@
 {
   "name": "@vexi/robinhood-wallet-wagmi",
   "version": "0.1.0",
-  "description": "Community Robinhood Wallet connector for wagmi v2 and v3",
+  "description": "Community Robinhood Wallet connector for wagmi, AppKit and ConnectKit",
   "author": "Vexi Lab",
-  "keywords": ["robinhood-wallet", "wallet-connector", "walletconnect", "eip-1193", "ethereum", "evm", "typescript", "wagmi", "react"],
+  "keywords": ["robinhood-wallet", "wallet-connector", "walletconnect", "eip-1193", "ethereum", "evm", "typescript", "wagmi", "react", "appkit", "connectkit"],
   "homepage": "https://github.com/vexi-v1/robinhood-wallet-connector/tree/main/packages/wagmi#readme",
   "bugs": {"url": "https://github.com/vexi-v1/robinhood-wallet-connector/issues"},
   "type": "module",

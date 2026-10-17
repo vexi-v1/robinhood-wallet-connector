@@ -1,0 +1,298 @@
+{
+  "generatedAt": "2026-10-17T08:20:35.756Z",
+  "browser": "155.0.8059.82",
+  "channel": "chrome",
+  "scriptSha256": "d3931e0a91f3d9ea2f680b5519560e1d4498d75f08013db0c9a9f6ccf9bdd1da",
+  "platformFixturesSha256": "4743aa6213d78f23f873a2498bbe80b61f3d0f167bb56d43fdcc667f17984c9d",
+  "matrixReportSha256": "915041de8fa6b648318a16e357d598a14821ff47802b3b24837e6b8cb0091079",
+  "externalTraffic": "blocked; Dynamic public configuration is fulfilled with local synthetic responses",
+  "physicalWallets": "not tested",
+  "results": [
+    {
+      "name": "appkit",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "appkit",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "appkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "appkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "connectkit",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "connectkit",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "connectkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "connectkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "ethers",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "ethers",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "ethers",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "ethers",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "viem",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "viem",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "viem",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "viem",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "thirdweb",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "thirdweb",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "thirdweb",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "thirdweb",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "privy",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "privy",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "privy",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "privy",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    }
+  ],
+  "originalReportSha256": "b3ac5ed88637e01a3ea03878ff39f06e78298a0e9f0f6b16bb3edb89cf860b27",
+  "summary": {
+    "scenariosPassed": 28,
+    "failed": 0,
+    "examples": [
+      "appkit",
+      "connectkit",
+      "ethers",
+      "viem",
+      "thirdweb",
+      "dynamic",
+      "privy"
+    ]
+  },
+  "playwright": "1.64.1",
+  "signaturesAndTransactions": "Synthetic guard configured to reject and count signing/transaction requests; final count was zero in every injected-wallet scenario. No real wallets or authentication were used.",
+  "screenshots": {
+    "dynamic-chooser-1280.png": {
+      "state": "disconnected chooser before synthetic approval",
+      "sha256": "f472c5adbbd42a055e3daa028320e9811231b75739aec360862b5ddc04f6b314"
+    },
+    "dynamic-chooser-390.png": {
+      "state": "disconnected chooser before synthetic approval",
+      "sha256": "4025d0a5b5b7c149c4329443d108f1cbdbfe3e8987647a7f498a8e6aa30bb905"
+    },
+    "thirdweb-1280.png": {
+      "state": "disconnected application before synthetic approval",
+      "sha256": "fb9611233c503806587cc0fc7e3d1afd2618afbcc66091aefb45a8848e277474"
+    },
+    "privy-390.png": {
+      "state": "disconnected application before synthetic approval",
+      "sha256": "af3f5f3f464a222ab1eb3ee4ccee12e0e570851a2a9a076435692e562de467ec"
+    }
+  }
+}

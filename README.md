@@ -4,7 +4,7 @@
 
 **Connect Robinhood Wallet to mainstream frontend wallet SDKs.**
 
-An open-source integration toolkit for dApp developers, with adapters for **wagmi v2/v3, RainbowKit, and Web3-Onboard**, plus a framework-independent **EIP-1193 provider**. Use it to add a recognizable Robinhood Wallet entry and a dedicated connection dialog to your application.
+An open-source integration toolkit for dApp developers, with adapters for **wagmi v2/v3, RainbowKit, and Web3-Onboard**, integrations for **AppKit and ConnectKit** through wagmi, and **ethers v6 and viem** through a framework-independent **EIP-1193 provider**. Additional adapters cover **thirdweb**, **Dynamic React**, and **Privy headless SIWE**. Use it to add a recognizable Robinhood Wallet entry and a dedicated connection dialog to your application.
 
 Built and maintained by **[Vexi Lab](https://vexi-protocol.ai) (an onchain options protocol)**. This is an independent community project, **not an official Robinhood SDK**, and is not affiliated with or endorsed by Robinhood.
 
@@ -18,6 +18,9 @@ A matching injected Robinhood provider is used when available; otherwise, the SD
 | `@vexi/robinhood-wallet-wagmi` | wagmi connector | [Guide](packages/wagmi/README.md) · [v2 example](examples/wagmi-v2) · [v3 example](examples/wagmi-v3) |
 | `@vexi/robinhood-wallet-rainbowkit` | Robinhood entry for `connectorsForWallets` | [Guide](packages/rainbowkit/README.md) · [Example](examples/rainbowkit) |
 | `@vexi/robinhood-wallet-onboard` | Standard Web3-Onboard wallet module | [Guide](packages/web3-onboard/README.md) · [Example](examples/onboard) |
+| `@vexi/robinhood-wallet-thirdweb` | thirdweb Wallet and React hooks | [Guide](packages/thirdweb/README.md) · [Example](examples/thirdweb) |
+| `@vexi/robinhood-wallet-dynamic` | Dynamic custom EVM connector | [Guide](packages/dynamic/README.md) · [Example](examples/dynamic) |
+| `@vexi/robinhood-wallet-privy` | Privy headless SIWE helper | [Guide](packages/privy/README.md) · [Example](examples/privy) |
 
 The core owns its connection lifecycle and native HTML dialog. It uses `@walletconnect/sign-client` directly and does not depend on AppKit modal internals or patches to a framework wallet chooser. Construction and imports do not request accounts or launch a wallet.
 
@@ -55,9 +58,11 @@ Install all required local SDK packages in the **same install command**, so npm 
 
 | Integration | Required tarballs |
 | --- | --- |
-| wagmi | `vexi-robinhood-wallet-0.1.0.tgz`, `vexi-robinhood-wallet-wagmi-0.1.0.tgz` |
+| ethers v6 / viem | `vexi-robinhood-wallet-0.1.0.tgz` |
+| wagmi / AppKit / ConnectKit | `vexi-robinhood-wallet-0.1.0.tgz`, `vexi-robinhood-wallet-wagmi-0.1.0.tgz` |
 | RainbowKit | Core and wagmi tarballs above, plus `vexi-robinhood-wallet-rainbowkit-0.1.0.tgz` |
 | Web3-Onboard | Core tarball, plus `vexi-robinhood-wallet-onboard-0.1.0.tgz` |
+| thirdweb / Dynamic / Privy | Core tarball, plus the matching `vexi-robinhood-wallet-thirdweb-0.1.0.tgz`, `vexi-robinhood-wallet-dynamic-0.1.0.tgz` or `vexi-robinhood-wallet-privy-0.1.0.tgz` |
 
 For example, in an existing wagmi v2 application:
 
@@ -144,9 +149,32 @@ Onboard supplies the configured chains, RPC endpoints, and application metadata 
 
 The tested Onboard dependency tree includes inherited critical and high-severity registry advisories. Review the [dependency notes](docs/dependency-notes.md) before adopting this integration; a passing framework test is not a security certification.
 
+## Use with AppKit, ConnectKit, ethers v6 and viem
+
+These integrations reuse the existing packages, connection dialog and session lifecycle. Each guide includes installation instructions and a runnable application.
+
+| Application | Integration | Guide and example |
+| --- | --- | --- |
+| Reown AppKit + React | Pass `robinhoodWallet(options)` to `new WagmiAdapter({ connectors })`, then share `adapter.wagmiConfig` with `WagmiProvider` | [AppKit](examples/appkit/README.md) |
+| ConnectKit + React | Include `robinhoodWalletForConnectKit(options)` in the wagmi configuration wrapped by `ConnectKitProvider` | [ConnectKit](examples/connectkit/README.md) |
+| ethers v6, without a React requirement | Wrap the core provider in `new BrowserProvider(provider, 'any')` | [ethers v6](examples/ethers/README.md) |
+| viem, without a React requirement | Use `createWalletClient({ transport: custom(provider, { retryCount: 0 }) })` | [viem](examples/viem/README.md) |
+
+AppKit and ConnectKit retain their own wallet choosers; the SDK owns Robinhood pairing and cancellation. The direct ethers/viem examples include user-triggered connection, restoration, state events and cleanup. Do not call ethers `getSigner()` or viem `requestAddresses()` during render or a passive account check: they can request permission.
+
+## Use with thirdweb, Dynamic and Privy
+
+| Platform | Public entry point | Integration |
+| --- | --- | --- |
+| thirdweb | `robinhoodWallet(options)` from `@vexi/robinhood-wallet-thirdweb` | Standard Wallet with `ThirdwebProvider` and `useConnect`; [guide](packages/thirdweb/README.md) |
+| Dynamic React | `robinhoodWalletConnectors(options)` from `@vexi/robinhood-wallet-dynamic` | Custom connector in `DynamicContextProvider.settings.walletConnectors`; [guide](packages/dynamic/README.md) |
+| Privy | `createRobinhoodPrivyLogin(provider, handlers)` from `@vexi/robinhood-wallet-privy` | Separate connect and sign-in actions using `useLoginWithSiwe`; [guide](packages/privy/README.md) |
+
+These packages reuse the same core discovery, transport, dialog and session behavior. Dynamic uses connect-only mode in its example. Privy uses headless authentication: it does not add a Robinhood entry to Privy's built-in chooser or populate `useWallets()`. The Privy example requests a signature only after **Sign in with Privy** is explicitly selected. Live authentication remains unverified.
+
 ## Framework versions
 
-The manifests intentionally use exact peer versions. The verification record distinguishes completed checks from pending work; these entries are not broad version-range or physical-wallet compatibility claims.
+The SDK peer versions and example dependency versions are pinned to the baselines below. The verification record distinguishes completed checks from pending work; these entries are not broad version-range or physical-wallet compatibility claims.
 
 | Integration | Declared baseline |
 | --- | --- |
@@ -154,8 +182,17 @@ The manifests intentionally use exact peer versions. The verification record dis
 | wagmi v3 | `wagmi 3.7.7`, `@wagmi/core 3.6.5`, `viem 2.57.7` |
 | RainbowKit | `@rainbow-me/rainbowkit 2.2.11`, wagmi v2 baseline above |
 | Web3-Onboard | `@web3-onboard/core 2.24.1`, `@web3-onboard/common 2.4.2` |
+| AppKit React + wagmi | `@reown/appkit 1.8.24`, `@reown/appkit-adapter-wagmi 1.8.24`, wagmi v3 baseline, React `19.3.1` |
+| ConnectKit | `connectkit 1.9.2`, wagmi v2 baseline, React / React DOM `18.3.1` |
+| ethers v6 | `ethers 6.17.0`, core SDK only |
+| viem | `viem 2.57.7`, core SDK only |
+| thirdweb | `thirdweb 5.122.0`, React / React DOM `19.3.1` |
+| Dynamic React | `@dynamic-labs/sdk-react-core`, `@dynamic-labs/ethereum-core`, `@dynamic-labs/wallet-connector-core` `5.12.0`, viem `2.57.7`, React `19.3.1` |
+| Privy headless SIWE | `@privy-io/react-auth 3.50.0`, viem `2.57.7`, React `19.3.1` |
 
 RainbowKit's listed baseline uses wagmi v2. The separate wagmi v3 example does not establish RainbowKit compatibility with wagmi v3.
+
+ConnectKit's baseline uses React 18 to respect its declared peers. AppKit's fresh dependency resolution requires wagmi core v3; its wagmi v2 combination is not supported by this example. AppKit's other adapters/framework bindings and other ethers/viem versions are outside these checks.
 
 ## Connection and verification boundaries
 
@@ -170,13 +207,11 @@ Physical Robinhood Wallet pairing, iOS/Android app routing, signatures, and tran
 ## Develop and review
 
 ```sh
-npm run build
-npm run typecheck
-npm test
-node scripts/framework-matrix.mjs
+npx playwright install chromium
+npm run test:all
 ```
 
-The matrix packs the packages, installs real framework dependencies in isolated temporary applications, builds the examples, and runs synthetic lifecycle checks. It does not request real wallet approval.
+The full suite builds and type-checks all seven SDK packages, runs core and documentation checks, then tests all twelve examples as packed consumers and in desktop/narrow browser viewports. The matrix installs real framework dependencies in isolated temporary applications and uses synthetic wallets. It does not request real wallet approval. Use `BROWSER_CHANNEL=chrome npm run test:all` for an installed Chrome browser; see the contributor guide for selected-case commands.
 
 See [architecture](docs/architecture.md), [verification](docs/verification.md), and [upstream assessment](docs/upstream-contributions.md). Package publication, upstream inclusion, deployment, and physical-wallet certification are separate delivery stages.
 

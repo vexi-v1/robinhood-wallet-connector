@@ -27,7 +27,10 @@ The packages are currently unpublished. For installation in another application,
 | `packages/wagmi` | wagmi v2/v3 connector |
 | `packages/rainbowkit` | RainbowKit wallet entry |
 | `packages/web3-onboard` | Web3-Onboard wallet module |
-| `examples` | Vanilla, wagmi v2/v3, RainbowKit and Onboard applications |
+| `packages/thirdweb` | thirdweb Wallet adapter |
+| `packages/dynamic` | Dynamic React custom EVM connector |
+| `packages/privy` | Privy headless SIWE helper |
+| `examples` | Vanilla, wagmi v2/v3, RainbowKit, Onboard, AppKit, ConnectKit, ethers, viem, thirdweb, Dynamic and Privy applications |
 | `tests` | Synthetic provider, transport, modal and framework consumer checks |
 | `scripts/framework-matrix.mjs` | Packed-package compatibility checks |
 | `docs` | Architecture, verification records, dependency notes and upstream contribution guidance |
@@ -55,15 +58,39 @@ The vanilla example also provides `fixture.html`, which uses a synthetic transpo
 
 ## Validate a change
 
+Run the complete local suite, including every packed example and its desktop/narrow browser checks:
+
+```sh
+npx playwright install chromium
+npm run test:all
+# Or use an installed Chrome browser:
+BROWSER_CHANNEL=chrome npm run test:all
+```
+
+`test:all` builds and type-checks all seven SDK packages, runs core tests and documentation checks, then runs the packed matrix with browser checks. CI runs the build, type and core checks on both Node.js baselines, then installs Playwright Chromium and runs the packed/browser integration command on Node.js 24. No real wallet approval, signature, transaction or live platform authentication is part of this suite.
+
 For provider or adapter changes, run the root build, type check and unit tests above. The type check also covers the test files. Test the affected integrations against packed packages:
 
 ```sh
 node scripts/framework-matrix.mjs
 # Or select one or more cases:
 node scripts/framework-matrix.mjs wagmi-v2 wagmi-v3
+# Add browser checks for the same selected consumers:
+node scripts/framework-matrix.mjs wagmi-v2 wagmi-v3 --browser
 ```
 
-Available cases are `wagmi-v2`, `wagmi-v3`, `rainbowkit` and `onboard`. The script downloads real npm framework dependencies into separate temporary applications, builds them, and runs synthetic lifecycle tests. It prints the location of `report.json` and the install/build/test logs. These checks do not need a live WalletConnect project ID or an approved wallet.
+Available cases are `vanilla`, `wagmi-v2`, `wagmi-v3`, `rainbowkit`, `onboard`, `appkit`, `connectkit`, `ethers`, `viem`, `thirdweb`, `dynamic` and `privy`. The script downloads real npm framework dependencies into separate temporary applications, builds them, and runs synthetic lifecycle tests. It prints the location of `report.json` and the install/build/test logs. `npm run test:integrations` runs all twelve cases with their browser checks; it expects the SDK packages to be built already. These checks do not need a live WalletConnect project ID or an approved wallet.
+
+For browser integration checks against a completed matrix report:
+
+```sh
+npx playwright install chromium
+node scripts/browser-integrations.mjs /path/to/matrix/report.json
+# Or use an installed Chrome browser:
+BROWSER_CHANNEL=chrome node scripts/browser-integrations.mjs /path/to/matrix/report.json
+```
+
+This serves every example in the supplied matrix locally and blocks external HTTP/WebSocket traffic. Dynamic receives synthetic public configuration from `scripts/browser-platform-fixtures.mjs`; authentication responses are never simulated in browser checks. It checks synthetic injected connection, reload behavior, disconnect and cleanup, plus the SDK dialog's keyboard cancellation and retry at desktop and narrow sizes. Vanilla and Onboard deliberately require explicit reconnection after reload; the other examples restore approved state without another permission request. Screenshots are captured only before approval or pairing material exists. A synthetic guard rejects and counts signing or transaction attempts; the Privy sign-in button is never clicked. This does not test a real relay, platform authentication or physical wallet. Optional final arguments select any of the twelve matrix cases. Unknown or missing cases fail instead of silently running zero checks.
 
 Add regression coverage when changing connection behavior, particularly cancellation, late results, session recovery, account/chain events and teardown. Browser presentation changes also need desktop and narrow-viewport checks. Use the [verification guide](docs/verification.md) to record what was actually tested; a rendered QR does not prove successful mobile pairing.
 

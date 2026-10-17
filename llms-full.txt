@@ -16,7 +16,7 @@ Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector
 
 **Connect Robinhood Wallet to mainstream frontend wallet SDKs.**
 
-An open-source integration toolkit for dApp developers, with adapters for **wagmi v2/v3, RainbowKit, and Web3-Onboard**, plus a framework-independent **EIP-1193 provider**. Use it to add a recognizable Robinhood Wallet entry and a dedicated connection dialog to your application.
+An open-source integration toolkit for dApp developers, with adapters for **wagmi v2/v3, RainbowKit, and Web3-Onboard**, integrations for **AppKit and ConnectKit** through wagmi, and **ethers v6 and viem** through a framework-independent **EIP-1193 provider**. Additional adapters cover **thirdweb**, **Dynamic React**, and **Privy headless SIWE**. Use it to add a recognizable Robinhood Wallet entry and a dedicated connection dialog to your application.
 
 Built and maintained by **[Vexi Lab](https://vexi-protocol.ai) (an onchain options protocol)**. This is an independent community project, **not an official Robinhood SDK**, and is not affiliated with or endorsed by Robinhood.
 
@@ -30,6 +30,9 @@ A matching injected Robinhood provider is used when available; otherwise, the SD
 | `@vexi/robinhood-wallet-wagmi` | wagmi connector | [Guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/wagmi/README.md) · [v2 example](https://github.com/vexi-v1/robinhood-wallet-connector/tree/main/examples/wagmi-v2) · [v3 example](https://github.com/vexi-v1/robinhood-wallet-connector/tree/main/examples/wagmi-v3) |
 | `@vexi/robinhood-wallet-rainbowkit` | Robinhood entry for `connectorsForWallets` | [Guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/rainbowkit/README.md) · [Example](https://github.com/vexi-v1/robinhood-wallet-connector/tree/main/examples/rainbowkit) |
 | `@vexi/robinhood-wallet-onboard` | Standard Web3-Onboard wallet module | [Guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/web3-onboard/README.md) · [Example](https://github.com/vexi-v1/robinhood-wallet-connector/tree/main/examples/onboard) |
+| `@vexi/robinhood-wallet-thirdweb` | thirdweb Wallet and React hooks | [Guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/thirdweb/README.md) · [Example](https://github.com/vexi-v1/robinhood-wallet-connector/tree/main/examples/thirdweb) |
+| `@vexi/robinhood-wallet-dynamic` | Dynamic custom EVM connector | [Guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/dynamic/README.md) · [Example](https://github.com/vexi-v1/robinhood-wallet-connector/tree/main/examples/dynamic) |
+| `@vexi/robinhood-wallet-privy` | Privy headless SIWE helper | [Guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/privy/README.md) · [Example](https://github.com/vexi-v1/robinhood-wallet-connector/tree/main/examples/privy) |
 
 The core owns its connection lifecycle and native HTML dialog. It uses `@walletconnect/sign-client` directly and does not depend on AppKit modal internals or patches to a framework wallet chooser. Construction and imports do not request accounts or launch a wallet.
 
@@ -67,9 +70,11 @@ Install all required local SDK packages in the **same install command**, so npm 
 
 | Integration | Required tarballs |
 | --- | --- |
-| wagmi | `vexi-robinhood-wallet-0.1.0.tgz`, `vexi-robinhood-wallet-wagmi-0.1.0.tgz` |
+| ethers v6 / viem | `vexi-robinhood-wallet-0.1.0.tgz` |
+| wagmi / AppKit / ConnectKit | `vexi-robinhood-wallet-0.1.0.tgz`, `vexi-robinhood-wallet-wagmi-0.1.0.tgz` |
 | RainbowKit | Core and wagmi tarballs above, plus `vexi-robinhood-wallet-rainbowkit-0.1.0.tgz` |
 | Web3-Onboard | Core tarball, plus `vexi-robinhood-wallet-onboard-0.1.0.tgz` |
+| thirdweb / Dynamic / Privy | Core tarball, plus the matching `vexi-robinhood-wallet-thirdweb-0.1.0.tgz`, `vexi-robinhood-wallet-dynamic-0.1.0.tgz` or `vexi-robinhood-wallet-privy-0.1.0.tgz` |
 
 For example, in an existing wagmi v2 application:
 
@@ -156,9 +161,32 @@ Onboard supplies the configured chains, RPC endpoints, and application metadata 
 
 The tested Onboard dependency tree includes inherited critical and high-severity registry advisories. Review the [dependency notes](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/dependency-notes.md) before adopting this integration; a passing framework test is not a security certification.
 
+## Use with AppKit, ConnectKit, ethers v6 and viem
+
+These integrations reuse the existing packages, connection dialog and session lifecycle. Each guide includes installation instructions and a runnable application.
+
+| Application | Integration | Guide and example |
+| --- | --- | --- |
+| Reown AppKit + React | Pass `robinhoodWallet(options)` to `new WagmiAdapter({ connectors })`, then share `adapter.wagmiConfig` with `WagmiProvider` | [AppKit](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/appkit/README.md) |
+| ConnectKit + React | Include `robinhoodWalletForConnectKit(options)` in the wagmi configuration wrapped by `ConnectKitProvider` | [ConnectKit](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/connectkit/README.md) |
+| ethers v6, without a React requirement | Wrap the core provider in `new BrowserProvider(provider, 'any')` | [ethers v6](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/ethers/README.md) |
+| viem, without a React requirement | Use `createWalletClient({ transport: custom(provider, { retryCount: 0 }) })` | [viem](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/viem/README.md) |
+
+AppKit and ConnectKit retain their own wallet choosers; the SDK owns Robinhood pairing and cancellation. The direct ethers/viem examples include user-triggered connection, restoration, state events and cleanup. Do not call ethers `getSigner()` or viem `requestAddresses()` during render or a passive account check: they can request permission.
+
+## Use with thirdweb, Dynamic and Privy
+
+| Platform | Public entry point | Integration |
+| --- | --- | --- |
+| thirdweb | `robinhoodWallet(options)` from `@vexi/robinhood-wallet-thirdweb` | Standard Wallet with `ThirdwebProvider` and `useConnect`; [guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/thirdweb/README.md) |
+| Dynamic React | `robinhoodWalletConnectors(options)` from `@vexi/robinhood-wallet-dynamic` | Custom connector in `DynamicContextProvider.settings.walletConnectors`; [guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/dynamic/README.md) |
+| Privy | `createRobinhoodPrivyLogin(provider, handlers)` from `@vexi/robinhood-wallet-privy` | Separate connect and sign-in actions using `useLoginWithSiwe`; [guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/privy/README.md) |
+
+These packages reuse the same core discovery, transport, dialog and session behavior. Dynamic uses connect-only mode in its example. Privy uses headless authentication: it does not add a Robinhood entry to Privy's built-in chooser or populate `useWallets()`. The Privy example requests a signature only after **Sign in with Privy** is explicitly selected. Live authentication remains unverified.
+
 ## Framework versions
 
-The manifests intentionally use exact peer versions. The verification record distinguishes completed checks from pending work; these entries are not broad version-range or physical-wallet compatibility claims.
+The SDK peer versions and example dependency versions are pinned to the baselines below. The verification record distinguishes completed checks from pending work; these entries are not broad version-range or physical-wallet compatibility claims.
 
 | Integration | Declared baseline |
 | --- | --- |
@@ -166,8 +194,17 @@ The manifests intentionally use exact peer versions. The verification record dis
 | wagmi v3 | `wagmi 3.7.7`, `@wagmi/core 3.6.5`, `viem 2.57.7` |
 | RainbowKit | `@rainbow-me/rainbowkit 2.2.11`, wagmi v2 baseline above |
 | Web3-Onboard | `@web3-onboard/core 2.24.1`, `@web3-onboard/common 2.4.2` |
+| AppKit React + wagmi | `@reown/appkit 1.8.24`, `@reown/appkit-adapter-wagmi 1.8.24`, wagmi v3 baseline, React `19.3.1` |
+| ConnectKit | `connectkit 1.9.2`, wagmi v2 baseline, React / React DOM `18.3.1` |
+| ethers v6 | `ethers 6.17.0`, core SDK only |
+| viem | `viem 2.57.7`, core SDK only |
+| thirdweb | `thirdweb 5.122.0`, React / React DOM `19.3.1` |
+| Dynamic React | `@dynamic-labs/sdk-react-core`, `@dynamic-labs/ethereum-core`, `@dynamic-labs/wallet-connector-core` `5.12.0`, viem `2.57.7`, React `19.3.1` |
+| Privy headless SIWE | `@privy-io/react-auth 3.50.0`, viem `2.57.7`, React `19.3.1` |
 
 RainbowKit's listed baseline uses wagmi v2. The separate wagmi v3 example does not establish RainbowKit compatibility with wagmi v3.
+
+ConnectKit's baseline uses React 18 to respect its declared peers. AppKit's fresh dependency resolution requires wagmi core v3; its wagmi v2 combination is not supported by this example. AppKit's other adapters/framework bindings and other ethers/viem versions are outside these checks.
 
 ## Connection and verification boundaries
 
@@ -182,13 +219,11 @@ Physical Robinhood Wallet pairing, iOS/Android app routing, signatures, and tran
 ## Develop and review
 
 ```sh
-npm run build
-npm run typecheck
-npm test
-node scripts/framework-matrix.mjs
+npx playwright install chromium
+npm run test:all
 ```
 
-The matrix packs the packages, installs real framework dependencies in isolated temporary applications, builds the examples, and runs synthetic lifecycle checks. It does not request real wallet approval.
+The full suite builds and type-checks all seven SDK packages, runs core and documentation checks, then tests all twelve examples as packed consumers and in desktop/narrow browser viewports. The matrix installs real framework dependencies in isolated temporary applications and uses synthetic wallets. It does not request real wallet approval. Use `BROWSER_CHANNEL=chrome npm run test:all` for an installed Chrome browser; see the contributor guide for selected-case commands.
 
 See [architecture](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/architecture.md), [verification](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md), and [upstream assessment](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/upstream-contributions.md). Package publication, upstream inclusion, deployment, and physical-wallet certification are separate delivery stages.
 
@@ -208,7 +243,7 @@ Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector
 
 # Robinhood Wallet integration guide for AI coding agents
 
-Use this guide to add Robinhood Wallet to an existing frontend application. This repository provides a standalone EIP-1193 provider and adapters for wagmi v2/v3, RainbowKit and Web3-Onboard.
+Use this guide to add Robinhood Wallet to an existing frontend application. This repository provides a standalone EIP-1193 provider and adapters for wagmi v2/v3, RainbowKit and Web3-Onboard. AppKit and ConnectKit reuse the wagmi connector; ethers v6 and viem wrap the core provider directly. Separate adapters cover thirdweb Wallet, Dynamic React custom connectors and Privy headless SIWE.
 
 Built by **[Vexi Lab](https://vexi-protocol.ai) (an onchain options protocol)**. This is an independent community project, not an official Robinhood SDK, and is not affiliated with or endorsed by Robinhood.
 
@@ -222,11 +257,18 @@ Inspect the application's existing wallet framework and dependency versions befo
 | wagmi v3 | Same wagmi entry point | [Adapter guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/wagmi/README.md), [example setup](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/wagmi-v3/README.md), [React app](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/wagmi-v3/src/main.tsx) |
 | RainbowKit with wagmi v2 | `import { robinhoodWallet } from '@vexi/robinhood-wallet-rainbowkit'` | [Adapter guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/rainbowkit/README.md), [example setup](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/rainbowkit/README.md), [React app](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/rainbowkit/src/main.tsx) |
 | Web3-Onboard | `import { robinhoodModule } from '@vexi/robinhood-wallet-onboard'` | [Module guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/web3-onboard/README.md), [example setup](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/onboard/README.md), [app source](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/onboard/src/main.ts) |
+| AppKit React + wagmi v3 | `robinhoodWallet` from `@vexi/robinhood-wallet-wagmi`, passed to `WagmiAdapter` | [AppKit guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/appkit/README.md), [configuration](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/appkit/src/config.ts), [React app](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/appkit/src/main.tsx) |
+| ConnectKit + wagmi v2 + React 18 | `robinhoodWalletForConnectKit` from `@vexi/robinhood-wallet-wagmi` | [ConnectKit guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/connectkit/README.md), [configuration](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/connectkit/src/config.ts), [React app](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/connectkit/src/main.tsx) |
+| ethers v6 | Core `RobinhoodProvider` wrapped in ethers `BrowserProvider` | [ethers guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/ethers/README.md), [client setup](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/ethers/src/client.ts), [app](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/ethers/src/main.ts) |
+| viem | Core `RobinhoodProvider` passed to viem `custom` | [viem guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/viem/README.md), [client setup](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/viem/src/client.ts), [app](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/viem/src/main.ts) |
+| thirdweb | `robinhoodWallet` from `@vexi/robinhood-wallet-thirdweb` | [Adapter guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/thirdweb/README.md), [React example](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/thirdweb/README.md) |
+| Dynamic React 5.12.0 | `robinhoodWalletConnectors` from `@vexi/robinhood-wallet-dynamic` | [Adapter guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/dynamic/README.md), [React example](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/dynamic/README.md) |
+| Privy headless SIWE | `createRobinhoodPrivyLogin` from `@vexi/robinhood-wallet-privy` | [Helper guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/privy/README.md), [React example](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/privy/README.md) |
 | Vanilla browser or a host that accepts an EIP-1193 provider | `import { RobinhoodProvider } from '@vexi/robinhood-wallet'` | [Core API](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/core/README.md), [example setup](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/vanilla/README.md), [app source](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/vanilla/main.ts) |
 
-The two `robinhoodWallet` exports serve different APIs: call the wagmi factory with options and put its result in `createConfig({ connectors })`; pass the RainbowKit factory without calling it in a `connectorsForWallets` wallet group. Call `robinhoodModule(options)` for `Onboard({ wallets })`. Keep the application's other wallet entries and provider wrappers intact.
+The wagmi, RainbowKit and thirdweb packages all export `robinhoodWallet` with different APIs. The thirdweb factory returns a standard Wallet; for wagmi and RainbowKit: call the wagmi factory with options and put its result in `createConfig({ connectors })`; pass the RainbowKit factory without calling it in a `connectorsForWallets` wallet group. Call `robinhoodModule(options)` for `Onboard({ wallets })`. ConnectKit 1.9.2 needs `robinhoodWalletForConnectKit(options)`: it uses the same provider with the chooser's injected-compatible routing hint, which does not mean an installed wallet was detected. The general `robinhoodWallet` type is displayed as unavailable by that chooser. Keep the application's other wallet entries and provider wrappers intact.
 
-This repository does not yet provide tested adapters for Reown AppKit, ConnectKit, thirdweb or Dynamic, or a verified Privy integration. Its EIP-1193 interface is an integration starting point, not evidence of compatibility with those SDKs. RainbowKit uses the documented wagmi v2 baseline; the separate wagmi v3 example does not extend that claim.
+The AppKit example covers its React + wagmi v3 path only. Its broad optional connector dependency currently resolves to a release requiring wagmi core v3; the wagmi v2 combination failed a fresh build. ConnectKit uses React 18 and wagmi v2 to match its declared peers. No separate AppKit, ConnectKit, ethers or viem SDK package is needed. AppKit's other framework bindings/adapters remain outside the verified integrations. thirdweb uses a custom connection button and active-wallet hooks. Dynamic targets its React 5.12.0 SDK, not its newer JavaScript SDK. Privy uses `useLoginWithSiwe` after an independent core connection; its built-in chooser and `useWallets()` do not receive this wallet. RainbowKit uses the documented wagmi v2 baseline; the separate wagmi v3 example does not extend that claim.
 
 ## Install the actual packages
 
@@ -245,10 +287,13 @@ In the consuming application, install the required tarballs together in one `npm
 
 | Integration | Local SDK packages required |
 | --- | --- |
-| Core | `@vexi/robinhood-wallet` |
-| wagmi | Core + `@vexi/robinhood-wallet-wagmi` |
+| Core / ethers v6 / viem | `@vexi/robinhood-wallet` |
+| wagmi / AppKit / ConnectKit | Core + `@vexi/robinhood-wallet-wagmi` |
 | RainbowKit | Core + wagmi adapter + `@vexi/robinhood-wallet-rainbowkit` |
 | Web3-Onboard | Core + `@vexi/robinhood-wallet-onboard` |
+| thirdweb | Core + `@vexi/robinhood-wallet-thirdweb` |
+| Dynamic React | Core + `@vexi/robinhood-wallet-dynamic` |
+| Privy headless SIWE | Core + `@vexi/robinhood-wallet-privy` |
 
 Use the exact tarball filenames and installation example in the [installation guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/README.md#install-from-this-repository), and install the chosen framework's declared peer dependencies. The examples' `package.json` files provide working dependency sets. The packages expose ESM and TypeScript declarations; use public `import` entry points, not CommonJS `require` or files from `src`, `dist` or the internal modal implementation.
 
@@ -258,7 +303,8 @@ Use the exact tarball filenames and installation example in the [installation gu
 2. Provide application metadata with a name, description, absolute HTTP(S) URL and icon array. For RainbowKit, pass `appName` and `appUrl` to `connectorsForWallets`. For Onboard, supply `appMetadata` or explicit module `metadata`.
 3. Configure the EVM chain IDs and usable RPC endpoints. Core takes numeric `chains` and `rpcMap`; wagmi derives them from its configured chains with an optional `rpcMap` override; Onboard derives them from its chain entries, which use hexadecimal IDs such as `0x1`. Use the existing application chain setup when appropriate.
 4. Create a stable provider or connector configuration rather than creating another instance on every render. If independent core/wagmi/Onboard instances need separate persisted sessions, give them distinct, stable `storagePrefix` values.
-5. Start connection only from the user's Connect action, using the framework's normal connection API or `provider.connect()`. Display pending, cancellation and error states; prevent repeated host clicks while pending. Connecting does not automatically sign or send transactions.
+5. For thirdweb, Dynamic or Privy, also supply the platform's own client/environment/app ID. Use the pinned peers in its guide. Dynamic's enabled networks must match the core configuration; its declarations require bundler module resolution. Privy requires wallet authentication enabled in the dashboard.
+6. Start connection only from the user's Connect action, using the framework's normal connection API or `provider.connect()`. Display pending, cancellation and error states; prevent repeated host clicks while pending. Connecting does not automatically sign or send transactions.
 
 Imports and core construction are safe without `window`, but interactive wallet use requires a browser. Supply metadata URLs explicitly for server rendering; the runnable Vite examples use `window.location.origin` and need adaptation before copying into server-executed code. Keep the consuming framework's own client/server boundaries intact.
 
@@ -280,7 +326,11 @@ Core `connect()` returns a numeric `chainId`; EIP-1193 `chainChanged` and `eth_c
 
 ## Avoid common integration mistakes
 
-- **One pairing UI:** leave the SDK's dialog enabled when using the supplied adapters. Do not add a generic WalletConnect/AppKit pairing modal around it. RainbowKit's chooser and the SDK dialog have separate roles; the chooser is inert during SDK pairing.
+- **One pairing UI:** leave the SDK's dialog enabled when using the supplied adapters. RainbowKit, AppKit and ConnectKit provide host choosers; the SDK owns Robinhood's remote pairing dialog. Do not add another QR handler for this connector or use AppKit `customWallets` as a substitute for installing the connector.
+- **One wagmi config:** AppKit's React provider must receive `adapter.wagmiConfig`; ConnectKit consumes its surrounding `WagmiProvider` configuration. Preserve other wallet entries. Do not mix the two different wagmi baselines or assume ConnectKit supports React 19.
+- **Generic wallet restoration:** the RainbowKit example keeps its Browser Wallet entry on a targetless wagmi connector, so it restores only its own explicit connection. A generic connector targeting the same injected provider can otherwise restore Robinhood's approval as a second connection. Verify that disconnect does not leave such a duplicate active; see the [example](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/rainbowkit/README.md).
+- **Direct clients:** ethers `getSigner()` and viem `requestAddresses()` can request account permission. Use them only after explicit intent. Read accounts passively with `listAccounts()` / `getAddresses()` and restore through core `isAuthorized()`. Use `custom(provider, { retryCount: 0 })`; clear cached signer/account selections on events and disconnect. Subscribe to EIP-1193 events on the core provider and remove listeners on disposal. An ethers wrapper's `destroy()` does not disconnect the SDK session.
+- **Authentication requires separate intent:** Dynamic's example uses connect-only mode. Privy's helper must be called only from an explicit sign-in action; `login()` requests a signature and does not connect the wallet. Cancel stale flows on account/chain changes and teardown. A submitted login cannot be withdrawn; late completion is signed out. Keep wallet disconnect and application logout policies explicit.
 - **Custom UI is a complete responsibility:** for integrations exposing `showModal: false`, subscribe to `display_uri` before connecting, provide QR/link rendering and cancellation, and clear sensitive pairing data after cancellation or completion. Import `getRobinhoodUri` from the core to construct the app link, and open it only on an explicit click. Follow the [custom UI contract](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/core/README.md#custom-connection-ui).
 - **Wallet identity:** discovery uses `com.robinhood.wallet` EIP-6963 metadata or `isRobinhoodMobileWallet`. Do not rename an arbitrary injected provider or a generic WalletConnect connector to Robinhood. These identity hints are not cryptographic vendor authentication.
 - **Network approval:** adding a chain ID does not establish wallet support. A remote session must approve the requested chain, accounts and methods. Switching between chains the session approved is local and shows no wallet prompt; a chain the session did not approve is rejected with `4901`. Robinhood Chain mainnet `4663` and testnet `46630` each need their own device/network evidence.
@@ -289,7 +339,7 @@ Core `connect()` returns a numeric `chainId`; EIP-1193 `chainChanged` and `eth_c
 
 ## Verify and describe the result
 
-Use the selected example to verify the normal framework flow and run the consuming application's build and type checks. For changes to this repository, follow [CONTRIBUTING.md](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/CONTRIBUTING.md); the packed-package matrix supports `wagmi-v2`, `wagmi-v3`, `rainbowkit` and `onboard` cases.
+Use the selected example to verify the normal framework flow and run the consuming application's build and type checks. For changes to this repository, follow [CONTRIBUTING.md](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/CONTRIBUTING.md). `npm run test:all` runs the SDK/core/documentation checks and all twelve packed/browser cases: `vanilla`, `wagmi-v2`, `wagmi-v3`, `rainbowkit`, `onboard`, `appkit`, `connectkit`, `ethers`, `viem`, `thirdweb`, `dynamic` and `privy`. Install Playwright Chromium first, or set `BROWSER_CHANNEL=chrome`. The Vanilla and Onboard examples require explicit reconnection after reload; other examples restore saved approval. Neither behavior may request account permission on page load.
 
 Check user-triggered connection, cancellation, retry, pending-state cleanup, disconnect, restored sessions, account/chain events and other wallet entries. UI work also needs desktop/narrow-viewport, keyboard and focus checks. The [vanilla fixture](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/vanilla/fixture.ts) offers a synthetic transport for repeatable UI checks; its QR cannot pair a real wallet.
 
@@ -305,7 +355,7 @@ Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector
 
 > **AI integration docs:** [llms.txt](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt) · [Integration guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/ai-integration.md)
 
-`@vexi/robinhood-wallet` provides a framework-independent EIP-1193 provider and a dedicated Robinhood Wallet connection dialog for frontend applications. It is the shared core behind this toolkit's wagmi, RainbowKit and Web3-Onboard adapters.
+`@vexi/robinhood-wallet` provides a framework-independent EIP-1193 provider and a dedicated Robinhood Wallet connection dialog for frontend applications. It is the shared core behind this toolkit's wagmi, RainbowKit, Web3-Onboard, thirdweb and Dynamic adapters, and its Privy headless SIWE helper. AppKit and ConnectKit reuse wagmi; ethers and viem consume the provider directly.
 
 Built and maintained by **[Vexi Lab](https://vexi-protocol.ai) (an onchain options protocol)**. This is an independent community project, **not an official Robinhood SDK**, and is not affiliated with or endorsed by Robinhood.
 
@@ -345,6 +395,10 @@ async function disconnectWallet() {
 ```
 
 Constructing the provider does not request accounts, initialize the remote transport, or open a dialog. Invoke `connect()` or `eth_requestAccounts` only after the user chooses to connect. A real WalletConnect project ID with the application's origin allowed is required for remote pairing.
+
+## Direct ethers and viem clients
+
+Use this package directly with ethers **6.17.0** or viem **2.57.7**; neither integration requires wagmi or an additional adapter package. The [ethers example](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/ethers/README.md) wraps it in `BrowserProvider`. The [viem example](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/viem/README.md) uses `custom(provider, { retryCount: 0 })`. Both include cancellation, non-prompting recovery, account/chain events and teardown. EIP-1193 events remain on this core provider, and disposing a client wrapper does not log out of the SDK session.
 
 ## Options
 
@@ -471,6 +525,10 @@ Compatibility baselines: wagmi **2.19.5** / `@wagmi/core` **2.22.1**, or wagmi *
 
 Use `showModal: false` only if your host handles `display_uri` and exposes cancellation. `isAuthorized()` and reconnection never request account permission. SSR import is supported; wallet interaction requires a browser.
 
+## AppKit and ConnectKit
+
+The same provider and lifecycle power the pinned [AppKit React + wagmi v3 example](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/appkit/README.md) and [ConnectKit + wagmi v2 / React 18 example](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/connectkit/README.md). Pass `robinhoodWallet(options)` to AppKit's `WagmiAdapter` connectors. Use the named export **`robinhoodWalletForConnectKit(options)`** in the wagmi config consumed by `ConnectKitProvider`. It takes the same `RobinhoodWalletParameters` and preserves `getProvider()` and `cancelConnect()`. These integrations add examples and packed-consumer verification, with no new SDK package or connection implementation. ConnectKit 1.9.2 requires `type: 'injected'` to route this SDK connector through its EIP-1193 screen; the helper changes only that routing field. This does not detect an installed wallet or select an arbitrary injected provider. The normal `robinhoodWallet` type is not actionable in that chooser. Keep the SDK dialog enabled, retain other wallet entries, and follow each guide's exact dependency baseline.
+
 ---
 
 # Source: packages/rainbowkit/README.md
@@ -565,6 +623,166 @@ Configuring a network does not establish wallet support for it. No transaction i
 
 ---
 
+# Source: packages/thirdweb/README.md
+
+Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/thirdweb/README.md
+
+# Robinhood Wallet for thirdweb
+
+> **AI agents: start with [llms.txt](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt).** [Raw text](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt) · [Integration guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/ai-integration.md)
+
+An independent community adapter for `thirdweb 5.122.0`. It implements thirdweb's public `Wallet` interface and delegates discovery, permission requests, WalletConnect, cancellation and persistence to the core provider. This package is unpublished and is not endorsed by Robinhood or thirdweb.
+
+## Install
+
+Build and pack the repository as described in the [root guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/README.md#install-from-this-repository), then install both tarballs together:
+
+```sh
+npm install /path/to/vexi-robinhood-wallet-0.1.0.tgz \
+  /path/to/vexi-robinhood-wallet-thirdweb-0.1.0.tgz thirdweb@5.122.0
+```
+
+## Use
+
+```ts
+import { createThirdwebClient } from 'thirdweb';
+import { robinhoodWallet } from '@vexi/robinhood-wallet-thirdweb';
+
+const client = createThirdwebClient({ clientId: 'YOUR_THIRDWEB_CLIENT_ID' });
+const wallet = robinhoodWallet({
+  projectId: 'YOUR_WALLETCONNECT_PROJECT_ID',
+  chains: [1],
+  metadata: { name: 'My app', description: 'My app', url: 'https://app.example', icons: [] },
+});
+
+// Only from a user-initiated connection action:
+await wallet.connect({ client });
+const account = wallet.getAccount();
+```
+
+Within `ThirdwebProvider`, use `useConnect().connect(async () => { await wallet.connect({ client }); return wallet; })` to populate thirdweb's active wallet hooks. The [React example](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/thirdweb/README.md) also restores saved approval with `wallet.autoConnect()` and `useSetActiveWallet`. This delivery uses a custom connection button; thirdweb's built-in wallet chooser is not part of the verified surface.
+
+## Lifecycle
+
+- `connect({ client, chain? })` requests permission through the core; construction does not.
+- `autoConnect({ client, chain? })` restores only previously approved state. It rejects if no saved connection exists and does not request accounts or switch chains.
+- `cancelConnect()` cancels a pending connection. A late injected approval is ignored; it cannot dismiss a wallet-owned prompt.
+- `disconnect()` clears the SDK session and framework listeners. Use thirdweb's `useDisconnect` when the wallet is active in its React context.
+- `destroy()` releases resources while retaining the core's persisted approval for another instance. Do not reuse a destroyed wallet.
+- `getProvider()` exposes the same `RobinhoodProvider`. `subscribe` follows thirdweb's account, chain, connection and disconnect events; unsubscribe when disposing consumers.
+
+The adapter uses [`EIP1193.fromProvider`](https://portal.thirdweb.com/typescript/v5/adapters) for account operations after the core has connected. It deliberately uses thirdweb's passive adoption path to avoid automatic permission retries. A new internal adapter is created after each disconnect so chain subscriptions survive reconnect. The core owns session disconnect; thirdweb's experimental permission revocation is not forwarded. Normal thirdweb client service and telemetry behavior still applies.
+
+See [verification](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md) for the exact checks and limits. No physical wallet, real signature, transaction, smart account, React Native or other thirdweb version is certified by these checks.
+
+---
+
+# Source: packages/dynamic/README.md
+
+Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/dynamic/README.md
+
+# Robinhood Wallet for Dynamic
+
+> **AI agents: start with [llms.txt](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt).** [Raw text](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt) · [Integration guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/ai-integration.md)
+
+A custom EVM wallet connector for Dynamic's React SDK `5.12.0`. It extends the public `EthereumWalletConnector` from `@dynamic-labs/ethereum-core` and uses the core Robinhood provider for discovery, WalletConnect and connection lifecycle. This is an unpublished community package without Robinhood or Dynamic endorsement.
+
+## Install
+
+Follow the [build and pack guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/README.md#install-from-this-repository), then install both SDK tarballs and the pinned peers:
+
+```sh
+npm install /path/to/vexi-robinhood-wallet-0.1.0.tgz \
+  /path/to/vexi-robinhood-wallet-dynamic-0.1.0.tgz \
+  @dynamic-labs/sdk-react-core@5.12.0 @dynamic-labs/ethereum-core@5.12.0 \
+  @dynamic-labs/wallet-connector-core@5.12.0 viem@2.57.7
+```
+
+The Dynamic declarations use extensionless re-exports. Use TypeScript's `moduleResolution: "Bundler"` for this integration, as in the runnable example.
+
+## Register the connector
+
+```tsx
+import { DynamicContextProvider, DynamicWidget } from '@dynamic-labs/sdk-react-core';
+import { robinhoodWalletConnectors } from '@vexi/robinhood-wallet-dynamic';
+
+const RobinhoodConnectors = robinhoodWalletConnectors({
+  projectId: 'YOUR_WALLETCONNECT_PROJECT_ID', chains: [1],
+  metadata: { name: 'My app', description: 'My app', url: 'https://app.example', icons: [] },
+});
+
+function App() {
+  return <DynamicContextProvider settings={{
+    environmentId: 'YOUR_DYNAMIC_ENVIRONMENT_ID',
+    initialAuthenticationMode: 'connect-only',
+    walletConnectors: [RobinhoodConnectors],
+  }}><DynamicWidget/></DynamicContextProvider>;
+}
+```
+
+Configure the same enabled EVM networks in Dynamic and the Robinhood options. The factory does not modify other connectors; include it alongside existing connector factories. Do not add a second Robinhood connector under the same key.
+
+`getAddress()` / `connect()` are permission-bearing actions. `getConnectedAccounts()` only restores approved state; `init()` announces readiness without creating a transport. The connector exposes `provider`, `cancelConnect()` and `destroy()` for custom hosts. `endSession()` disconnects and clears listeners. Repeated setup/teardown is supported, and account/chain/disconnect events are translated to Dynamic events. viem wallet clients use `retryCount: 0`.
+
+Dynamic calls its custom SDK routing flag `canConnectViaCustodialService`; the adapter sets that flag to make its own connection UI reachable. This is a framework routing convention, not a claim that Robinhood is custodial or that its mobile app is installed. Provider identity is still checked by the core.
+
+See the [runnable example](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/dynamic/README.md), [upstream custom connector guide](https://github.com/dynamic-labs/public-wallet-connectors/blob/main/CONTRIBUTING.md) and [verification record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md). The example uses connect-only mode. Dynamic authentication, embedded wallets, the newer JavaScript SDK, physical devices and actual signing are outside the verified surface.
+
+---
+
+# Source: packages/privy/README.md
+
+Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/privy/README.md
+
+# Robinhood Wallet with Privy headless SIWE
+
+> **AI agents: start with [llms.txt](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt).** [Raw text](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt) · [Integration guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/ai-integration.md)
+
+An unpublished community helper for `@privy-io/react-auth 3.50.0` and `viem 2.57.7`. It connects an already-approved Robinhood provider to Privy's public [`useLoginWithSiwe`](https://docs.privy.io/authentication/user-authentication/login-methods/wallet) flow. It does not add an entry to Privy's built-in wallet chooser or populate `useWallets()`. Robinhood and Privy do not endorse this package.
+
+## Install
+
+Follow the [build and pack guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/README.md#install-from-this-repository), then install both tarballs together:
+
+```sh
+npm install /path/to/vexi-robinhood-wallet-0.1.0.tgz \
+  /path/to/vexi-robinhood-wallet-privy-0.1.0.tgz \
+  @privy-io/react-auth@3.50.0 viem@2.57.7
+```
+
+Enable wallet authentication and configure allowed origins in your own Privy application. A Privy app ID and a WalletConnect project ID are separate public identifiers. Neither requires a server secret in the browser.
+
+## Use
+
+Create one `RobinhoodProvider` for the application and connect it from a user action. Inside `PrivyProvider`, pass the methods from `useLoginWithSiwe()` and `usePrivy()` to the helper:
+
+```ts
+import { createRobinhoodPrivyLogin } from '@vexi/robinhood-wallet-privy';
+
+const login = createRobinhoodPrivyLogin(provider, {
+  generateSiweMessage,
+  loginWithSiwe,
+  logout,
+});
+
+// A separate, explicitly labeled sign-in button, after provider.connect():
+await login.login();
+```
+
+Keep the controller stable across renders and forward current hook methods, as shown in the [React example](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/privy/README.md). Do not call `login()` from render, restoration, an account-change effect, or a generic Connect button. Login requests `personal_sign`; basic connection does not.
+
+## Lifecycle and limits
+
+The helper uses the current checksummed account and CAIP-2 chain ID to request a Privy-generated message, asks the connected provider to sign it, then submits it to Privy. It never requests accounts itself. It rejects concurrent login calls and removes its provider event listeners when an operation finishes or is invalidated. Account/chain changes, disconnect, `cancel()` or `destroy()` invalidate a pending flow before its next step. Wait for the old operation to settle before retrying from another explicit user action.
+
+Cancellation cannot dismiss an existing wallet prompt or withdraw an already-submitted authentication request. If Privy completes a submitted request after cancellation or a connection change, the helper calls the supplied `logout()` before rejecting. Do not start an unrelated authentication flow while this controller is pending: that cleanup could sign it out too. Handle a failed logout as an authentication cleanup failure. The helper never logs or persists messages, signatures or user data.
+
+`provider.disconnect()` and Privy's `logout()` are separate operations. Signing out does not revoke wallet approval, and disconnecting after a completed login does not automatically invalidate an application authentication session. Apply your application's session policy explicitly. `destroy()` invalidates this helper; dispose the provider separately when the application shuts down.
+
+The [verification record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md) distinguishes type/build/SSR and synthetic callback checks from live Privy authentication. Automated browser checks never request a signature. Privy wallet-list integration, embedded wallets, linked accounts, actual login/signatures, and physical wallet behavior are not certified by this helper.
+
+---
+
 # Source: examples/vanilla/README.md
 
 Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/vanilla/README.md
@@ -578,6 +796,8 @@ example origin in your WalletConnect project, and restart the server.
 
 `index.html` uses the real SDK and WalletConnect relay. It requests account
 access only after the Connect button; it never requests a signature or transaction.
+This minimal example requires another explicit connection after reload. Passive
+restoration with `provider.isAuthorized()` is demonstrated in the ethers and viem examples.
 
 `fixture.html` uses the same SDK dialog with an explicitly synthetic transport.
 Its inert QR cannot pair any wallet. It is useful for responsive presentation,
@@ -653,6 +873,10 @@ The project ID is a public application identifier, not a wallet secret. Never en
 
 `npm run build` performs a real TypeScript and Vite production build. The repository's framework matrix separately packs and installs the published package layout instead of relying on these local file links.
 
+The status line uses wagmi's connection status, including `reconnecting` during reload recovery. A cached account button can appear before recovery finishes; wait for `connected` before treating the connection as ready. Use the native RainbowKit account menu to disconnect.
+
+The generic Browser Wallet entry uses a targetless wagmi injected connector, retaining RainbowKit's name and icon. It restores only after that entry was explicitly connected. RainbowKit's default generic entry targets the detected provider and can otherwise restore the same injected approval alongside the Robinhood connector, leaving a second active connection after Robinhood disconnects. The WalletConnect entry remains available. Packed tests cover both Robinhood-only approval and explicit generic-wallet connection.
+
 ---
 
 # Source: examples/onboard/README.md
@@ -676,6 +900,402 @@ The project ID is a public application identifier, not a wallet secret. Never en
 
 `npm run build` performs a real TypeScript and Vite production build. The repository's framework matrix separately packs and installs the published package layout instead of relying on these local file links.
 
+This example requires explicit reconnection after reload. It does not enable Onboard's automatic connection options, which can call `eth_requestAccounts`; hiding the host modal is not a guarantee of passive restoration. The core provider's `isAuthorized()` is the passive restoration API. The full browser suite verifies that this example never prompts on page load.
+
+---
+
+# Source: examples/appkit/README.md
+
+Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/appkit/README.md
+
+# Robinhood Wallet with Reown AppKit
+
+Use the existing `@vexi/robinhood-wallet-wagmi` connector through AppKit's public `WagmiAdapter`. The AppKit chooser lists Robinhood; the core SDK owns its remote pairing dialog and session. No additional SDK adapter package is required.
+
+Baseline: `@reown/appkit` and `@reown/appkit-adapter-wagmi` **1.8.24**, `wagmi` **3.7.7**, `@wagmi/core` **3.6.5**, `viem` **2.57.7**, React **19.3.1**. This example covers AppKit's React + wagmi integration; it does not establish compatibility with AppKit's ethers adapter, other framework bindings, wagmi v2 or non-EVM adapters.
+
+AppKit's broad optional `@wagmi/connectors` range can resolve to a release requiring wagmi core v3. This baseline uses wagmi v3 throughout; a fresh install with wagmi v2 failed on the upstream `@wagmi/core/tempo` export and is not claimed as supported.
+
+## Run the example
+
+From the repository root:
+
+```sh
+npm ci
+npm run build
+cd examples/appkit
+npm install
+cp .env.example .env.local
+# Set VITE_WC_PROJECT_ID, allow this origin in the project settings, then:
+npm run dev
+```
+
+For a separate application, install the unpublished SDK tarballs together using the [installation guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/README.md#install-from-this-repository). The `file:` dependencies here are for development from this checkout, not npm registry releases.
+
+## Integration
+
+```ts
+import { createAppKit } from '@reown/appkit/react';
+import { WagmiAdapter } from '@reown/appkit-adapter-wagmi';
+import { mainnet } from '@reown/appkit/networks';
+import { robinhoodWallet } from '@vexi/robinhood-wallet-wagmi';
+
+const projectId = 'YOUR_WALLETCONNECT_PROJECT_ID';
+const metadata = { name: 'My app', description: 'My app description', url: 'https://my-app.example', icons: [] };
+const adapter = new WagmiAdapter({
+  projectId,
+  networks: [mainnet],
+  connectors: [robinhoodWallet({ projectId, metadata })],
+  ssr: true,
+});
+// Initialize once in the browser's application entry point.
+const modal = createAppKit({
+  adapters: [adapter], networks: [mainnet], projectId, metadata,
+  features: { analytics: false, email: false, socials: false, swaps: false, onramp: false },
+});
+// From an explicit user action:
+async function openWalletChooser() { await modal.open(); }
+```
+
+Wrap the application in `WagmiProvider` with **`adapter.wagmiConfig`** and `QueryClientProvider`. Do not create a second wagmi config for AppKit. Keep existing custom connectors in the adapter's `connectors` array. AppKit supplies its ordinary wallet entries; this integration does not rename them. The [configuration](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/appkit/src/config.ts) and [React app](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/appkit/src/main.tsx) show the complete wiring.
+
+The SDK connector retains its own `robinhood` ID and `robinhoodWallet` type. AppKit maps it to an external connector. A `customWallets` catalog entry alone would not install this transport or lifecycle implementation. Leave `showModal` enabled and do not add another QR handler for the Robinhood connector.
+
+Close or Escape in the SDK dialog cancels pairing; retry from AppKit after the previous request settles. Use wagmi's account state and disconnect/reconnect flows. Cancellation cannot dismiss a separate injected wallet permission prompt; it prevents late completion from adopting that connection. Explicit metadata keeps SDK configuration safe during SSR; the Vite app's `window.location.origin` and `createAppKit` setup belong at the browser boundary in an SSR application.
+
+Upstream references: [AppKit React setup](https://docs.reown.com/appkit/react/core/installation), [AppKit options](https://docs.reown.com/appkit/react/core/options), and the tested [WagmiAdapter source](https://github.com/reown-com/appkit/blob/v1.8.24/packages/adapters/wagmi/src/client.ts).
+
+## Verification boundary
+
+Run `node scripts/framework-matrix.mjs appkit` from the repository root to install packed SDK tarballs with the exact dependencies in this example, compile its public types, build it and run synthetic lifecycle checks. See the [verification record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md) for completed results. Do not infer support for other versions, frameworks, networks or physical wallets.
+
+Connection does not request a signature or send a transaction. Real iOS/Android pairing, handoff and signing remain unverified. Keep pairing material and account information out of logs, screenshots and analytics. This is a community integration, not an official Robinhood SDK or endorsement.
+
+---
+
+# Source: examples/connectkit/README.md
+
+Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/connectkit/README.md
+
+# Robinhood Wallet with ConnectKit
+
+Use `robinhoodWalletForConnectKit` from the existing `@vexi/robinhood-wallet-wagmi` package in the wagmi configuration supplied to ConnectKit. The chooser reads the connector's name and icon; the core SDK owns remote pairing. No additional SDK adapter package is required.
+
+Baseline: `connectkit` **1.9.2**, React / React DOM **18.3.1**, `wagmi` **2.19.5**, `@wagmi/core` **2.22.1**, `viem` **2.57.7**. ConnectKit 1.9.2 declares React 17/18 peers; this example pins React 18 and does not claim React 19 or wagmi v3 compatibility.
+
+## Run the example
+
+From the repository root:
+
+```sh
+npm ci
+npm run build
+cd examples/connectkit
+npm install
+cp .env.example .env.local
+# Set VITE_WC_PROJECT_ID, allow this origin in the project settings, then:
+npm run dev
+```
+
+For a separate application, install the unpublished SDK tarballs together using the [installation guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/README.md#install-from-this-repository). The `file:` dependencies here are for development from this checkout, not npm registry releases.
+
+## Integration
+
+```tsx
+import { createConfig, http, WagmiProvider } from 'wagmi';
+import { mainnet } from 'wagmi/chains';
+import { injected } from 'wagmi/connectors';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { ConnectKitButton, ConnectKitProvider } from 'connectkit';
+import { robinhoodWalletForConnectKit } from '@vexi/robinhood-wallet-wagmi';
+
+const config = createConfig({
+  chains: [mainnet],
+  connectors: [
+    robinhoodWalletForConnectKit({
+      projectId: 'YOUR_WALLETCONNECT_PROJECT_ID',
+      metadata: { name: 'My app', description: 'My app description', url: 'https://my-app.example', icons: [] },
+    }),
+    injected(),
+  ],
+  transports: { [mainnet.id]: http() },
+  ssr: true,
+});
+const queryClient = new QueryClient({ defaultOptions: { mutations: { retry: false } } });
+
+export function App() {
+  return <WagmiProvider config={config}>
+    <QueryClientProvider client={queryClient}>
+      <ConnectKitProvider><ConnectKitButton showBalance={false}/></ConnectKitProvider>
+    </QueryClientProvider>
+  </WagmiProvider>;
+}
+```
+
+The helper reuses `robinhoodWallet` and classifies it as `type: 'injected'` for ConnectKit 1.9.2's EIP-1193 connection screen. This is a chooser routing hint, not evidence that the wallet is installed. Its provider still discovers only Robinhood metadata and otherwise opens the SDK's remote dialog. Passing the general `robinhoodWallet` factory directly leaves this ConnectKit chooser in its unavailable state. No upstream source or private wallet catalog is patched.
+
+Keep the application's other connector factories alongside Robinhood when constructing its wagmi config. If using `getDefaultConfig`, pass the combined connector list deliberately: supplying `connectors` overrides that helper's defaults. Do not rename `injected()` or a generic WalletConnect entry to Robinhood. The [configuration](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/connectkit/src/config.ts) and [React app](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/connectkit/src/main.tsx) retain an ordinary injected entry alongside Robinhood.
+
+Leave the SDK's modal enabled. Selecting Robinhood opens its dialog; Close or Escape cancels the pending request. The chooser may display its rejection state afterward; use its retry or select Robinhood again. Do not create a second pairing UI or depend on ConnectKit's private route state. Account changes, disconnect and restored sessions use wagmi's normal state. For server-rendered applications, retain the framework's client-component boundary and use explicit metadata URLs.
+
+Upstream reference: [ConnectKit setup and provider order](https://family.co/docs/connectkit/getting-started).
+
+## Verification boundary
+
+Run `node scripts/framework-matrix.mjs connectkit` from the repository root to install packed SDK tarballs with the exact dependencies in this example, compile its public types, build it and run synthetic lifecycle checks. See the [verification record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md) for completed results. Do not infer support for other versions, frameworks, networks or physical wallets.
+
+Connection does not request a signature or send a transaction. Real iOS/Android pairing, handoff and signing remain unverified. Keep pairing material and account information out of logs, screenshots and analytics. This is a community integration, not an official Robinhood SDK or endorsement.
+
+---
+
+# Source: examples/ethers/README.md
+
+Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/ethers/README.md
+
+# Robinhood Wallet with ethers v6
+
+Use the core `@vexi/robinhood-wallet` EIP-1193 provider directly with ethers **6.17.0**. This TypeScript browser example needs no React, wagmi or extra SDK adapter package.
+
+## Run the example
+
+From the repository root:
+
+```sh
+npm ci
+npm run build
+cd examples/ethers
+npm install
+cp .env.example .env.local
+# Set VITE_WC_PROJECT_ID, allow this origin in the project settings, then:
+npm run dev
+```
+
+For a separate application, install the unpublished SDK tarballs together using the [installation guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/README.md#install-from-this-repository). The `file:` dependencies here are for development from this checkout, not npm registry releases.
+
+## Integration
+
+```ts
+import { BrowserProvider } from 'ethers';
+import { RobinhoodProvider } from '@vexi/robinhood-wallet';
+
+const wallet = new RobinhoodProvider({
+  projectId: 'YOUR_WALLETCONNECT_PROJECT_ID', chains: [1],
+  rpcMap: { 1: 'https://ethereum-rpc.publicnode.com' },
+  metadata: { name: 'My app', description: 'My app description', url: 'https://my-app.example', icons: [] },
+});
+const ethersProvider = new BrowserProvider(wallet, 'any', { cacheTimeout: -1 });
+
+// Call only from the user's Connect action.
+async function connectWallet() {
+  await wallet.connect({ chainId: 1 });
+  return ethersProvider.getSigner();
+}
+// On startup, recover prior approval without calling getSigner/requestAccounts.
+async function restoreWallet() { return wallet.isAuthorized(); }
+async function disconnectWallet() { await wallet.disconnect(); }
+function cancelConnection() { wallet.cancel(); }
+function dispose() { ethersProvider.destroy(); wallet.destroy(); }
+```
+
+`getSigner()` can request account permission if no account is approved. Do not call it during render, startup, a read-only check, or a disconnect event. Obtain a current signer when needed after connection, and discard previously selected signers on account/chain changes or disconnect. No signing method is called in this example.
+
+The `'any'` network follows chain changes instead of fixing the wrapper to the first network; `cacheTimeout: -1` avoids reusing a recent account query after an event. `getNetwork()` may return the previous network once while processing a change, so the example reads `eth_chainId` directly for event-driven UI updates. Neither option establishes wallet support for a chain. Use `listAccounts()` for non-prompting account reads and `send('eth_chainId', [])` for the current chain **after** connection/restoration; before approval the core chain is only configuration.
+
+Subscribe to `accountsChanged`, `chainChanged` and `disconnect` on **`wallet`**, since ethers does not expose those EIP-1193 events as its general event API. Remove the subscriptions on disposal. `ethersProvider.destroy()` stops ethers resources; only `wallet.disconnect()` ends the SDK session. `wallet.destroy()` releases local resources while preserving approval for a later instance.
+
+The [client setup](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/ethers/src/client.ts) and [app](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/ethers/src/main.ts) implement cancellation, guarded pending controls, saved-session recovery, event updates and disposal. Wallet errors use fixed UI messages to keep RPC details out of the interface and logs.
+
+Upstream reference: [ethers BrowserProvider](https://docs.ethers.org/v6/api/providers/#BrowserProvider).
+
+## Verification boundary
+
+Run `node scripts/framework-matrix.mjs ethers` from the repository root to install packed SDK tarballs with the exact dependencies in this example, compile its public types, build it and run synthetic lifecycle checks. See the [verification record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md) for completed results. Do not infer support for other versions, frameworks, networks or physical wallets.
+
+Connection does not request a signature or send a transaction. Real iOS/Android pairing, handoff and signing remain unverified. Keep pairing material and account information out of logs, screenshots and analytics. This is a community integration, not an official Robinhood SDK or endorsement.
+
+---
+
+# Source: examples/viem/README.md
+
+Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/viem/README.md
+
+# Robinhood Wallet with viem
+
+Use the core `@vexi/robinhood-wallet` EIP-1193 provider as a viem **2.57.7** custom transport. This TypeScript browser example needs no React, wagmi or extra SDK adapter package.
+
+## Run the example
+
+From the repository root:
+
+```sh
+npm ci
+npm run build
+cd examples/viem
+npm install
+cp .env.example .env.local
+# Set VITE_WC_PROJECT_ID, allow this origin in the project settings, then:
+npm run dev
+```
+
+For a separate application, install the unpublished SDK tarballs together using the [installation guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/README.md#install-from-this-repository). The `file:` dependencies here are for development from this checkout, not npm registry releases.
+
+## Integration
+
+```ts
+import { createWalletClient, custom } from 'viem';
+import { RobinhoodProvider } from '@vexi/robinhood-wallet';
+
+const wallet = new RobinhoodProvider({
+  projectId: 'YOUR_WALLETCONNECT_PROJECT_ID', chains: [1],
+  rpcMap: { 1: 'https://ethereum-rpc.publicnode.com' },
+  metadata: { name: 'My app', description: 'My app description', url: 'https://my-app.example', icons: [] },
+});
+const walletClient = createWalletClient({ transport: custom(wallet, { retryCount: 0 }) });
+
+// Call only from the user's Connect action.
+async function connectWallet() {
+  await wallet.connect({ chainId: 1 });
+  return walletClient.getAddresses();
+}
+// On startup, recover prior approval without requesting accounts.
+async function restoreWallet() { return wallet.isAuthorized(); }
+async function disconnectWallet() { await wallet.disconnect(); }
+function cancelConnection() { wallet.cancel(); }
+```
+
+`walletClient.requestAddresses()` is another explicit connection entry point, forwarding `eth_requestAccounts`. It does not select a chain; use `wallet.connect({ chainId })` when a particular configured chain is required. `getAddresses()` only reads the current cache; use `isAuthorized()` to recover persisted approval. Read `getChainId()` after connection/restoration; before approval the core chain reflects application configuration.
+
+Disable custom-transport retries with `retryCount: 0` so failed permission requests are not repeated automatically. This example does not hoist a fixed `account` or `chain` into the client: later application operations must supply current account/chain configuration and validate the wallet's state. A fixed client account becomes stale after account changes. Use a separate `createPublicClient({ transport: http(...) })` for application reads that should work while disconnected.
+
+Observe `accountsChanged`, `chainChanged` and `disconnect` on **`wallet`**. The custom transport forwards requests; it does not manage an application's reactive state or disposal. Remove listeners and call `wallet.destroy()` on disposal, or `wallet.disconnect()` to log out. Do not treat disposing the client or dropping its reference as a disconnect.
+
+The [client setup](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/viem/src/client.ts) and [app](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/viem/src/main.ts) demonstrate pending controls, cancellation, recovery, state refresh and cleanup. No signing or transaction methods run automatically.
+
+Upstream references: [viem wallet client](https://viem.sh/docs/clients/wallet), [custom EIP-1193 transport](https://viem.sh/docs/clients/transports/custom).
+
+## Verification boundary
+
+Run `node scripts/framework-matrix.mjs viem` from the repository root to install packed SDK tarballs with the exact dependencies in this example, compile its public types, build it and run synthetic lifecycle checks. See the [verification record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md) for completed results. Do not infer support for other versions, frameworks, networks or physical wallets.
+
+Connection does not request a signature or send a transaction. Real iOS/Android pairing, handoff and signing remain unverified. Keep pairing material and account information out of logs, screenshots and analytics. This is a community integration, not an official Robinhood SDK or endorsement.
+
+---
+
+# Source: examples/thirdweb/README.md
+
+Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/thirdweb/README.md
+
+# thirdweb example
+
+> **AI agents: start with [llms.txt](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt).** [Raw text](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt) · [Integration guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/ai-integration.md)
+
+Uses thirdweb 5.122.0 with React / React DOM 19.3.1. A custom button connects the SDK wallet through `useConnect`; `useActiveAccount` and `useActiveWalletChain` display approved state. Restore uses `autoConnect` and `useSetActiveWallet`. No built-in ConnectButton chooser integration is claimed.
+
+## Run locally
+
+Use Node.js 22.12 or newer. These packages are unpublished; build the repository first:
+
+```sh
+# Repository root
+npm ci
+npm run build
+cd examples/thirdweb
+npm install
+cp .env.example .env.local
+# Set VITE_WC_PROJECT_ID and VITE_THIRDWEB_CLIENT_ID.
+npm run dev
+```
+
+Use your own WalletConnect project ID and thirdweb client ID. They are distinct public application identifiers. Configure the allowed application origin in the relevant dashboards, then restart Vite after editing environment variables. Never put a private key, recovery phrase or server secret in a Vite environment variable.
+
+To consume this integration outside the repository, install the packed core and `thirdweb` adapter together using the [package guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/thirdweb/README.md). Local `file:` dependencies in this example are for repository development.
+
+## Behavior
+
+Construction and imports do not request accounts. Connection starts from an explicit button or wallet selection; only the core's matching Robinhood provider or its WalletConnect transport is used. Close the Robinhood dialog or press Escape to cancel, then retry deliberately. Reload recovery uses saved approval without another account request. Disconnect clears that saved session; teardown releases listeners.
+
+This example requests no signature or transaction. Automated checks use synthetic wallets only.
+
+The application displays connection state without logging account details or pairing material. See the [adapter API](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/thirdweb/README.md) and [verification record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md) for coverage and limitations. A successful build or synthetic connection does not prove live platform authentication, relay pairing, physical-device routing or network support. No Robinhood endorsement is implied.
+
+---
+
+# Source: examples/dynamic/README.md
+
+Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/dynamic/README.md
+
+# Dynamic example
+
+> **AI agents: start with [llms.txt](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt).** [Raw text](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt) · [Integration guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/ai-integration.md)
+
+Uses Dynamic React SDK 5.12.0 with React / React DOM 19.3.1 and viem 2.57.7. Register the custom connector with `DynamicContextProvider`, then select Robinhood in `DynamicWidget`. The environment must enable the same EVM networks as the core options. `connect-only` mode prevents automatic SIWE authentication. Dynamic labels this SDK generation as its legacy React SDK; its newer JavaScript SDK is a separate, untested integration.
+
+## Run locally
+
+Use Node.js 22.12 or newer. These packages are unpublished; build the repository first:
+
+```sh
+# Repository root
+npm ci
+npm run build
+cd examples/dynamic
+npm install
+cp .env.example .env.local
+# Set VITE_WC_PROJECT_ID and VITE_DYNAMIC_ENVIRONMENT_ID.
+npm run dev
+```
+
+Use your own WalletConnect project ID and Dynamic environment ID. They are distinct public application identifiers. Configure the allowed application origin in the relevant dashboards, then restart Vite after editing environment variables. Never put a private key, recovery phrase or server secret in a Vite environment variable.
+
+To consume this integration outside the repository, install the packed core and `dynamic` adapter together using the [package guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/dynamic/README.md). Local `file:` dependencies in this example are for repository development.
+
+## Behavior
+
+Construction and imports do not request accounts. Connection starts from an explicit button or wallet selection; only the core's matching Robinhood provider or its WalletConnect transport is used. Close the Robinhood dialog or press Escape to cancel, then retry deliberately. Reload recovery uses saved approval without another account request. Disconnect clears that saved session; teardown releases listeners.
+
+This example requests no signature or transaction. Automated checks use synthetic wallets only.
+
+The application displays connection state without logging account details or pairing material. See the [adapter API](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/dynamic/README.md) and [verification record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md) for coverage and limitations. A successful build or synthetic connection does not prove live platform authentication, relay pairing, physical-device routing or network support. No Robinhood endorsement is implied.
+
+---
+
+# Source: examples/privy/README.md
+
+Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/privy/README.md
+
+# Privy example
+
+> **AI agents: start with [llms.txt](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt).** [Raw text](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt) · [Integration guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/ai-integration.md)
+
+Uses Privy React Auth 3.50.0 with React / React DOM 19.3.1 and viem 2.57.7. The core connects Robinhood independently; a separate **Sign in with Privy** button invokes the public headless SIWE flow. Enable wallet authentication in the Privy dashboard and allow the application origin. The wallet is not added to Privy's chooser or `useWallets()` array. The example disables Privy's own external wallet connectors to keep a single connection owner.
+
+## Run locally
+
+Use Node.js 22.12 or newer. These packages are unpublished; build the repository first:
+
+```sh
+# Repository root
+npm ci
+npm run build
+cd examples/privy
+npm install
+cp .env.example .env.local
+# Set VITE_WC_PROJECT_ID and VITE_PRIVY_APP_ID.
+npm run dev
+```
+
+Use your own WalletConnect project ID and Privy app ID. They are distinct public application identifiers. Configure the allowed application origin in the relevant dashboards, then restart Vite after editing environment variables. Never put a private key, recovery phrase or server secret in a Vite environment variable.
+
+To consume this integration outside the repository, install the packed core and `privy` adapter together using the [package guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/privy/README.md). Local `file:` dependencies in this example are for repository development.
+
+## Behavior
+
+Construction and imports do not request accounts. Connection starts from an explicit button or wallet selection; only the core's matching Robinhood provider or its WalletConnect transport is used. Close the Robinhood dialog or press Escape to cancel, then retry deliberately. Reload recovery uses saved approval without another account request. Disconnect clears that saved session; teardown releases listeners.
+
+The sign-in button requests a signature. Cancel sign-in invalidates the pending result but cannot dismiss a wallet-owned prompt. If authentication completes after cancellation, the helper signs out the late session. Sign out and wallet disconnect are separate controls. Do not run concurrent authentication flows. No automated UI check clicks the sign-in button.
+
+The application displays connection state without logging account details or pairing material. See the [adapter API](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/privy/README.md) and [verification record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md) for coverage and limitations. A successful build or synthetic connection does not prove live platform authentication, relay pairing, physical-device routing or network support. No Robinhood endorsement is implied.
+
 ---
 
 # Source: docs/architecture.md
@@ -694,6 +1314,9 @@ flowchart TD
   Wagmi[wagmi adapter] --> Core
   RainbowKit[RainbowKit wallet entry] --> Wagmi
   Onboard[Web3-Onboard module] --> Core
+  Thirdweb[thirdweb Wallet adapter] --> Core
+  Dynamic[Dynamic custom EVM connector] --> Core
+  Privy[Privy headless SIWE helper] --> Core
   Core --> Discovery[Published Robinhood identity discovery]
   Discovery --> Injected[Matching EIP-1193 provider]
   Core --> Remote[WalletConnect SignClient transport]
@@ -704,6 +1327,10 @@ flowchart TD
 ```
 
 The core owns connection intent, timeout, cancellation, current accounts, events, and recovery. The transport owns its approved WalletConnect session topic and translates session events into EIP-1193 state. The modal owns presentation and user cancellation. Framework adapters translate public framework contracts into that common core.
+
+The thirdweb adapter connects with core, then passively adopts accounts through the public EIP-1193 adapter. Its stable outer Wallet recreates internal subscriptions after disconnect, and prevents thirdweb's automatic account-request retries. Dynamic's custom connector translates core account/chain/disconnect events and restores through `getConnectedAccounts()` without requesting permission. The Dynamic example uses connect-only mode.
+
+Privy uses a different boundary: the core owns the wallet connection, while an explicit sign-in action calls Privy's public headless SIWE methods. Its helper invalidates account/chain changes and cancelled operations; if an already-submitted request authenticates late, it calls the host's logout handler. A completed authentication session and wallet connection have independent lifecycles. This does not register a custom Privy wallet-list connector.
 
 `@walletconnect/sign-client` is pinned to **2.26.0**, and `qrcode` to **1.5.4**. There is no AppKit UI dependency and no private RainbowKit controller patch. Framework packages can bring their own unrelated wallet dependencies; this SDK does not assume ownership of their sessions.
 
@@ -765,6 +1392,12 @@ The project does not modify the icon to impersonate a new wallet identity. Robin
 
 The implementation and tests are separate from real-device behavior, registry publication, upstream acceptance, and deployment. See [verification](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md) and [upstream contributions](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/upstream-contributions.md). No Robinhood Chain environment is certified by accepting an arbitrary numeric chain ID.
 
+## Additional frontend consumers
+
+AppKit React uses the existing wagmi connector through `WagmiAdapter` and shares its config with `WagmiProvider`. ConnectKit reads `robinhoodWalletForConnectKit` from its surrounding wagmi provider. That small factory delegates all behavior to the normal connector and uses `type: 'injected'` for ConnectKit 1.9.2's EIP-1193 UI route. It is not a wallet-installation signal and does not change provider discovery. Their choosers do not own the SDK's pairing session or dialog. AppKit is checked on the pinned wagmi v3 baseline; ConnectKit uses wagmi v2 and React 18.
+
+The ethers v6 and viem examples wrap the same core EIP-1193 provider through `BrowserProvider` and `custom`, respectively. Client construction is lazy with respect to account permission. Core owns cancellation, discovery, restoration and disconnect; applications observe core events and clear their own selected signer/account state. The wrappers add no separate transport or SDK package. See the [integration guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/ai-integration.md) for entry points and exact version limits.
+
 ---
 
 # Source: docs/verification.md
@@ -772,6 +1405,69 @@ The implementation and tests are separate from real-device behavior, registry pu
 Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md
 
 # Verification record
+
+## Complete example suite — 2026-10-17
+
+`npm run test:all` completed successfully against the working tree based on `fc8774a6a3231a4c1af143091dc8f34f517b2054`. The command builds and type-checks all seven SDK packages, runs core tests and documentation checks, then validates all twelve packed examples and their browser flows. [Matrix evidence](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/complete-suite/framework-matrix.json) records 109 source/build input hashes, root configuration hashes, exact installed versions and packed artifacts. [Check output](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/complete-suite/framework-checks.log) preserves the passing results with temporary paths sanitized. These checks ran locally before committing the changes. Packages remain unpublished and undeployed; this record does not establish a merge or remote CI result.
+
+| Check | Outcome | Scope |
+| --- | --- | --- |
+| SDK build and type check | **Passed** | All seven SDK packages. |
+| Core unit suite | **40 passed** | Synthetic discovery, provider, transport and modal behavior. |
+| Packed examples | **12 builds/type contracts and 79 runtime tests passed** | Vanilla (7), wagmi v2 (4), wagmi v3 (4), RainbowKit (7), Onboard (3), AppKit (5), ConnectKit (6), ethers (5), viem (5), thirdweb (9), Dynamic (8), Privy (16). |
+| Browser examples | **48 scenarios passed** | All twelve examples, two scenarios each at 1280×720 and 390×844, using Playwright 1.64.1 / Chromium 156.0.8078.4. [Browser evidence](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/complete-suite/browser.json). |
+| Documentation | **Passed** | Generated bundle freshness and link checks across 29 documents. |
+| CI configuration | **Updated** | Installs Playwright Chromium and invokes `npm run test:all`; no remote CI execution is claimed. |
+
+The expanded browser run exposed a RainbowKit example issue: its default generic Browser Wallet entry could restore the same injected approval alongside the Robinhood connector. Disconnecting Robinhood then left the generic connection active. The example now retains that entry's branding while using a targetless wagmi injected connector, which restores only after that entry was explicitly selected. The regression test verifies both rejection of Robinhood-only approval and successful explicit generic connection. The status line now distinguishes `reconnecting` from `connected`, and the native account menu disconnect/reload path passes in both viewports.
+
+The browser suite checks no permission request on page load, explicit synthetic connection, reload behavior, disconnect and listener cleanup. Ten examples restore approved state without another permission request. Vanilla and Onboard deliberately require a second explicit connection after reload; neither prompts automatically. The second scenario verifies one SDK dialog with blocked remote traffic, contained keyboard focus, Escape cancellation and explicit retry through each host's controls. Unknown/missing case selections and incomplete scenario counts fail the runner. The final browser pass repeats all 48 scenarios against the same packed builds after allowing chooser animations to finish before captures.
+
+All external HTTP/WebSocket traffic is blocked; Dynamic uses the local public-configuration fixtures described below. The synthetic signing/transaction guard records zero requests in all 24 injected-wallet scenarios. No real wallet, live platform authentication, signature, transaction or network certification is established. Screenshots contain only disconnected pages/choosers before approval: [RainbowKit](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/complete-suite/rainbowkit-chooser-390.png), [Onboard](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/complete-suite/onboard-chooser-390.png), [Vanilla](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/complete-suite/vanilla-1280.png), [Dynamic](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/complete-suite/dynamic-chooser-390.png), [Privy](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/complete-suite/privy-390.png).
+
+Reproduce with `npx playwright install chromium` followed by `npm run test:all`; an installed Chrome browser can instead use `BROWSER_CHANNEL=chrome npm run test:all`. For selected examples, use `node scripts/framework-matrix.mjs rainbowkit onboard --browser`. See [CONTRIBUTING.md](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/CONTRIBUTING.md#validate-a-change) for separate commands and the earlier records below for integration baselines and remaining verification limits.
+
+## Expanded platform integrations — 2026-10-17
+
+The earlier platform run verified the working tree based on `fc8774a6a3231a4c1af143091dc8f34f517b2054`, including AppKit, ConnectKit, ethers, viem and the new thirdweb, Dynamic and Privy packages. At the time of this run, the changes were not committed, merged, published or deployed. The [matrix evidence](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/platform-integrations/framework-matrix.json) records 100 runtime/build input hashes, the root manifests, exact installed top-level versions and all seven packed SDK hashes. Temporary paths are sanitized; `originalReportSha256` ties this record to the original matrix report used by the browser checks.
+
+| Check | Outcome | Scope |
+| --- | --- | --- |
+| SDK build and type check | **Passed** | All seven SDK packages, including the three new adapters/helpers. |
+| Core unit suite | **40 passed** | Synthetic discovery, provider, transport and modal checks; core source is unchanged. |
+| Packed consumers | **11 builds/type contracts and 71 runtime tests passed** | Fresh isolated installs: wagmi v2 (4), wagmi v3 (4), RainbowKit (6), Onboard (3), AppKit (5), ConnectKit (6), ethers (5), viem (5), thirdweb (9), Dynamic (8), Privy (16). [Check output](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/platform-integrations/framework-checks.log). |
+| Browser integration checks | **28 scenarios passed** | Seven examples at 1280×720 and 390×844; two scenarios per viewport. [Browser record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/platform-integrations/browser.json). |
+| Agent documentation | **Generation and link/freshness checks passed** | Canonical guides, `llms.txt` and generated `llms-full.txt` cover the new packages and their limits. |
+
+The added baselines are **thirdweb 5.122.0**, **Dynamic React 5.12.0** (`sdk-react-core`, `ethereum-core`, `wallet-connector-core`) and **Privy React 3.50.0**, with React / React DOM **19.3.1**. Dynamic and Privy use viem **2.57.7**. Existing AppKit, ConnectKit, ethers and viem baselines are listed in the earlier record below and were rechecked in this full matrix. Dynamic uses bundler module resolution for its upstream declarations. Inherited dependency/peer warnings are described in [dependency notes](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/dependency-notes.md); no new dependency audit or security certification is claimed.
+
+thirdweb is tested as a standard Wallet with a custom connection button and active-wallet hooks. Dynamic is tested as a custom connector in its React SDK's native wallet chooser, in connect-only mode. Privy uses the public headless `useLoginWithSiwe` flow after a separate core connection; it does not register this wallet in Privy's chooser or `useWallets()`. Packed tests cover server imports/rendering, account and chain events, cancellation and late approval, rejection without automatic retries, disconnect/reconnect, saved approval and listener cleanup. Privy additionally uses deliberately invalid synthetic signatures and in-process callbacks to verify stale sign-in suppression, immediate listener cleanup and logout after a late authentication callback. No signature is sent to a platform.
+
+Browser checks run the packed production builds in Chrome **155.0.8059.82** through Playwright **1.64.1**. Each example passes synthetic injected connection, reload recovery without another permission request, disconnect and listener cleanup; the second scenario covers a blocked remote transport, one SDK dialog, contained keyboard focus, Escape cancellation and explicit retry. External HTTP and WebSocket traffic is blocked. Dynamic receives local synthetic public configuration, an unrelated wallet-book entry and an empty nonce list so its real chooser can render; no platform authentication response is simulated. A synthetic guard rejects and counts signing/transaction requests, and the final count is zero in every injected-wallet scenario. Privy's sign-in button is never clicked. Narrow viewports are desktop-browser layout checks, not physical mobile-device results.
+
+Reproduce with `npm run build`, `npm run typecheck`, `npm test`, `node scripts/framework-matrix.mjs`, then `BROWSER_CHANNEL=chrome node scripts/browser-integrations.mjs /path/to/matrix/report.json`. See [CONTRIBUTING.md](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/CONTRIBUTING.md#validate-a-change) for browser setup. The browser record includes hashes for both the runner and its platform fixtures. Captures contain only disconnected pages/choosers: [Dynamic desktop](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/platform-integrations/dynamic-chooser-1280.png), [Dynamic narrow viewport](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/platform-integrations/dynamic-chooser-390.png), [thirdweb desktop](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/platform-integrations/thirdweb-1280.png), [Privy narrow viewport](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/platform-integrations/privy-390.png).
+
+Live Dynamic/Privy authentication, thirdweb's built-in chooser, physical Robinhood Wallet pairing, actual signatures/transactions and network certification remain unverified. The evidence below is historical and retains its original scope.
+
+## Additional frontend integrations — 2026-10-17
+
+The initial frontend run verified the working tree based on `fc8774a6a3231a4c1af143091dc8f34f517b2054`, including the new `robinhoodWalletForConnectKit` export and four runnable examples. It is not a claim that these changes are already merged, published or deployed. [Matrix evidence](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/frontend-integrations/framework-matrix.json) records the base commit, modified-working-tree flag, input/source hashes, exact installed top-level versions and packed SDK hashes. Temporary paths are sanitized; `originalReportSha256` identifies the original matrix report consumed by the browser check.
+
+| Check | Outcome | Scope |
+| --- | --- | --- |
+| SDK build and type check | **Passed** | All four existing SDK packages; one new thin ConnectKit factory reuses the wagmi lifecycle. |
+| Core unit suite | **40 passed** | Synthetic provider, transport, discovery and modal checks. |
+| Packed consumers | **8 builds/type contracts and 38 runtime tests passed** | wagmi v2 (4), wagmi v3 (4), RainbowKit (6), Onboard (3), AppKit (5), ConnectKit (6), ethers (5), viem (5). [Check output](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/frontend-integrations/framework-checks.log). |
+| Browser integration checks | **16 scenarios passed** | Each new example at 1280×720 and 390×844: synthetic injected connection/reload/disconnect/cleanup, plus one SDK dialog, keyboard cancellation and retry with external traffic blocked. [Browser record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/frontend-integrations/browser.json). |
+| Agent documentation | **Generation and link/freshness checks passed** | Updated canonical guides, `llms.txt` and generated `llms-full.txt`. |
+
+The new baselines are AppKit and its wagmi adapter **1.8.24** with wagmi **3.7.7** / core **3.6.5** / React **19.3.1**; ConnectKit **1.9.2** with wagmi **2.19.5** / core **2.22.1** / React **18.3.1**; ethers **6.17.0**; and viem **2.57.7**. Both wagmi consumers use viem **2.57.7**. AppKit's wagmi v2 combination failed on an upstream optional dependency's `@wagmi/core/tempo` import and is not part of the supported example. ConnectKit's helper supplies its required EIP-1193 chooser routing without changing Robinhood provider discovery; an unrelated injected provider is explicitly rejected by a regression test.
+
+Reproduce the packed matrix with `node scripts/framework-matrix.mjs`, then run `node scripts/browser-integrations.mjs /path/to/matrix/report.json` using Playwright Chromium (or `BROWSER_CHANNEL=chrome` for installed Chrome). The [contributor guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/CONTRIBUTING.md#validate-a-change) includes setup. Browser tests block external HTTP and WebSocket traffic, approve only a synthetic injected wallet, and capture only disconnected pages/choosers before account or pairing material exists. These results do not add live-relay, physical-device, signature, transaction or chain-certification evidence. Dependency audits for the new consumers were not refreshed; the historical audit below remains scoped to its original installs.
+
+Disconnected chooser captures: [AppKit desktop](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/frontend-integrations/appkit-chooser-1280.png), [ConnectKit narrow viewport](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/frontend-integrations/connectkit-chooser-390.png).
+
+## Original delivery evidence
 
 Verification recorded on **2026-10-17**. The original delivery was verified at source `f6958cf6798c0c7e35961e2ee2779af855239249`, merged as `c117311a621af2f7819bdf6a407115733feccd3e` with an identical Git tree. The AI follow-up review changes were verified on their own tree before merge; rows and sections marked follow-up refer to those checks. A supplemental merge review then corrected two additional lifecycle regressions; see the separate merge-review record below. A command listed under reproduction is an instruction, not evidence that it has passed.
 
@@ -877,6 +1573,16 @@ Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector
 
 # Dependency audit notes
 
+## Additional platform baselines — 2026-10-17
+
+The thirdweb adapter pins `thirdweb 5.122.0`. Dynamic's connector pins `@dynamic-labs/ethereum-core` and `@dynamic-labs/wallet-connector-core` `5.12.0`; its example also pins `@dynamic-labs/sdk-react-core 5.12.0`. Privy's helper pins `@privy-io/react-auth 3.50.0`. Dynamic and Privy use `viem 2.57.7`, and all three React examples use React / React DOM `19.3.1`.
+
+Dynamic's published declarations use extensionless re-exports, so its adapter and example use TypeScript bundler module resolution. Dynamic's documentation labels this generation as the legacy React SDK; no compatibility with its newer JavaScript SDK is implied. Privy's dependency tree emits inherited peer warnings, including an internal `@privy-io/ethereum` viem pin. The isolated consumers use ordinary npm resolution with no forced peer overrides. Build and runtime results are recorded separately from those warnings.
+
+These SDKs add substantial framework dependency trees; core-only consumers do not need them. Upstream clients can perform their own configuration, telemetry and service requests. Automated checks stub or block external traffic and never send synthetic authentication material to those services. No new security audit or advisory clearance is claimed; historical counts below do not describe these newly resolved trees.
+
+## Earlier audit scope
+
 The 2026-10-17 verification used actual npm tarballs and the exact framework baselines below. Functional builds and lifecycle tests passed, but the framework consumers do not all have clean dependency audits. This is not a security audit or a production-readiness certification.
 
 The sanitized [audit evidence](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/dependency-audit.json) records versions, package hashes, dependency paths, advisory URLs, and counts from `npm audit --json`. Counts include propagated package entries, not unique vulnerabilities or demonstrated exploits. Framework audits include their development dependencies; the standalone core install includes only its runtime dependencies.
@@ -909,6 +1615,12 @@ No force-fix, dependency override, or unsupported major framework upgrade was ap
 The tested Onboard public API has no `connect.disableUD` analytics switch. Its deprecated `connect.disableUDResolution` option concerns optional Unstoppable Domains resolution; the [source declaration](https://github.com/thirdweb-dev/web3-onboard/blob/03b25b0ade48b7cc8d48dd408741c7e211cf22ac/packages/core/src/types.ts#L275) does not describe telemetry control.
 
 The inspected Onboard source uses `bnc-sdk` in type-only imports. A production build of this exact example with source maps enabled produced 18 maps and 803 source entries; none identified `bnc-sdk` or `crypto-es`. That is a limited observation about this example's generated bundle. It neither removes the installed dependency findings nor proves that another consumer cannot reach affected code, and no configuration option is presented as a security mitigation.
+
+## Additional frontend integrations
+
+The AppKit, ConnectKit, ethers v6 and direct viem examples have separate pinned dependency sets and packed-consumer checks; see their [baselines](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/README.md#framework-versions). The earlier audit counts above were not refreshed for these new consumers and must not be presented as their audit results. No dependency overrides or force-fixes were added.
+
+AppKit 1.8.24 declares a broad optional `@wagmi/connectors >=5.9.9` dependency. The observed fresh install selected 8.2.0, which requires `@wagmi/core 3.6.5` and imports `@wagmi/core/tempo`. A wagmi v2 consumer failed to bundle that export; the delivered AppKit example uses the already supported wagmi 3.7.7 / core 3.6.5 baseline. ConnectKit 1.9.2 instead declares wagmi v2 and React 17/18 peers, so its example uses React 18.3.1.
 
 ---
 
@@ -945,7 +1657,10 @@ The packages are currently unpublished. For installation in another application,
 | `packages/wagmi` | wagmi v2/v3 connector |
 | `packages/rainbowkit` | RainbowKit wallet entry |
 | `packages/web3-onboard` | Web3-Onboard wallet module |
-| `examples` | Vanilla, wagmi v2/v3, RainbowKit and Onboard applications |
+| `packages/thirdweb` | thirdweb Wallet adapter |
+| `packages/dynamic` | Dynamic React custom EVM connector |
+| `packages/privy` | Privy headless SIWE helper |
+| `examples` | Vanilla, wagmi v2/v3, RainbowKit, Onboard, AppKit, ConnectKit, ethers, viem, thirdweb, Dynamic and Privy applications |
 | `tests` | Synthetic provider, transport, modal and framework consumer checks |
 | `scripts/framework-matrix.mjs` | Packed-package compatibility checks |
 | `docs` | Architecture, verification records, dependency notes and upstream contribution guidance |
@@ -973,15 +1688,39 @@ The vanilla example also provides `fixture.html`, which uses a synthetic transpo
 
 ## Validate a change
 
+Run the complete local suite, including every packed example and its desktop/narrow browser checks:
+
+```sh
+npx playwright install chromium
+npm run test:all
+# Or use an installed Chrome browser:
+BROWSER_CHANNEL=chrome npm run test:all
+```
+
+`test:all` builds and type-checks all seven SDK packages, runs core tests and documentation checks, then runs the packed matrix with browser checks. CI runs the build, type and core checks on both Node.js baselines, then installs Playwright Chromium and runs the packed/browser integration command on Node.js 24. No real wallet approval, signature, transaction or live platform authentication is part of this suite.
+
 For provider or adapter changes, run the root build, type check and unit tests above. The type check also covers the test files. Test the affected integrations against packed packages:
 
 ```sh
 node scripts/framework-matrix.mjs
 # Or select one or more cases:
 node scripts/framework-matrix.mjs wagmi-v2 wagmi-v3
+# Add browser checks for the same selected consumers:
+node scripts/framework-matrix.mjs wagmi-v2 wagmi-v3 --browser
 ```
 
-Available cases are `wagmi-v2`, `wagmi-v3`, `rainbowkit` and `onboard`. The script downloads real npm framework dependencies into separate temporary applications, builds them, and runs synthetic lifecycle tests. It prints the location of `report.json` and the install/build/test logs. These checks do not need a live WalletConnect project ID or an approved wallet.
+Available cases are `vanilla`, `wagmi-v2`, `wagmi-v3`, `rainbowkit`, `onboard`, `appkit`, `connectkit`, `ethers`, `viem`, `thirdweb`, `dynamic` and `privy`. The script downloads real npm framework dependencies into separate temporary applications, builds them, and runs synthetic lifecycle tests. It prints the location of `report.json` and the install/build/test logs. `npm run test:integrations` runs all twelve cases with their browser checks; it expects the SDK packages to be built already. These checks do not need a live WalletConnect project ID or an approved wallet.
+
+For browser integration checks against a completed matrix report:
+
+```sh
+npx playwright install chromium
+node scripts/browser-integrations.mjs /path/to/matrix/report.json
+# Or use an installed Chrome browser:
+BROWSER_CHANNEL=chrome node scripts/browser-integrations.mjs /path/to/matrix/report.json
+```
+
+This serves every example in the supplied matrix locally and blocks external HTTP/WebSocket traffic. Dynamic receives synthetic public configuration from `scripts/browser-platform-fixtures.mjs`; authentication responses are never simulated in browser checks. It checks synthetic injected connection, reload behavior, disconnect and cleanup, plus the SDK dialog's keyboard cancellation and retry at desktop and narrow sizes. Vanilla and Onboard deliberately require explicit reconnection after reload; the other examples restore approved state without another permission request. Screenshots are captured only before approval or pairing material exists. A synthetic guard rejects and counts signing or transaction attempts; the Privy sign-in button is never clicked. This does not test a real relay, platform authentication or physical wallet. Optional final arguments select any of the twelve matrix cases. Unknown or missing cases fail instead of silently running zero checks.
 
 Add regression coverage when changing connection behavior, particularly cancellation, late results, session recovery, account/chain events and teardown. Browser presentation changes also need desktop and narrow-viewport checks. Use the [verification guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md) to record what was actually tested; a rendered QR does not prove successful mobile pairing.
 

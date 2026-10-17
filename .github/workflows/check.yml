@@ -37,7 +37,7 @@ jobs:
       - run: npm run typecheck
       - run: npm test
   frameworks:
-    name: Packed framework consumers
+    name: Packed framework consumers and browser flows
     needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 20
@@ -48,5 +48,6 @@ jobs:
           node-version: 24
           cache: npm
       - run: npm ci --ignore-scripts
+      - run: npx playwright install --with-deps chromium
       - run: npm run build
-      - run: node scripts/framework-matrix.mjs
+      - run: npm run test:integrations
