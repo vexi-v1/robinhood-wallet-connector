@@ -2,6 +2,7 @@ import { createConnector, ChainNotConfiguredError } from '@wagmi/core';
 import { getAddress, numberToHex, ResourceUnavailableRpcError, SwitchChainError, UserRejectedRequestError } from 'viem';
 import {
   discoverRobinhood,
+  ProviderRpcError,
   RobinhoodProvider,
   ROBINHOOD_WALLET,
   type RobinhoodProviderOptions,
@@ -42,6 +43,16 @@ function asError(error: unknown, message: string): Error {
   return error instanceof Error ? error : new Error(message, { cause: error });
 }
 
+function isConnectionLoss(error: unknown): boolean {
+  const seen = new Set<unknown>();
+  while (error && typeof error === 'object' && !seen.has(error)) {
+    if (errorCode(error) === 4900 || errorCode(error) === 4100) return true;
+    seen.add(error);
+    error = 'cause' in error ? error.cause : undefined;
+  }
+  return false;
+}
+
 function rethrowConnectionError(error: unknown): never {
   if (error instanceof UserRejectedRequestError || error instanceof ResourceUnavailableRpcError) throw error;
   if (isUserRejection(error)) throw new UserRejectedRequestError(asError(error, 'Connection rejected.'));
@@ -54,17 +65,28 @@ export function robinhoodWallet(parameters: RobinhoodWalletParameters) {
   return createConnector<RobinhoodProvider, { cancelConnect(): void }>((config) => {
     let provider: RobinhoodProvider | undefined;
     let listenersAttached = false;
-    let pending: { chainId?: number; promise: Promise<Connected> } | undefined;
+    let intent = 0;
+    let pending: { chainId?: number; promise: Promise<Connected>; reject(error: unknown): void } | undefined;
+    const cancelPending = (error: unknown) => {
+      ++intent;
+      const previous = pending;
+      pending = undefined;
+      previous?.reject(error);
+    };
 
     const onAccountsChanged = (value: unknown) => {
       const accounts = addresses(value);
-      if (accounts.length === 0) config.emitter.emit('disconnect');
+      if (accounts.length === 0) {
+        cancelPending(new ProviderRpcError(4900, 'Wallet disconnected before connection completed.'));
+        config.emitter.emit('disconnect');
+      }
       else config.emitter.emit('change', { accounts });
     };
     const onChainChanged = (value: unknown) => {
       config.emitter.emit('change', { chainId: chainNumber(value) });
     };
     const onDisconnect = () => {
+      cancelPending(new ProviderRpcError(4900, 'Wallet disconnected before connection completed.'));
       config.emitter.emit('disconnect');
     };
     const onDisplayUri = (uri: unknown) => {
@@ -117,23 +139,38 @@ export function robinhoodWallet(parameters: RobinhoodWalletParameters) {
       }
     };
 
-    const establish = async (wallet: RobinhoodProvider, chainId: number | undefined): Promise<Connected> => {
+    const ensureCurrent = (wallet: RobinhoodProvider, expectedIntent: number) => {
+      if (intent !== expectedIntent || !wallet.connected) throw new ProviderRpcError(4900, 'Wallet disconnected before connection completed.');
+    };
+    const establish = async (wallet: RobinhoodProvider, chainId: number | undefined, expectedIntent: number, isReconnecting?: boolean): Promise<Connected> => {
+      if (isReconnecting) {
+        const authorized = await wallet.isAuthorized();
+        if (intent !== expectedIntent) throw new ProviderRpcError(4900, 'Connection ended before session recovery completed.');
+        if (!authorized) throw new Error('Robinhood Wallet has no approved session to reconnect.');
+      }
       const result = await wallet.connect();
-      let current = chainNumber(result.chainId);
-      // As in wagmi's injected and walletConnect connectors, a requested chain is a preference: only a
-      // user rejection fails the connection, while any other switch failure keeps the wallet's chain.
+      ensureCurrent(wallet, expectedIntent);
+      const current = chainNumber(result.chainId);
+      // An unavailable preferred chain can fall back to the connected wallet's chain. A lost or
+      // cancelled connection cannot: its result must never be filled from a later connection.
       if (chainId !== undefined && chainId !== current) {
         try {
-          current = (await switchChain({ chainId })).id;
+          await switchChain({ chainId });
         } catch (error) {
+          ensureCurrent(wallet, expectedIntent);
           if (error instanceof UserRejectedRequestError) {
             // wagmi records this connection as failed, so the provider must not keep it either.
+            cancelPending(error);
             await wallet.disconnect();
             throw error;
           }
+          if (isConnectionLoss(error)) throw error;
         }
       }
-      return { accounts: addresses(await wallet.getAccounts()), chainId: current };
+      const [accounts, liveChainId] = await Promise.all([wallet.getAccounts(), wallet.getChainId()]);
+      ensureCurrent(wallet, expectedIntent);
+      if (!accounts.length) throw new ProviderRpcError(4100, 'Robinhood Wallet no longer exposes an approved account.');
+      return { accounts: addresses(accounts), chainId: chainNumber(liveChainId) };
     };
 
     return {
@@ -144,18 +181,21 @@ export function robinhoodWallet(parameters: RobinhoodWalletParameters) {
       type: 'robinhoodWallet',
       async connect({ chainId, isReconnecting, withCapabilities } = {}) {
         const wallet = getProvider();
-        if (isReconnecting && !(await wallet.isAuthorized())) {
-          throw new Error('Robinhood Wallet has no approved session to reconnect.');
-        }
         let shared = pending;
         // A repeated request shares the pending one; a different chain cannot join it.
         if (shared && shared.chainId !== chainId) {
           throw new ResourceUnavailableRpcError(new Error('A Robinhood Wallet connection is already pending.'));
         }
         if (!shared) {
-          const current = { chainId, promise: establish(wallet, chainId) };
+          let resolve!: (result: Connected) => void;
+          let reject!: (error: unknown) => void;
+          const promise = new Promise<Connected>((res, rej) => { resolve = res; reject = rej; });
+          const current = { chainId, promise, reject };
           shared = pending = current;
-          void current.promise.then(() => undefined, () => undefined).then(() => { if (pending === current) pending = undefined; });
+          void establish(wallet, chainId, ++intent, isReconnecting).then(
+            (result) => { if (pending === current) pending = undefined; resolve(result); },
+            (error) => { if (pending === current) pending = undefined; reject(error); },
+          );
         }
         try {
           const { accounts, chainId: connectedChainId } = await shared.promise;
@@ -170,12 +210,14 @@ export function robinhoodWallet(parameters: RobinhoodWalletParameters) {
         }
       },
       async disconnect() {
+        cancelPending(new ProviderRpcError(4900, 'Wallet disconnected before connection completed.'));
         if (!provider) return;
         provider.cancel();
         detach();
         await provider.disconnect();
       },
       cancelConnect() {
+        cancelPending(new ProviderRpcError(4001, 'Connection cancelled.'));
         provider?.cancel();
       },
       async getProvider() {

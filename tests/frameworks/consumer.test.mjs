@@ -16,6 +16,8 @@ class InjectedWallet extends EventEmitter {
   chainId = 1;
   prompts = 0;
   pendingApproval;
+  pendingSwitch;
+  switches = 0;
   switchError;
   async request({ method, params }) {
     if (method === 'eth_accounts') return [...this.accounts];
@@ -27,6 +29,8 @@ class InjectedWallet extends EventEmitter {
       return [...this.accounts];
     }
     if (method === 'wallet_switchEthereumChain') {
+      this.switches++;
+      if (this.pendingSwitch) await this.pendingSwitch;
       if (this.switchError) throw this.switchError;
       this.chainId = Number(params[0].chainId);
       this.emit('chainChanged', `0x${this.chainId.toString(16)}`);
@@ -106,7 +110,7 @@ if (!isOnboard) {
     await connector.disconnect();
   });
 
-  test('a requested chain is a preference: the in-app chain is reported, kept after a failed switch, and lost only on rejection', async () => {
+  test('a requested chain is a preference: an unsupported switch keeps the wallet chain and user rejection fails connection', async () => {
     const wallet = installWallet();
     wallet.chainId = 10;
     const { createConfig, connect, disconnect, getAccount, http } = await import('@wagmi/core');
@@ -125,6 +129,97 @@ if (!isOnboard) {
     await assert.rejects(connect(config, { connector, chainId: 1 }), { name: 'UserRejectedRequestError' });
     assert.equal(getAccount(config).status, 'disconnected');
     assert.equal((await connector.getProvider()).status, 'idle');
+  });
+
+  test('disconnect, destroy and account removal during a preferred-chain switch cannot produce a successful connection', { timeout: 2000 }, async () => {
+    const { createConfig, connect, getAccount, http } = await import('@wagmi/core');
+    const { mainnet, optimism } = await import('viem/chains');
+    const { robinhoodWallet } = await import('@vexi/robinhood-wallet-wagmi');
+    for (const action of ['disconnect', 'destroy', 'accounts']) {
+      const wallet = installWallet(); let finishSwitch;
+      wallet.pendingSwitch = new Promise((resolve) => { finishSwitch = resolve; });
+      const config = createConfig({ chains: [mainnet, optimism], connectors: [robinhoodWallet({ projectId, metadata, showModal: false, discoveryTimeoutMs: 1 })], transports: { 1: http(), 10: http() }, multiInjectedProviderDiscovery: false, storage: null });
+      const connector = config.connectors[0];
+      const rejected = assert.rejects(connect(config, { connector, chainId: 10 }), /disconnect|connection/i);
+      while (!wallet.switches) await new Promise((resolve) => setTimeout(resolve, 2));
+      if (action === 'disconnect') await connector.disconnect();
+      else if (action === 'destroy') (await connector.getProvider()).destroy();
+      else { wallet.accounts = []; wallet.emit('accountsChanged', []); }
+      finishSwitch(); await rejected;
+      assert.equal(getAccount(config).status, 'disconnected');
+      assert.equal((await connector.getProvider()).connected, false);
+      assert.deepEqual(await connector.getAccounts(), []);
+      if (action !== 'destroy') {
+        await connect(config, { connector });
+        assert.equal(getAccount(config).status, 'connected');
+        await connector.disconnect();
+      }
+    }
+  });
+
+  test('cancelling a preferred-chain switch rejects immediately, preserves its approved core session and permits a new connection', { timeout: 2000 }, async () => {
+    const wallet = installWallet(); let finishSwitch;
+    wallet.pendingSwitch = new Promise((resolve) => { finishSwitch = resolve; });
+    const { createConfig, connect, getAccount, http } = await import('@wagmi/core');
+    const { mainnet, optimism } = await import('viem/chains');
+    const { robinhoodWallet } = await import('@vexi/robinhood-wallet-wagmi');
+    const config = createConfig({ chains: [mainnet, optimism], connectors: [robinhoodWallet({ projectId, metadata, showModal: false, discoveryTimeoutMs: 1 })], transports: { 1: http(), 10: http() }, multiInjectedProviderDiscovery: false, storage: null });
+    const connector = config.connectors[0];
+    const rejected = assert.rejects(connect(config, { connector, chainId: 10 }), { name: 'UserRejectedRequestError' });
+    while (!wallet.switches) await new Promise((resolve) => setTimeout(resolve, 2));
+    connector.cancelConnect(); await rejected;
+    assert.equal(getAccount(config).status, 'disconnected');
+    assert.equal((await connector.getProvider()).connected, true);
+    assert.deepEqual((await connect(config, { connector })).accounts, [account]);
+    finishSwitch(); await new Promise((resolve) => setTimeout(resolve, 10));
+    assert.equal(getAccount(config).status, 'connected');
+    assert.deepEqual(await connector.getAccounts(), [account]);
+    await connector.disconnect();
+  });
+
+  test('cancellation during reconnect preflight cannot start a later wallet request', { timeout: 2000 }, async () => {
+    const { createConfig, http } = await import('@wagmi/core');
+    const { mainnet } = await import('viem/chains');
+    const { robinhoodWallet } = await import('@vexi/robinhood-wallet-wagmi');
+    for (const action of ['disconnect', 'cancelConnect']) {
+      const wallet = installWallet();
+      const config = createConfig({ chains: [mainnet], connectors: [robinhoodWallet({ projectId, metadata, showModal: false, discoveryTimeoutMs: 1 })], transports: { 1: http() }, multiInjectedProviderDiscovery: false, storage: null });
+      const connector = config.connectors[0];
+      await connector.connect();
+      const pending = connector.connect({ isReconnecting: true });
+      const rejected = assert.rejects(pending, /disconnect|cancel|reject/i);
+      await connector[action](); await rejected;
+      await new Promise((resolve) => setTimeout(resolve, 10));
+      assert.equal(wallet.prompts, 1);
+      assert.equal((await connector.getProvider()).connected, action === 'cancelConnect');
+      await connector.disconnect();
+    }
+  });
+
+  test('a fallback uses the live wallet chain and accounts, while a disconnected RPC error remains a failure', async () => {
+    const wallet = installWallet();
+    const { createConfig, connect, disconnect, http } = await import('@wagmi/core');
+    const { mainnet, optimism } = await import('viem/chains');
+    const { robinhoodWallet } = await import('@vexi/robinhood-wallet-wagmi');
+    const config = createConfig({ chains: [mainnet, optimism], connectors: [robinhoodWallet({ projectId, metadata, showModal: false, discoveryTimeoutMs: 1 })], transports: { 1: http(), 10: http() }, multiInjectedProviderDiscovery: false, storage: null });
+    const connector = config.connectors[0];
+    const request = wallet.request.bind(wallet);
+    const other = '0x0000000000000000000000000000000000000002';
+    wallet.request = async (args) => {
+      if (args.method === 'wallet_switchEthereumChain') {
+        wallet.chainId = 137; wallet.accounts = [other];
+        wallet.emit('chainChanged', '0x89'); wallet.emit('accountsChanged', [other]);
+        throw Object.assign(new Error('Preferred chain unavailable'), { code: 4902 });
+      }
+      return request(args);
+    };
+    const connected = await connect(config, { connector, chainId: 10 });
+    assert.equal(connected.chainId, 137); assert.deepEqual(connected.accounts, [other]);
+    await disconnect(config, { connector });
+    wallet.request = request; wallet.chainId = 1;
+    wallet.switchError = Object.assign(new Error('Wallet disconnected'), { code: 4900 });
+    await assert.rejects(connect(config, { connector, chainId: 10 }), /disconnect/i);
+    await disconnect(config, { connector });
   });
 
   test('a repeated wagmi connect shares the pending wallet prompt', async () => {

@@ -1,8 +1,16 @@
 # Verification record
 
-Verification recorded on **2026-10-17**. The original delivery was verified at source `f6958cf6798c0c7e35961e2ee2779af855239249`, merged as `c117311a621af2f7819bdf6a407115733feccd3e` with an identical Git tree. The AI follow-up review changes were verified on their own tree before merge; rows and sections marked follow-up refer to those checks. A command listed under reproduction is an instruction, not evidence that it has passed.
+Verification recorded on **2026-10-17**. The original delivery was verified at source `f6958cf6798c0c7e35961e2ee2779af855239249`, merged as `c117311a621af2f7819bdf6a407115733feccd3e` with an identical Git tree. The AI follow-up review changes were verified on their own tree before merge; rows and sections marked follow-up refer to those checks. A supplemental merge review then corrected two additional lifecycle regressions; see the separate merge-review record below. A command listed under reproduction is an instruction, not evidence that it has passed.
 
 The repository was subsequently renamed to `vexi-v1/robinhood-wallet-connector`, and repository URLs were corrected in package metadata and documentation. Provider and adapter source did not change. Recorded tarball hashes identify the tested artifacts before that metadata correction; newly packed artifacts can have different hashes.
+
+## Supplemental merge review
+
+Review of PR #7 at `ef547350d99170d746bc21e979bab0dba0e16094` reproduced two additional regressions: a stalled saved-session recovery ignored connection timeout/cancellation, and a disconnect during a preferred-chain switch could return a successful empty-account result. The supplemental fix bounds and cancels recovery through any required chain switch, protects retries from old completion, and rejects obsolete adapter results. The reconnect authorization preflight is guarded as part of the same adapter attempt.
+
+Local build and type checks passed on Node.js 24.19.0. The full core suite passed **68/68**, including five added tests and a stronger existing cancellation assertion. The original follow-up's R02 is resolved: cancelling a stalled recovery and retrying can recover the saved session without a new pairing; the old recovery cannot overwrite or clear the new one. Final source review found no remaining blocker in the changed paths. This is AI review with synthetic wallets, not human review or a security audit.
+
+See the [supplemental evidence](evidence/2026-10-17/merge-review.json) for exact source hashes, packed-consumer results and limitations. PR checks record validation of the final submitted commit. The earlier **63-test / 21-consumer-test** results and browser observations below are historical follow-up evidence, not a rerun of the supplemental tree.
 
 ## Recorded checks
 
@@ -10,16 +18,16 @@ The repository was subsequently renamed to `vexi-v1/robinhood-wallet-connector`,
 | --- | --- | --- |
 | All four SDK packages | **Build passed** | TypeScript build of core and three adapters. |
 | Core behavioral suite | **63 passed** | Follow-up: discovery 5, modal 13, provider 27, transport 16, storage 2; synthetic EIP-1193 / SignClient fixtures and JSDOM. `npm run typecheck` also type-checks the test files. Passed on Node.js 24.19.0 and on the declared minimum, 22.12.0. The original delivery recorded 40. |
-| Packed framework consumers | **4 builds/type contracts and 21 runtime tests passed** | Follow-up, fresh installs of real wagmi v2/v3, RainbowKit and Onboard packages: wagmi v2 5, wagmi v3 5, RainbowKit 7, Onboard 4. Current [tarball hashes and versions](evidence/2026-10-17/follow-up-review.json); the original delivery run (4 builds, 14 runtime tests) is in the [matrix evidence](evidence/2026-10-17/framework-matrix.json). |
+| Packed framework consumers | **4 builds/type contracts and 21 runtime tests passed** | Follow-up, fresh installs of real wagmi v2/v3, RainbowKit and Onboard packages: wagmi v2 5, wagmi v3 5, RainbowKit 7, Onboard 4. Historical follow-up [tarball hashes and versions](evidence/2026-10-17/follow-up-review.json); the original delivery run (4 builds, 14 runtime tests) is in the [matrix evidence](evidence/2026-10-17/framework-matrix.json). |
 | Actual browser flow | **Passed within the scope below** | Original delivery: local examples in a Chromium browser with a real relay proposal and no wallet approval. Follow-up: headless Chromium on the synthetic fixture and on production framework builds with all non-local network blocked. |
 | AI code review | **No remaining actionable blocker in reviewed paths** | Cancellation, session ownership, account permissions, asynchronous switching and event reentrancy; regressions recorded in [review evidence](evidence/2026-10-17/review.json). |
-| AI follow-up review | **26 confirmed issues fixed; 7 remaining items recorded** | One primary and two independent AI reviews of the core and adapters against real framework and WalletConnect source. Each fix has a regression test or browser measurement, listed in the [follow-up evidence](evidence/2026-10-17/follow-up-review.json). Not a human approval or security audit. |
+| AI follow-up review | **26 confirmed issues fixed; 7 items recorded at that stage** | One primary and two independent AI reviews of the core and adapters against real framework and WalletConnect source. Each fix has a regression test or browser measurement, listed in the [follow-up evidence](evidence/2026-10-17/follow-up-review.json). Not a human approval or security audit. R02 was subsequently resolved by the merge review below. |
 | Dependency audit | **Core and wagmi v3: zero reported findings; legacy frameworks have findings** | Onboard includes inherited critical findings. See [dependency notes](dependency-notes.md); this is not a security certification. |
 | Embedded icon hash | **Matched** recorded SHA-256 | See [asset provenance](architecture.md#asset-provenance). |
 | Real mobile wallet pairing, signatures, transactions | **Not performed** | No physical-device or chain certification. |
 | npm publication, external upstream acceptance, deployment | **Not performed** | Repository delivery does not establish these states. |
 
-The original delivery's final core tarball SHA-256 was `e635001e95f65fa43bb2fad1831a97b56f6c28af1a6feb6e18f79617ba9d7335`. The follow-up's core tarball SHA-256, packed with the corrected repository metadata, is `b8d7bbc700c994c9fde7daf871eaacbe6cca5a6952512cf7bec8a805238429cc`; adapter hashes and environment versions are in the follow-up evidence. No real pairing URI, session key, account address, or wallet approval is included in the committed evidence.
+The original delivery's final core tarball SHA-256 was `e635001e95f65fa43bb2fad1831a97b56f6c28af1a6feb6e18f79617ba9d7335`. The historical follow-up core tarball SHA-256, packed with the corrected repository metadata before the supplemental merge fixes, was `b8d7bbc700c994c9fde7daf871eaacbe6cca5a6952512cf7bec8a805238429cc`; adapter hashes and environment versions are in the follow-up evidence. No real pairing URI, session key, account address, or wallet approval is included in the committed evidence.
 
 ## Reproduce local checks
 
@@ -41,7 +49,7 @@ The [browser record](evidence/2026-10-17/browser.json) separates synthetic layou
 
 ### Follow-up checks
 
-These ran after the follow-up fixes in headless Chrome for Testing 153. The synthetic fixture page was also served with an aggressive host stylesheet and with `Content-Security-Policy: style-src 'self'`. The framework pages are the packed-consumer production builds, with every request and WebSocket to a host other than `127.0.0.1` blocked. Details are in the [follow-up evidence](evidence/2026-10-17/follow-up-review.json).
+These ran after the follow-up fixes, before the supplemental merge-review changes, in headless Chrome for Testing 153. They were not repeated for the supplemental changes. The synthetic fixture page was also served with an aggressive host stylesheet and with `Content-Security-Policy: style-src 'self'`. The framework pages are the packed-consumer production builds, with every request and WebSocket to a host other than `127.0.0.1` blocked. Details are in the [follow-up evidence](evidence/2026-10-17/follow-up-review.json).
 
 | Scenario | Before the fixes | After the fixes |
 | --- | --- | --- |

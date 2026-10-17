@@ -53,7 +53,7 @@ Constructing the provider does not request accounts, initialize the remote trans
 | `rpcMap?: Record<number, string>` | RPC endpoints used for supported read requests through the remote provider. |
 | `metadata` | Application `{ name, description, url, icons }`. Supply an HTTP(S) application URL. |
 | `showModal?: boolean` | Defaults to `true`. Set `false` only when the host handles connection links and cancellation. |
-| `connectTimeoutMs?: number` | Attempt timeout, default `120000`. |
+| `connectTimeoutMs?: number` | Timeout for a connection attempt, including its wait for saved-session recovery, default `120000`. |
 | `discoveryTimeoutMs?: number` | Injected-provider discovery window, default `200`. |
 | `storagePrefix?: string` | Isolates this connector's persisted session state; defaults to a project-ID-based prefix. |
 
@@ -90,7 +90,7 @@ Events report actual changes: a chain switch or session update that leaves the a
 
 ### Retry and cancellation
 
-Matching concurrent core connection requests share the current attempt; a conflicting requested chain is rejected. Closing the SDK dialog or pressing Escape rejects the pending attempt with code `4001`. A timeout also terminates the attempt. Late remote approval is cleaned up for its original session topic instead of adopting it after cancellation.
+Matching concurrent core connection requests share the current attempt; a conflicting requested chain is rejected. Closing the SDK dialog or pressing Escape rejects the pending attempt with code `4001`. Saved-session recovery also has a bounded, cancellable wait: cancelling, disconnecting or destroying the provider settles the waiting connection without waiting for a stalled wallet response. The same timeout and cancellation cover a requested-chain switch during recovery. A timeout also terminates the wait or attempt; late recovery results cannot adopt a connection or clear a newer recovery. Late remote approval is cleaned up for its original session topic instead of adopting it after cancellation.
 
 A wallet that rejects the connection proposal or a request with WalletConnect's `USER_REJECTED` codes (`5000`–`5003`) is reported with EIP-1193 code `4001`; the original WalletConnect error is kept as `data`.
 

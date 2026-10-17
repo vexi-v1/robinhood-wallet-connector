@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-17",
+  "pullRequest": "https://github.com/vexi-v1/robinhood-wallet-connector/pull/7",
+  "reviewedSource": "ef547350d99170d746bc21e979bab0dba0e16094",
+  "reviewType": "Supplemental AI merge review and independent review of the fixes. Not human approval or a security audit.",
+  "fixedSourceSha256": {
+    "packages/core/src/provider.ts": "f9a5ebd8b20855bb154372963211f1b6524a1ce83a341326f76927e80bdfa7ec",
+    "packages/wagmi/src/index.ts": "eb166705c8056476a888b1aa67200f5634393e3d76cfd521f8e88dee6a9ea7b9",
+    "tests/provider.test.ts": "aad486c784f3caed505f653ef847f374b0f71c4bea90abfd05cef25cf23ea363",
+    "tests/frameworks/consumer.test.mjs": "fb3464953f734905fb0bbf84aeb7f9d40d1830988fdafd92759115e1b1c112a4"
+  },
+  "findings": [
+    {
+      "id": "M01",
+      "area": "core/provider",
+      "disposition": "fixed",
+      "summary": "A connect waiting for a stalled saved-session recovery never settled on timeout or cancellation.",
+      "reproduction": "On the reviewed source, an injected eth_accounts response remained pending after the configured timeout and cancel. The current provider regressions run against that source yield 26 passes and six test timeouts.",
+      "resolution": "One bounded, cancellable recovery wait covers restoration, required restored-session chain selection and fresh approval fallback. Cancellation releases its promise immediately, and identity/revision guards protect a newer recovery from old completion.",
+      "relatedHistoricalFinding": "R02 in follow-up-review.json is resolved: immediate retry can start an independent saved-session recovery without fresh pairing while the old restore remains pending."
+    },
+    {
+      "id": "M02",
+      "area": "adapters/wagmi",
+      "disposition": "fixed",
+      "summary": "Disconnecting during a preferred-chain switch could resolve connect successfully with an empty account list.",
+      "reproduction": "Hold wallet_switchEthereumChain, disconnect, then release the switch. The reviewed source could return empty accounts and a chain ID while the provider was idle.",
+      "resolution": "The pending adapter attempt owns an intent guard, including reconnect authorization. Cancellation and disconnect reject it; preferred-chain fallback requires the same active connection, nonempty live accounts and its current chain. Connection-loss RPC errors do not become successful fallback.",
+      "cancellationBoundary": "cancelConnect rejects the unfinished adapter attempt but preserves an already-approved core session and any wallet-side request; disconnect clears that session."
+    }
+  ],
+  "checks": {
+    "environment": {
+      "node": "24.19.0",
+      "npm": "12.0.2",
+      "platform": "darwin",
+      "architecture": "arm64"
+    },
+    "build": {
+      "command": "npm run build",
+      "result": "passed, all four packages"
+    },
+    "typecheck": {
+      "command": "npm run typecheck",
+      "result": "passed, packages and tests"
+    },
+    "coreSuite": {
+      "command": "npm test",
+      "total": 68,
+      "passed": 68,
+      "provider": 32,
+      "discovery": 5,
+      "modal": 13,
+      "transport": 16,
+      "storage": 2
+    },
+    "negativeControl": {
+      "source": "ef547350d99170d746bc21e979bab0dba0e16094",
+      "method": "Current provider tests run against original modules transpiled in memory, without modifying the checkout.",
+      "total": 32,
+      "passed": 26,
+      "cancelledByTestTimeout": 6,
+      "exitCode": 1
+    },
+    "packedWagmiV2": {
+      "buildAndPublicTypes": "passed",
+      "runtimeTests": 9,
+      "passed": 9,
+      "versions": {
+        "wagmi": "2.19.5",
+        "@wagmi/core": "2.22.1",
+        "viem": "2.57.7"
+      },
+      "artifacts": {
+        "@vexi/robinhood-wallet": "24d0a4f6771502fdb18a497c344110b78657821533107d791d820443bbc1a340",
+        "@vexi/robinhood-wallet-wagmi": "7ab488eeddfeaff2c6ac53763d6a0fdd3efbc474343b2cb5cc991497d30d4087"
+      },
+      "method": "Packed the current packages and installed an isolated real wagmi v2 consumer. Production build and public type contracts passed. The first runtime pass had a test-fixture cleanup error: direct connector.disconnect did not update the wagmi store before its next action. After using the framework disconnect action in that test, reran all nine runtime checks against the same packed artifacts and installation; all passed. The original failed matrix report was preserved."
+    },
+    "independentFixReview": "Separate provider and adapter reviews found no remaining blocker in the changed paths after correcting restored-chain-switch coverage and the reconnect-preflight race.",
+    "finalCommitCi": "Use the linked PR checks for final submitted-commit results on Node 22.12.0 and 24, the full four-framework matrix, documentation freshness and CodeQL. This local record does not predeclare their outcome."
+  },
+  "notReRun": [
+    "Earlier headless-browser and real-relay checks",
+    "Physical iOS/Android wallet pairing, handoff, signatures and transactions",
+    "Network certification, npm publication, deployment or upstream acceptance"
+  ],
+  "documentation": "Updated canonical connection/cancellation guides and regenerated llms-full.txt. Reviewed llms.txt: its package map, framework support, publication status and device-verification boundary remain accurate."
+}

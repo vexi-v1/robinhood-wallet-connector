@@ -274,13 +274,89 @@ test('an unrecoverable saved session falls back to one fresh approval shared by 
   assert.deepEqual(await first, result); assert.deepEqual(await second, [ADDRESS]); assert.equal(store.getItem('vexi-robinhood-fixture:connected'), 'walletConnect'); provider.destroy();
 });
 
-test('cancel during saved-session recovery rejects the connection and adopts nothing', async () => {
+test('cancel during saved-session recovery settles before recovery returns and adopts nothing', {timeout: 1000}, async () => {
   const store = storage(); store.setItem('vexi-robinhood-fixture:connected', 'walletConnect');
   const remote = new Remote(); const restoring = deferred<ConnectionResult | undefined>(); remote.restored = restoring.promise;
   const provider = new RobinhoodProvider(options, {discover: async () => undefined, remote: async () => remote, storage: store});
-  const connecting = provider.connect(); await tick(); provider.cancel(); restoring.resolve(result);
-  await assert.rejects(connecting, {code: 4001}); await tick();
+  const connecting = provider.connect(); await tick(); provider.cancel();
+  await assert.rejects(connecting, {code: 4001});
+  restoring.resolve(result); await tick();
   assert.equal(provider.status, 'idle'); assert.equal(remote.pending.length, 0); assert.deepEqual(await provider.getAccounts(), []); provider.destroy();
+});
+
+test('a cancelled recovery cannot clear or adopt a newer shared recovery', {timeout: 1000}, async () => {
+  const store = storage(); const marker = 'vexi-robinhood-fixture:connected'; store.setItem(marker, 'walletConnect');
+  const remote = new Remote(); const firstRecovery = deferred<ConnectionResult | undefined>(); const secondRecovery = deferred<ConnectionResult | undefined>(); let restores = 0;
+  remote.restore = () => ++restores === 1 ? firstRecovery.promise : secondRecovery.promise;
+  const provider = new RobinhoodProvider(options, {discover: async () => undefined, remote: async () => remote, storage: store});
+  const first = provider.connect(); await tick(); provider.cancel(); await assert.rejects(first, {code: 4001});
+  const second = provider.connect(); assert.equal(provider.connect(), second); await tick();
+  await assert.rejects(provider.connect({chainId: 10}), {code: -32002});
+  firstRecovery.resolve(undefined); await tick();
+  const authorization = provider.isAuthorized(); await tick();
+  assert.equal(restores, 2); assert.equal(store.getItem(marker), 'walletConnect'); assert.equal(provider.status, 'connecting');
+  secondRecovery.resolve({accounts: [OTHER], chainId: 10});
+  assert.deepEqual(await second, {accounts: [OTHER], chainId: 10}); assert.equal(await authorization, true);
+  assert.deepEqual(await provider.getAccounts(), [OTHER]); provider.destroy();
+});
+
+test('a stalled injected recovery times out and a retry ignores its late account response', {timeout: 1000}, async () => {
+  const store = storage(); store.setItem('vexi-robinhood-fixture:connected', 'injected');
+  const stalled = new Injected(); const accounts = deferred<string[]>(); const request = stalled.request.bind(stalled);
+  stalled.request = async <T = unknown>(args: RequestArguments): Promise<T> => args.method === 'eth_accounts' ? await accounts.promise as T : request<T>(args);
+  const replacement = new Injected(); replacement.accounts = [OTHER]; let discoveries = 0;
+  const provider = new RobinhoodProvider({...options, connectTimeoutMs: 20}, {storage: store, discover: async () => ++discoveries === 1 ? stalled : replacement});
+  await assert.rejects(provider.connect(), /timed out/i); assert.equal(provider.status, 'idle');
+  assert.deepEqual(await provider.connect(), {accounts: [OTHER], chainId: 1});
+  accounts.resolve([ADDRESS]); await tick();
+  assert.deepEqual(await provider.getAccounts(), [OTHER]); assert.equal(provider.status, 'connected'); provider.destroy();
+});
+
+test('destroy and disconnect immediately reject a connection waiting for saved transport initialization', {timeout: 1000}, async () => {
+  for (const action of ['destroy', 'disconnect'] as const) {
+    const store = storage(); store.setItem('vexi-robinhood-fixture:connected', 'walletConnect');
+    const remote = new Remote(); remote.restored = Promise.resolve(result); const loading = deferred<RemoteTransport>();
+    const provider = new RobinhoodProvider(options, {storage: store, remote: () => loading.promise, discover: async () => undefined});
+    const connecting = provider.connect(); await tick();
+    const closing = provider[action]();
+    await assert.rejects(connecting, {code: 4001});
+    loading.resolve(remote); await closing; await tick();
+    assert.equal(provider.status, 'idle'); assert.deepEqual(await provider.getAccounts(), []); assert.equal(remote.pending.length, 0);
+    if (action === 'destroy') await assert.rejects(provider.connect(), {code: 4900});
+    else {
+      const retry = provider.connect(); await tick(); remote.pending[0].resolve(result); assert.deepEqual(await retry, result); provider.destroy();
+    }
+  }
+});
+
+test('explicit connection can time out while sharing passive authorization without later adoption', {timeout: 1000}, async () => {
+  const store = storage(); store.setItem('vexi-robinhood-fixture:connected', 'walletConnect');
+  const remote = new Remote(); const restoring = deferred<ConnectionResult | undefined>(); remote.restored = restoring.promise;
+  const provider = new RobinhoodProvider({...options, connectTimeoutMs: 20}, {storage: store, remote: async () => remote});
+  const authorization = provider.isAuthorized(); await tick();
+  await assert.rejects(provider.connect(), /timed out/i);
+  restoring.resolve(result); assert.equal(await authorization, false); await tick();
+  assert.equal(provider.status, 'idle'); assert.equal(remote.pending.length, 0); provider.destroy();
+});
+
+test('a restored connection remains cancellable and timed through its requested chain switch', {timeout: 1000}, async () => {
+  for (const action of ['cancel', 'timeout'] as const) {
+    const store = storage(); store.setItem('vexi-robinhood-fixture:connected', 'injected');
+    const injected = new Injected(); const switching = deferred<null>(); const request = injected.request.bind(injected); let started = false;
+    injected.request = async <T = unknown>(args: RequestArguments): Promise<T> => {
+      if (args.method === 'wallet_switchEthereumChain') {started = true; return await switching.promise as T;}
+      return request<T>(args);
+    };
+    const provider = new RobinhoodProvider({...options, connectTimeoutMs: 20}, {storage: store, discover: async () => injected});
+    const connecting = provider.connect({chainId: 10});
+    const rejected = assert.rejects(connecting, {code: 4001});
+    while (!started) await tick();
+    if (action === 'cancel') provider.cancel();
+    await rejected; assert.equal(provider.status, 'idle');
+    switching.resolve(null); await tick(); assert.deepEqual(await provider.getAccounts(), []);
+    injected.accounts = [OTHER];
+    assert.deepEqual(await provider.connect(), {accounts: [OTHER], chainId: 1}); provider.destroy();
+  }
 });
 
 test('an empty-account listener that disconnects still lets every listener receive disconnect', async () => {

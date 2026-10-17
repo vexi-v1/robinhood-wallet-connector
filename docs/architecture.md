@@ -25,7 +25,7 @@ The core owns connection intent, timeout, cancellation, current accounts, events
 
 ## Connect lifecycle
 
-1. Import or construct the provider without requesting accounts. `connect()` or `eth_requestAccounts` is the explicit account-permission entry point. If this connector has a persisted approval, it is recovered first, as wallets answer `eth_requestAccounts` for an existing permission; the steps below run only when recovery fails. `cancel()` also ends that recovery.
+1. Import or construct the provider without requesting accounts. `connect()` or `eth_requestAccounts` is the explicit account-permission entry point. If this connector has a persisted approval, it is recovered first, as wallets answer `eth_requestAccounts` for an existing permission; the steps below run only when recovery fails. `connect()` bounds the recovery wait and any required recovered-session chain switch with the configured connection timeout; cancellation settles its promise without waiting for the wallet. A cancelled recovery cannot adopt a late result or clear a newer recovery job.
 2. Discover an EIP-6963 provider advertising `com.robinhood.wallet`, or the published `isRobinhoodMobileWallet` injected flag. Identity hints are not vendor authentication.
 3. Request accounts from a matching injected provider. If none is found, lazily initialize the remote transport and show the dedicated dialog when enabled.
 4. Offer configured EVM chains and methods to the wallet. Render a returned, validated pairing URI as a local QR and construct the published native app route.

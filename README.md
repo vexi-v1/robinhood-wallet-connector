@@ -94,7 +94,7 @@ export const config = createConfig({
 
 Use the resulting connector with wagmi's normal connection hooks or actions. A user selecting **Connect** starts the permission request. The adapter exposes `cancelConnect()` for custom host controls. The runnable examples include the React provider setup.
 
-As with wagmi's built-in connectors, a `chainId` passed to `connect` is a preference: if switching to it fails, the connection stays on the wallet's chain, and only a user rejection fails it. A previously approved session is recovered on reconnect, and by `connect` itself, without a new approval.
+As with wagmi's built-in connectors, a `chainId` passed to `connect` is a preference: if switching to it fails while the wallet remains connected, the connection stays on the wallet's chain. User rejection, cancellation, disconnection or destruction still rejects the connection attempt. A previously approved session is recovered on reconnect, and by `connect` itself, without a new approval.
 
 ## Use with RainbowKit
 

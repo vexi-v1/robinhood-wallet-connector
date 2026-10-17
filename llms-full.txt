@@ -106,7 +106,7 @@ export const config = createConfig({
 
 Use the resulting connector with wagmi's normal connection hooks or actions. A user selecting **Connect** starts the permission request. The adapter exposes `cancelConnect()` for custom host controls. The runnable examples include the React provider setup.
 
-As with wagmi's built-in connectors, a `chainId` passed to `connect` is a preference: if switching to it fails, the connection stays on the wallet's chain, and only a user rejection fails it. A previously approved session is recovered on reconnect, and by `connect` itself, without a new approval.
+As with wagmi's built-in connectors, a `chainId` passed to `connect` is a preference: if switching to it fails while the wallet remains connected, the connection stays on the wallet's chain. User rejection, cancellation, disconnection or destruction still rejects the connection attempt. A previously approved session is recovered on reconnect, and by `connect` itself, without a new approval.
 
 ## Use with RainbowKit
 
@@ -268,8 +268,8 @@ The default UI requires native `HTMLDialogElement.showModal()` and Shadow DOM. I
 
 | Host action or condition | Required behavior |
 | --- | --- |
-| Connect | Use the chosen adapter or `provider.connect({ chainId })`. A previously approved, persisted session is recovered first, without a new approval. Otherwise a matching Robinhood injected provider is preferred, and failing that the SDK pairs through WalletConnect with its dedicated Robinhood dialog. Core `connect({ chainId })` requires that chain; the wagmi and RainbowKit adapters treat a requested chain as a preference, as wagmi's built-in connectors do, and fail only when the user rejects the switch. |
-| Cancel pending connection | Close the SDK dialog or press Escape. Custom controls can call `provider.cancel()` or the wagmi connector's `cancelConnect()`. Core cancellation rejects with code `4001`; wagmi maps it to its normal user-rejection error. A wallet rejection that WalletConnect reports as `USER_REJECTED` also arrives as `4001`. Cancellation does not revoke an established connection, interrupt its requests, or dismiss an injected wallet's own permission prompt. |
+| Connect | Use the chosen adapter or `provider.connect({ chainId })`. A previously approved, persisted session is recovered first, without a new approval. Otherwise a matching Robinhood injected provider is preferred, and failing that the SDK pairs through WalletConnect with its dedicated Robinhood dialog. Core `connect({ chainId })` requires that chain; the wagmi and RainbowKit adapters treat a requested chain as a preference, as wagmi's built-in connectors do. A failed preferred switch can fall back only while the same connection remains active; user rejection, cancellation, disconnection or destruction still rejects the connection attempt. |
+| Cancel pending connection | Close the SDK dialog or press Escape. Custom controls can call `provider.cancel()` or the wagmi connector's `cancelConnect()`. Core cancellation rejects with code `4001`; wagmi maps it to its normal user-rejection error. A wallet rejection that WalletConnect reports as `USER_REJECTED` also arrives as `4001`. The connection promise settles even if saved-session recovery is waiting on a stalled wallet response. Cancellation does not revoke an established connection, interrupt its requests, or dismiss an injected wallet's own permission prompt. In particular, `cancelConnect()` during the adapter's preferred-chain switch rejects the unfinished adapter attempt but keeps the already-approved core session; use `disconnect()` to clear that session. |
 | Retry after rejection, cancellation or error | Settle the old host request, close any error dialog, and start a fresh request from a new user action. Do not automatically reopen permission prompts. Core shares matching concurrent attempts; the wagmi adapter shares a repeated pending connect and rejects one for a different chain with `ResourceUnavailableRpcError`. |
 | Recover after reload | Use the framework's reconnect flow, `provider.isAuthorized()`, or an explicit Connect. Recovery checks previously approved state without requesting account permission and may initialize remote transport; it keeps the session's approved chain and account selection, and revokes a session that approves none of the configured chains. `eth_accounts` alone only reads the current instance's cache. |
 | Account or chain changes | Use the framework's reactive state. With core, subscribe to `accountsChanged`, `chainChanged` and `disconnect`; update application state and remove listeners on disposal. An empty account list means access is gone. |
@@ -356,7 +356,7 @@ Constructing the provider does not request accounts, initialize the remote trans
 | `rpcMap?: Record<number, string>` | RPC endpoints used for supported read requests through the remote provider. |
 | `metadata` | Application `{ name, description, url, icons }`. Supply an HTTP(S) application URL. |
 | `showModal?: boolean` | Defaults to `true`. Set `false` only when the host handles connection links and cancellation. |
-| `connectTimeoutMs?: number` | Attempt timeout, default `120000`. |
+| `connectTimeoutMs?: number` | Timeout for a connection attempt, including its wait for saved-session recovery, default `120000`. |
 | `discoveryTimeoutMs?: number` | Injected-provider discovery window, default `200`. |
 | `storagePrefix?: string` | Isolates this connector's persisted session state; defaults to a project-ID-based prefix. |
 
@@ -393,7 +393,7 @@ Events report actual changes: a chain switch or session update that leaves the a
 
 ### Retry and cancellation
 
-Matching concurrent core connection requests share the current attempt; a conflicting requested chain is rejected. Closing the SDK dialog or pressing Escape rejects the pending attempt with code `4001`. A timeout also terminates the attempt. Late remote approval is cleaned up for its original session topic instead of adopting it after cancellation.
+Matching concurrent core connection requests share the current attempt; a conflicting requested chain is rejected. Closing the SDK dialog or pressing Escape rejects the pending attempt with code `4001`. Saved-session recovery also has a bounded, cancellable wait: cancelling, disconnecting or destroying the provider settles the waiting connection without waiting for a stalled wallet response. The same timeout and cancellation cover a requested-chain switch during recovery. A timeout also terminates the wait or attempt; late recovery results cannot adopt a connection or clear a newer recovery. Late remote approval is cleaned up for its original session topic instead of adopting it after cancellation.
 
 A wallet that rejects the connection proposal or a request with WalletConnect's `USER_REJECTED` codes (`5000`–`5003`) is reported with EIP-1193 code `4001`; the original WalletConnect error is kept as `data`.
 
@@ -463,9 +463,9 @@ export const config = createConfig({
 
 Use wagmi's normal `useConnect`, `useDisconnect`, and wallet client APIs. Connection requests start only after an explicit connect action. A discovered Robinhood provider is selected by its published identity hints; other injected providers are never relabeled. Without one, the SDK opens a dedicated Robinhood dialog using WalletConnect as transport.
 
-`getProvider()` returns the stable `RobinhoodProvider`. `cancelConnect()` cancels only a pending attempt. `disconnect()` clears the connector's session and listeners; it does not revoke permissions in another wallet or modify another connector's session. Chain switching requires a configured chain and actual wallet confirmation. The chain list is application configuration, not evidence that Robinhood supports every configured network.
+`getProvider()` returns the stable `RobinhoodProvider`. `cancelConnect()` rejects an unfinished adapter connection, including its preferred-chain switch. If wallet approval has already completed, the core session and any wallet-side request remain active; use `disconnect()` to clear the session. `disconnect()` clears the connector's session and listeners; it does not revoke permissions in another wallet or modify another connector's session. Chain switching requires a configured chain and the applicable wallet or session approval; switching between already-approved WalletConnect chains is local. The chain list is application configuration, not evidence that Robinhood supports every configured network.
 
-As with wagmi's built-in `injected` and `walletConnect` connectors, a `chainId` passed to `connect` is a preference. After the wallet approves, the connector asks to switch; if the switch fails, the connection stays on the wallet's chain, and only a user rejection fails it. Before connecting, `getChainId()` reports an in-app Robinhood wallet's current chain (read with `eth_chainId`, which needs no account permission), so hosts such as RainbowKit do not request a needless switch. Without one, it reports the first configured chain. A repeated `connect` while one is pending shares that request; one for a different chain fails with `ResourceUnavailableRpcError`.
+As with wagmi's built-in `injected` and `walletConnect` connectors, a `chainId` passed to `connect` is a preference. After the wallet approves, the connector asks to switch; if the switch fails while the wallet remains connected, the connection stays on the wallet's current chain. User rejection, cancellation, disconnection or destruction still rejects the connection attempt; it cannot return a successful connection with an empty account list. Before connecting, `getChainId()` reports an in-app Robinhood wallet's current chain (read with `eth_chainId`, which needs no account permission), so hosts such as RainbowKit do not request a needless switch. Without one, it reports the first configured chain. A repeated `connect` while one is pending shares that request; one for a different chain fails with `ResourceUnavailableRpcError`.
 
 Compatibility baselines: wagmi **2.19.5** / `@wagmi/core` **2.22.1**, or wagmi **3.7.7** / `@wagmi/core` **3.6.5**, with Viem **2.57.7**. The repository matrix validates packed packages against both. Runnable examples are in `examples/wagmi-v2` and `examples/wagmi-v3`.
 
@@ -510,7 +510,7 @@ This adapter targets **RainbowKit 2.2.11 + wagmi 2.19.5**. RainbowKit currently 
 
 Selecting Robinhood opens the SDK's native top-layer dialog, with its own close, Escape, and app-opening controls. Close it and select Robinhood again to retry. The underlying wallet chooser remains inert until the SDK dialog closes. This deliberately omits RainbowKit's `qrCode` and `mobile` hooks: RainbowKit's native Back navigation has no public cancellation callback for a pending wallet proposal. A second pairing modal or a private controller patch is unnecessary.
 
-RainbowKit always passes a chain to wagmi's `connect`. The wagmi adapter treats it as a preference, as wagmi's built-in connectors do: if the wallet session does not approve that chain, or the in-app wallet cannot switch to it, the connection stays on the wallet's chain instead of failing. Only a user rejection of the switch fails the connection.
+RainbowKit always passes a chain to wagmi's `connect`. The wagmi adapter treats it as a preference, as wagmi's built-in connectors do: if the wallet session does not approve that chain, or the in-app wallet cannot switch to it, the connection stays on the wallet's chain instead of failing. User rejection, cancellation, disconnection or destruction still rejects the connection attempt; a lost connection is never converted into a successful empty-account result.
 
 The adapter consumes `walletConnectParameters.metadata` generated by `connectorsForWallets`. Other generic WalletConnect provider options are not forwarded: this package owns its session transport and lifecycle. Configuration order controls the recommended group; RainbowKit may show installed or recent wallets before it according to its own settings.
 
@@ -709,7 +709,7 @@ The core owns connection intent, timeout, cancellation, current accounts, events
 
 ## Connect lifecycle
 
-1. Import or construct the provider without requesting accounts. `connect()` or `eth_requestAccounts` is the explicit account-permission entry point. If this connector has a persisted approval, it is recovered first, as wallets answer `eth_requestAccounts` for an existing permission; the steps below run only when recovery fails. `cancel()` also ends that recovery.
+1. Import or construct the provider without requesting accounts. `connect()` or `eth_requestAccounts` is the explicit account-permission entry point. If this connector has a persisted approval, it is recovered first, as wallets answer `eth_requestAccounts` for an existing permission; the steps below run only when recovery fails. `connect()` bounds the recovery wait and any required recovered-session chain switch with the configured connection timeout; cancellation settles its promise without waiting for the wallet. A cancelled recovery cannot adopt a late result or clear a newer recovery job.
 2. Discover an EIP-6963 provider advertising `com.robinhood.wallet`, or the published `isRobinhoodMobileWallet` injected flag. Identity hints are not vendor authentication.
 3. Request accounts from a matching injected provider. If none is found, lazily initialize the remote transport and show the dedicated dialog when enabled.
 4. Offer configured EVM chains and methods to the wallet. Render a returned, validated pairing URI as a local QR and construct the published native app route.
@@ -773,9 +773,17 @@ Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector
 
 # Verification record
 
-Verification recorded on **2026-10-17**. The original delivery was verified at source `f6958cf6798c0c7e35961e2ee2779af855239249`, merged as `c117311a621af2f7819bdf6a407115733feccd3e` with an identical Git tree. The AI follow-up review changes were verified on their own tree before merge; rows and sections marked follow-up refer to those checks. A command listed under reproduction is an instruction, not evidence that it has passed.
+Verification recorded on **2026-10-17**. The original delivery was verified at source `f6958cf6798c0c7e35961e2ee2779af855239249`, merged as `c117311a621af2f7819bdf6a407115733feccd3e` with an identical Git tree. The AI follow-up review changes were verified on their own tree before merge; rows and sections marked follow-up refer to those checks. A supplemental merge review then corrected two additional lifecycle regressions; see the separate merge-review record below. A command listed under reproduction is an instruction, not evidence that it has passed.
 
 The repository was subsequently renamed to `vexi-v1/robinhood-wallet-connector`, and repository URLs were corrected in package metadata and documentation. Provider and adapter source did not change. Recorded tarball hashes identify the tested artifacts before that metadata correction; newly packed artifacts can have different hashes.
+
+## Supplemental merge review
+
+Review of PR #7 at `ef547350d99170d746bc21e979bab0dba0e16094` reproduced two additional regressions: a stalled saved-session recovery ignored connection timeout/cancellation, and a disconnect during a preferred-chain switch could return a successful empty-account result. The supplemental fix bounds and cancels recovery through any required chain switch, protects retries from old completion, and rejects obsolete adapter results. The reconnect authorization preflight is guarded as part of the same adapter attempt.
+
+Local build and type checks passed on Node.js 24.19.0. The full core suite passed **68/68**, including five added tests and a stronger existing cancellation assertion. The original follow-up's R02 is resolved: cancelling a stalled recovery and retrying can recover the saved session without a new pairing; the old recovery cannot overwrite or clear the new one. Final source review found no remaining blocker in the changed paths. This is AI review with synthetic wallets, not human review or a security audit.
+
+See the [supplemental evidence](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/merge-review.json) for exact source hashes, packed-consumer results and limitations. PR checks record validation of the final submitted commit. The earlier **63-test / 21-consumer-test** results and browser observations below are historical follow-up evidence, not a rerun of the supplemental tree.
 
 ## Recorded checks
 
@@ -783,16 +791,16 @@ The repository was subsequently renamed to `vexi-v1/robinhood-wallet-connector`,
 | --- | --- | --- |
 | All four SDK packages | **Build passed** | TypeScript build of core and three adapters. |
 | Core behavioral suite | **63 passed** | Follow-up: discovery 5, modal 13, provider 27, transport 16, storage 2; synthetic EIP-1193 / SignClient fixtures and JSDOM. `npm run typecheck` also type-checks the test files. Passed on Node.js 24.19.0 and on the declared minimum, 22.12.0. The original delivery recorded 40. |
-| Packed framework consumers | **4 builds/type contracts and 21 runtime tests passed** | Follow-up, fresh installs of real wagmi v2/v3, RainbowKit and Onboard packages: wagmi v2 5, wagmi v3 5, RainbowKit 7, Onboard 4. Current [tarball hashes and versions](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/follow-up-review.json); the original delivery run (4 builds, 14 runtime tests) is in the [matrix evidence](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/framework-matrix.json). |
+| Packed framework consumers | **4 builds/type contracts and 21 runtime tests passed** | Follow-up, fresh installs of real wagmi v2/v3, RainbowKit and Onboard packages: wagmi v2 5, wagmi v3 5, RainbowKit 7, Onboard 4. Historical follow-up [tarball hashes and versions](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/follow-up-review.json); the original delivery run (4 builds, 14 runtime tests) is in the [matrix evidence](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/framework-matrix.json). |
 | Actual browser flow | **Passed within the scope below** | Original delivery: local examples in a Chromium browser with a real relay proposal and no wallet approval. Follow-up: headless Chromium on the synthetic fixture and on production framework builds with all non-local network blocked. |
 | AI code review | **No remaining actionable blocker in reviewed paths** | Cancellation, session ownership, account permissions, asynchronous switching and event reentrancy; regressions recorded in [review evidence](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/review.json). |
-| AI follow-up review | **26 confirmed issues fixed; 7 remaining items recorded** | One primary and two independent AI reviews of the core and adapters against real framework and WalletConnect source. Each fix has a regression test or browser measurement, listed in the [follow-up evidence](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/follow-up-review.json). Not a human approval or security audit. |
+| AI follow-up review | **26 confirmed issues fixed; 7 items recorded at that stage** | One primary and two independent AI reviews of the core and adapters against real framework and WalletConnect source. Each fix has a regression test or browser measurement, listed in the [follow-up evidence](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/follow-up-review.json). Not a human approval or security audit. R02 was subsequently resolved by the merge review below. |
 | Dependency audit | **Core and wagmi v3: zero reported findings; legacy frameworks have findings** | Onboard includes inherited critical findings. See [dependency notes](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/dependency-notes.md); this is not a security certification. |
 | Embedded icon hash | **Matched** recorded SHA-256 | See [asset provenance](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/architecture.md#asset-provenance). |
 | Real mobile wallet pairing, signatures, transactions | **Not performed** | No physical-device or chain certification. |
 | npm publication, external upstream acceptance, deployment | **Not performed** | Repository delivery does not establish these states. |
 
-The original delivery's final core tarball SHA-256 was `e635001e95f65fa43bb2fad1831a97b56f6c28af1a6feb6e18f79617ba9d7335`. The follow-up's core tarball SHA-256, packed with the corrected repository metadata, is `b8d7bbc700c994c9fde7daf871eaacbe6cca5a6952512cf7bec8a805238429cc`; adapter hashes and environment versions are in the follow-up evidence. No real pairing URI, session key, account address, or wallet approval is included in the committed evidence.
+The original delivery's final core tarball SHA-256 was `e635001e95f65fa43bb2fad1831a97b56f6c28af1a6feb6e18f79617ba9d7335`. The historical follow-up core tarball SHA-256, packed with the corrected repository metadata before the supplemental merge fixes, was `b8d7bbc700c994c9fde7daf871eaacbe6cca5a6952512cf7bec8a805238429cc`; adapter hashes and environment versions are in the follow-up evidence. No real pairing URI, session key, account address, or wallet approval is included in the committed evidence.
 
 ## Reproduce local checks
 
@@ -814,7 +822,7 @@ The [browser record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-
 
 ### Follow-up checks
 
-These ran after the follow-up fixes in headless Chrome for Testing 153. The synthetic fixture page was also served with an aggressive host stylesheet and with `Content-Security-Policy: style-src 'self'`. The framework pages are the packed-consumer production builds, with every request and WebSocket to a host other than `127.0.0.1` blocked. Details are in the [follow-up evidence](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/follow-up-review.json).
+These ran after the follow-up fixes, before the supplemental merge-review changes, in headless Chrome for Testing 153. They were not repeated for the supplemental changes. The synthetic fixture page was also served with an aggressive host stylesheet and with `Content-Security-Policy: style-src 'self'`. The framework pages are the packed-consumer production builds, with every request and WebSocket to a host other than `127.0.0.1` blocked. Details are in the [follow-up evidence](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/follow-up-review.json).
 
 | Scenario | Before the fixes | After the fixes |
 | --- | --- | --- |
