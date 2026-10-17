@@ -1,6 +1,22 @@
 # Verification record
 
-## Complete example suite — 2026-10-17
+## Verification after integrating main — 2026-10-17
+
+After integrating the session, adapter and dialog fixes from main commit `d199d82`, `npm run test:all` passed against integration commit `65e9be0`. The [matrix record](evidence/2026-10-17/post-rebase/framework-matrix.json) identifies the full commit, 109 source/build input hashes, root configuration hashes, exact installed versions and all seven SDK tarballs. The [check output](evidence/2026-10-17/post-rebase/framework-checks.log) preserves the successful command and individual test results with temporary paths sanitized. Final documentation generation and freshness checks passed after adding this record.
+
+| Check | Outcome | Scope |
+| --- | --- | --- |
+| SDK build and type check | **Passed** | All seven SDK packages and the core test files. |
+| Core unit suite | **68 passed** | Includes the lifecycle and dialog regressions from main. |
+| Packed examples | **12 builds/type contracts and 110 runtime tests passed** | Vanilla (7), wagmi v2 (10), wagmi v3 (10), RainbowKit (13), Onboard (4), AppKit (11), ConnectKit (12), ethers (5), viem (5), thirdweb (9), Dynamic (8), Privy (16). |
+| Browser examples | **48 scenarios passed** | All twelve examples at 1280×720 and 390×844, using Playwright 1.64.1 / Chromium 156.0.8078.4. [Browser record](evidence/2026-10-17/post-rebase/browser.json). |
+| Documentation | **Passed** | Generated bundle freshness and links across 29 documents. |
+
+The browser runner checks the SDK dialog inside its shadow root, including focus, Escape cancellation and retry. All 24 injected-wallet scenarios make exactly one permission request and zero signing/transaction requests. Vanilla and Onboard still require an explicit Connect after reload, but core now recovers the saved approval without another permission prompt; the other examples restore automatically. Disconnect removes listeners and prevents automatic restoration on the next reload.
+
+These are local synthetic checks with external HTTP/WebSocket traffic blocked. Live platform authentication, real wallet pairing, signatures, transactions and physical-device/network compatibility remain unverified. Packages remain unpublished and undeployed. CI preserves the Node.js 22.12.0/24 build, type and core checks and runs the packed/browser suite on Node.js 24; this local record does not establish a remote CI result. The earlier records below retain their original source and scope.
+
+## Earlier complete example suite — 2026-10-17
 
 `npm run test:all` completed successfully against the working tree based on `fc8774a6a3231a4c1af143091dc8f34f517b2054`. The command builds and type-checks all seven SDK packages, runs core tests and documentation checks, then validates all twelve packed examples and their browser flows. [Matrix evidence](evidence/2026-10-17/complete-suite/framework-matrix.json) records 109 source/build input hashes, root configuration hashes, exact installed versions and packed artifacts. [Check output](evidence/2026-10-17/complete-suite/framework-checks.log) preserves the passing results with temporary paths sanitized. These checks ran locally before committing the changes. Packages remain unpublished and undeployed; this record does not establish a merge or remote CI result.
 

@@ -15,4 +15,4 @@ The project ID is a public application identifier, not a wallet secret. Never en
 
 `npm run build` performs a real TypeScript and Vite production build. The repository's framework matrix separately packs and installs the published package layout instead of relying on these local file links.
 
-This example requires explicit reconnection after reload. It does not enable Onboard's automatic connection options, which can call `eth_requestAccounts`; hiding the host modal is not a guarantee of passive restoration. The core provider's `isAuthorized()` is the passive restoration API. The full browser suite verifies that this example never prompts on page load.
+This example requires explicit reconnection after reload; core recovers the saved approval without another permission prompt. It does not enable Onboard's automatic connection options, which can call `eth_requestAccounts`; hiding the host modal is not a guarantee of passive restoration. The core provider's `isAuthorized()` is the passive restoration API. The full browser suite verifies that this example never prompts on page load.

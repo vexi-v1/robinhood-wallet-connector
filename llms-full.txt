@@ -339,7 +339,7 @@ Core `connect()` returns a numeric `chainId`; EIP-1193 `chainChanged` and `eth_c
 
 ## Verify and describe the result
 
-Use the selected example to verify the normal framework flow and run the consuming application's build and type checks. For changes to this repository, follow [CONTRIBUTING.md](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/CONTRIBUTING.md). `npm run test:all` runs the SDK/core/documentation checks and all twelve packed/browser cases: `vanilla`, `wagmi-v2`, `wagmi-v3`, `rainbowkit`, `onboard`, `appkit`, `connectkit`, `ethers`, `viem`, `thirdweb`, `dynamic` and `privy`. Install Playwright Chromium first, or set `BROWSER_CHANNEL=chrome`. The Vanilla and Onboard examples require explicit reconnection after reload; other examples restore saved approval. Neither behavior may request account permission on page load.
+Use the selected example to verify the normal framework flow and run the consuming application's build and type checks. For changes to this repository, follow [CONTRIBUTING.md](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/CONTRIBUTING.md). `npm run test:all` runs the SDK/core/documentation checks and all twelve packed/browser cases: `vanilla`, `wagmi-v2`, `wagmi-v3`, `rainbowkit`, `onboard`, `appkit`, `connectkit`, `ethers`, `viem`, `thirdweb`, `dynamic` and `privy`. Install Playwright Chromium first, or set `BROWSER_CHANNEL=chrome`. The Vanilla and Onboard examples require explicit reconnection after reload; other examples restore saved approval automatically. Both paths recover saved approval without another permission prompt. Neither behavior may request account permission on page load.
 
 Check user-triggered connection, cancellation, retry, pending-state cleanup, disconnect, restored sessions, account/chain events and other wallet entries. UI work also needs desktop/narrow-viewport, keyboard and focus checks. The [vanilla fixture](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/vanilla/fixture.ts) offers a synthetic transport for repeatable UI checks; its QR cannot pair a real wallet.
 
@@ -796,7 +796,8 @@ example origin in your WalletConnect project, and restart the server.
 
 `index.html` uses the real SDK and WalletConnect relay. It requests account
 access only after the Connect button; it never requests a signature or transaction.
-This minimal example requires another explicit connection after reload. Passive
+This minimal example requires another explicit connection after reload; core
+recovers the saved approval without another permission prompt. Passive
 restoration with `provider.isAuthorized()` is demonstrated in the ethers and viem examples.
 
 `fixture.html` uses the same SDK dialog with an explicitly synthetic transport.
@@ -900,7 +901,7 @@ The project ID is a public application identifier, not a wallet secret. Never en
 
 `npm run build` performs a real TypeScript and Vite production build. The repository's framework matrix separately packs and installs the published package layout instead of relying on these local file links.
 
-This example requires explicit reconnection after reload. It does not enable Onboard's automatic connection options, which can call `eth_requestAccounts`; hiding the host modal is not a guarantee of passive restoration. The core provider's `isAuthorized()` is the passive restoration API. The full browser suite verifies that this example never prompts on page load.
+This example requires explicit reconnection after reload; core recovers the saved approval without another permission prompt. It does not enable Onboard's automatic connection options, which can call `eth_requestAccounts`; hiding the host modal is not a guarantee of passive restoration. The core provider's `isAuthorized()` is the passive restoration API. The full browser suite verifies that this example never prompts on page load.
 
 ---
 
@@ -1406,7 +1407,23 @@ Source URL: https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector
 
 # Verification record
 
-## Complete example suite — 2026-10-17
+## Verification after integrating main — 2026-10-17
+
+After integrating the session, adapter and dialog fixes from main commit `d199d82`, `npm run test:all` passed against integration commit `65e9be0`. The [matrix record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/post-rebase/framework-matrix.json) identifies the full commit, 109 source/build input hashes, root configuration hashes, exact installed versions and all seven SDK tarballs. The [check output](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/post-rebase/framework-checks.log) preserves the successful command and individual test results with temporary paths sanitized. Final documentation generation and freshness checks passed after adding this record.
+
+| Check | Outcome | Scope |
+| --- | --- | --- |
+| SDK build and type check | **Passed** | All seven SDK packages and the core test files. |
+| Core unit suite | **68 passed** | Includes the lifecycle and dialog regressions from main. |
+| Packed examples | **12 builds/type contracts and 110 runtime tests passed** | Vanilla (7), wagmi v2 (10), wagmi v3 (10), RainbowKit (13), Onboard (4), AppKit (11), ConnectKit (12), ethers (5), viem (5), thirdweb (9), Dynamic (8), Privy (16). |
+| Browser examples | **48 scenarios passed** | All twelve examples at 1280×720 and 390×844, using Playwright 1.64.1 / Chromium 156.0.8078.4. [Browser record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/post-rebase/browser.json). |
+| Documentation | **Passed** | Generated bundle freshness and links across 29 documents. |
+
+The browser runner checks the SDK dialog inside its shadow root, including focus, Escape cancellation and retry. All 24 injected-wallet scenarios make exactly one permission request and zero signing/transaction requests. Vanilla and Onboard still require an explicit Connect after reload, but core now recovers the saved approval without another permission prompt; the other examples restore automatically. Disconnect removes listeners and prevents automatic restoration on the next reload.
+
+These are local synthetic checks with external HTTP/WebSocket traffic blocked. Live platform authentication, real wallet pairing, signatures, transactions and physical-device/network compatibility remain unverified. Packages remain unpublished and undeployed. CI preserves the Node.js 22.12.0/24 build, type and core checks and runs the packed/browser suite on Node.js 24; this local record does not establish a remote CI result. The earlier records below retain their original source and scope.
+
+## Earlier complete example suite — 2026-10-17
 
 `npm run test:all` completed successfully against the working tree based on `fc8774a6a3231a4c1af143091dc8f34f517b2054`. The command builds and type-checks all seven SDK packages, runs core tests and documentation checks, then validates all twelve packed examples and their browser flows. [Matrix evidence](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/complete-suite/framework-matrix.json) records 109 source/build input hashes, root configuration hashes, exact installed versions and packed artifacts. [Check output](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/evidence/2026-10-17/complete-suite/framework-checks.log) preserves the passing results with temporary paths sanitized. These checks ran locally before committing the changes. Packages remain unpublished and undeployed; this record does not establish a merge or remote CI result.
 
@@ -1720,7 +1737,7 @@ node scripts/browser-integrations.mjs /path/to/matrix/report.json
 BROWSER_CHANNEL=chrome node scripts/browser-integrations.mjs /path/to/matrix/report.json
 ```
 
-This serves every example in the supplied matrix locally and blocks external HTTP/WebSocket traffic. Dynamic receives synthetic public configuration from `scripts/browser-platform-fixtures.mjs`; authentication responses are never simulated in browser checks. It checks synthetic injected connection, reload behavior, disconnect and cleanup, plus the SDK dialog's keyboard cancellation and retry at desktop and narrow sizes. Vanilla and Onboard deliberately require explicit reconnection after reload; the other examples restore approved state without another permission request. Screenshots are captured only before approval or pairing material exists. A synthetic guard rejects and counts signing or transaction attempts; the Privy sign-in button is never clicked. This does not test a real relay, platform authentication or physical wallet. Optional final arguments select any of the twelve matrix cases. Unknown or missing cases fail instead of silently running zero checks.
+This serves every example in the supplied matrix locally and blocks external HTTP/WebSocket traffic. Dynamic receives synthetic public configuration from `scripts/browser-platform-fixtures.mjs`; authentication responses are never simulated in browser checks. It checks synthetic injected connection, reload behavior, disconnect and cleanup, plus the SDK dialog's keyboard cancellation and retry at desktop and narrow sizes. Vanilla and Onboard deliberately require explicit reconnection after reload; the other examples restore approved state automatically. Both paths recover saved approval without another permission prompt. Screenshots are captured only before approval or pairing material exists. A synthetic guard rejects and counts signing or transaction attempts; the Privy sign-in button is never clicked. This does not test a real relay, platform authentication or physical wallet. Optional final arguments select any of the twelve matrix cases. Unknown or missing cases fail instead of silently running zero checks.
 
 Add regression coverage when changing connection behavior, particularly cancellation, late results, session recovery, account/chain events and teardown. Browser presentation changes also need desktop and narrow-viewport checks. Use the [verification guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md) to record what was actually tested; a rendered QR does not prove successful mobile pairing.
 
