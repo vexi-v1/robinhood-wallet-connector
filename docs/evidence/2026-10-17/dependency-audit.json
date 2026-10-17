@@ -1,7 +1,6 @@
 {
   "schemaVersion": 1,
   "capturedAt": "2026-10-16T20:55:04.289Z",
-  "task": "TK-465",
   "commands": [
     "npm audit --json",
     "npm explain <affected packages> --json"

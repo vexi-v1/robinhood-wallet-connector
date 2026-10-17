@@ -2,7 +2,7 @@
 
 The 2026-10-17 verification used actual npm tarballs and the exact framework baselines below. Functional builds and lifecycle tests passed, but the framework consumers do not all have clean dependency audits. This is not a security audit or a production-readiness certification.
 
-The sanitized [audit evidence](evidence/tk-465/dependency-audit.json) records versions, package hashes, dependency paths, advisory URLs, and counts from `npm audit --json`. Counts include propagated package entries, not unique vulnerabilities or demonstrated exploits. Framework audits include their development dependencies; the standalone core install includes only its runtime dependencies.
+The sanitized [audit evidence](evidence/2026-10-17/dependency-audit.json) records versions, package hashes, dependency paths, advisory URLs, and counts from `npm audit --json`. Counts include propagated package entries, not unique vulnerabilities or demonstrated exploits. Framework audits include their development dependencies; the standalone core install includes only its runtime dependencies.
 
 | Consumer | Exact baseline | Moderate | High | Critical |
 | --- | --- | ---: | ---: | ---: |

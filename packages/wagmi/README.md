@@ -1,5 +1,7 @@
 # Robinhood Wallet for wagmi
 
+These packages are not published to npm. Follow the [tarball installation guide](https://github.com/vexi-v1/robinhood-wallet-connector#install-from-this-repository) before using this adapter.
+
 An independent community connector. Robinhood does not endorse this package.
 
 ```ts

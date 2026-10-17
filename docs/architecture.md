@@ -1,8 +1,8 @@
 # Architecture
 
-Scope: **TK-465 / RDR-0097 / F-APP-011**, accepted in Vexi spec [PR #327](https://github.com/vexi-v1/vexi-spec/pull/327), merge `712411a1`. This repository is an independent SDK; it does not depend on a Vexi backend, contract deployment, or frontend runtime.
+The SDK connects applications to Robinhood Wallet through a matching injected provider or WalletConnect. Its core provider, connection dialog, and framework adapters can be used independently of any application backend or contract deployment.
 
-## Components and ownership
+## Components
 
 ```mermaid
 flowchart TD
@@ -66,9 +66,8 @@ The `display_uri` event contains pairing material. Hosts must not log it, attach
 | --- | --- |
 | Asset | Robinhood Wallet PNG, embedded as `ROBINHOOD_WALLET.iconUrl` |
 | Published listing | [Apple App Store, Robinhood Wallet, ID 1634080733](https://apps.apple.com/app/id1634080733) |
-| Existing source asset | `vexi-frontend/public/icons/wallets/robinhood.png` |
 | SHA-256 of embedded PNG | `8036938af96b8d0a7fec88c8bdb8e5fbc1ef59e7759b55d5d59667f7513fa951` |
-| Verification | Decoded embedded PNG hash checked against the recorded source hash on 2026-10-17 |
+| Verification | The decoded embedded PNG matched this SHA-256 on 2026-10-17 |
 
 The project does not modify the icon to impersonate a new wallet identity. Robinhood's name, icon, and related marks remain third-party property and are not granted under the project's MIT license. Their use does not establish vendor endorsement or certification.
 
