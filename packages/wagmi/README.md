@@ -32,6 +32,8 @@ Use wagmi's normal `useConnect`, `useDisconnect`, and wallet client APIs. Connec
 
 `getProvider()` returns the stable `RobinhoodProvider`. `cancelConnect()` cancels only a pending attempt. `disconnect()` clears the connector's session and listeners; it does not revoke permissions in another wallet or modify another connector's session. Chain switching requires a configured chain and actual wallet confirmation. The chain list is application configuration, not evidence that Robinhood supports every configured network.
 
+As with wagmi's built-in `injected` and `walletConnect` connectors, a `chainId` passed to `connect` is a preference. After the wallet approves, the connector asks to switch; if the switch fails, the connection stays on the wallet's chain, and only a user rejection fails it. Before connecting, `getChainId()` reports an in-app Robinhood wallet's current chain (read with `eth_chainId`, which needs no account permission), so hosts such as RainbowKit do not request a needless switch. Without one, it reports the first configured chain. A repeated `connect` while one is pending shares that request; one for a different chain fails with `ResourceUnavailableRpcError`.
+
 Compatibility baselines: wagmi **2.19.5** / `@wagmi/core` **2.22.1**, or wagmi **3.7.7** / `@wagmi/core` **3.6.5**, with Viem **2.57.7**. The repository matrix validates packed packages against both. Runnable examples are in `examples/wagmi-v2` and `examples/wagmi-v3`.
 
 Use `showModal: false` only if your host handles `display_uri` and exposes cancellation. `isAuthorized()` and reconnection never request account permission. SSR import is supported; wallet interaction requires a browser.

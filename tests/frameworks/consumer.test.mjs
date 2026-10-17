@@ -16,6 +16,7 @@ class InjectedWallet extends EventEmitter {
   chainId = 1;
   prompts = 0;
   pendingApproval;
+  switchError;
   async request({ method, params }) {
     if (method === 'eth_accounts') return [...this.accounts];
     if (method === 'eth_chainId') return `0x${this.chainId.toString(16)}`;
@@ -26,6 +27,7 @@ class InjectedWallet extends EventEmitter {
       return [...this.accounts];
     }
     if (method === 'wallet_switchEthereumChain') {
+      if (this.switchError) throw this.switchError;
       this.chainId = Number(params[0].chainId);
       this.emit('chainChanged', `0x${this.chainId.toString(16)}`);
       return null;
@@ -103,6 +105,47 @@ if (!isOnboard) {
     assert.equal(getAccount(config).status, 'connected');
     await connector.disconnect();
   });
+
+  test('a requested chain is a preference: the in-app chain is reported, kept after a failed switch, and lost only on rejection', async () => {
+    const wallet = installWallet();
+    wallet.chainId = 10;
+    const { createConfig, connect, disconnect, getAccount, http } = await import('@wagmi/core');
+    const { mainnet, optimism } = await import('viem/chains');
+    const { robinhoodWallet } = await import('@vexi/robinhood-wallet-wagmi');
+    const config = createConfig({ chains: [mainnet, optimism], connectors: [robinhoodWallet({ projectId, metadata, showModal: false, discoveryTimeoutMs: 1 })], transports: { 1: http(), 10: http() }, multiInjectedProviderDiscovery: false, storage: null });
+    const connector = config.connectors[0];
+    // Like wagmi's injected connector, the chain reported before connecting is the wallet's own.
+    assert.equal(await connector.getChainId(), 10);
+    assert.equal(wallet.prompts, 0);
+    wallet.switchError = Object.assign(new Error('Unrecognized chain ID'), { code: 4902 });
+    assert.equal((await connect(config, { connector, chainId: 1 })).chainId, 10);
+    assert.equal(getAccount(config).chainId, 10);
+    await disconnect(config, { connector });
+    wallet.switchError = Object.assign(new Error('User rejected the request.'), { code: 4001 });
+    await assert.rejects(connect(config, { connector, chainId: 1 }), { name: 'UserRejectedRequestError' });
+    assert.equal(getAccount(config).status, 'disconnected');
+    assert.equal((await connector.getProvider()).status, 'idle');
+  });
+
+  test('a repeated wagmi connect shares the pending wallet prompt', async () => {
+    const wallet = installWallet();
+    let approve;
+    wallet.pendingApproval = new Promise((resolve) => { approve = resolve; });
+    const { createConfig, connect, getAccount, http } = await import('@wagmi/core');
+    const { mainnet } = await import('viem/chains');
+    const { robinhoodWallet } = await import('@vexi/robinhood-wallet-wagmi');
+    const config = createConfig({ chains: [mainnet], connectors: [robinhoodWallet({ projectId, metadata, showModal: false, discoveryTimeoutMs: 1 })], transports: { 1: http() }, multiInjectedProviderDiscovery: false, storage: null });
+    const connector = config.connectors[0];
+    const first = connect(config, { connector });
+    const second = connect(config, { connector });
+    while (!wallet.prompts) await new Promise((resolve) => setTimeout(resolve, 2));
+    approve();
+    const [firstResult, secondResult] = await Promise.all([first, second]);
+    assert.deepEqual(firstResult.accounts, secondResult.accounts);
+    assert.equal(wallet.prompts, 1);
+    assert.equal(getAccount(config).status, 'connected');
+    await connector.disconnect();
+  });
 }
 
 if (isRainbowKit) {
@@ -167,6 +210,28 @@ if (isOnboard) {
     await provider.disconnect();
     assert.equal(wallet.listenerCount('accountsChanged'), 0);
     assert.deepEqual(await provider.request({ method: 'eth_accounts' }), []);
+  });
+
+  test('a new Onboard module instance recovers the approved session without another prompt', async () => {
+    const values = new Map();
+    globalThis.localStorage = { getItem: (key) => values.get(key) ?? null, setItem: (key, value) => { values.set(key, String(value)); }, removeItem: (key) => { values.delete(key); } };
+    try {
+      const wallet = installWallet();
+      const { robinhoodModule } = await import('@vexi/robinhood-wallet-onboard');
+      const helpers = { chains: [{ id: '0x1', label: 'Ethereum', token: 'ETH', rpcUrl: 'https://example.test/rpc' }], appMetadata: null, EventEmitter };
+      const create = () => robinhoodModule({ projectId, metadata, showModal: false, discoveryTimeoutMs: 1 })({ device: { type: null, os: null, browser: null } }).getInterface(helpers);
+      const first = await create();
+      assert.deepEqual(await first.provider.request({ method: 'eth_requestAccounts' }), [account]);
+      first.instance.destroy();
+      // Onboard reconnects through eth_requestAccounts; the approved session is recovered, not requested again.
+      const second = await create();
+      assert.deepEqual(await second.provider.request({ method: 'eth_requestAccounts' }), [account]);
+      assert.equal(wallet.prompts, 1);
+      await second.provider.disconnect();
+      assert.equal(values.size, 0);
+    } finally {
+      delete globalThis.localStorage;
+    }
   });
 
   test('actual Onboard core accepts the module and initializes without requesting accounts', async () => {

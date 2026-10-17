@@ -31,6 +31,8 @@ The module derives chain IDs and RPC URLs from Onboard's configured chains. Meta
 
 Robinhood's dedicated native dialog owns remote pairing cancellation. Close it and select Robinhood again to retry. A matching injected Robinhood provider is used when present. Other wallet modules remain independent. Supply a public WalletConnect project ID with the app origin allowed in its dashboard; never supply a private key or recovery phrase.
 
+Onboard reconnects through `eth_requestAccounts`, including with `connect.autoConnectLastWallet`. The provider first recovers the session the user approved earlier, so a reload does not open a new pairing or leave the old session behind. If that session has expired or been removed, the request opens a new pairing dialog, including during an automatic reconnect. A wallet rejection is reported with code `4001`, which Onboard shows as a rejected connection with its retry action.
+
 Compatibility baseline: `@web3-onboard/core` **2.24.1**, `@web3-onboard/common` **2.4.2**. See the standalone app in `examples/onboard` and the packed-package framework matrix.
 
 Configuring a network does not establish wallet support for it. No transaction is sent automatically.

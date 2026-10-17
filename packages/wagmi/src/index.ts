@@ -1,6 +1,7 @@
 import { createConnector, ChainNotConfiguredError } from '@wagmi/core';
-import { getAddress, numberToHex, SwitchChainError, UserRejectedRequestError } from 'viem';
+import { getAddress, numberToHex, ResourceUnavailableRpcError, SwitchChainError, UserRejectedRequestError } from 'viem';
 import {
+  discoverRobinhood,
   RobinhoodProvider,
   ROBINHOOD_WALLET,
   type RobinhoodProviderOptions,
@@ -10,6 +11,8 @@ export type RobinhoodWalletParameters = Omit<
   RobinhoodProviderOptions,
   'chains' | 'optionalChains'
 >;
+
+type Connected = { accounts: readonly `0x${string}`[]; chainId: number };
 
 function addresses(value: unknown): readonly `0x${string}`[] {
   if (!Array.isArray(value) || !value.every((item) => typeof item === 'string')) {
@@ -26,10 +29,23 @@ function chainNumber(value: unknown): number {
   return chainId;
 }
 
+function errorCode(error: unknown): unknown {
+  return typeof error === 'object' && error !== null && 'code' in error ? error.code : undefined;
+}
+
+/** EIP-1193 4001, or WalletConnect's USER_REJECTED (5000) passed through by a custom transport. */
+function isUserRejection(error: unknown): boolean {
+  return error instanceof UserRejectedRequestError || errorCode(error) === 4001 || errorCode(error) === 5000;
+}
+
+function asError(error: unknown, message: string): Error {
+  return error instanceof Error ? error : new Error(message, { cause: error });
+}
+
 function rethrowConnectionError(error: unknown): never {
-  if (typeof error === 'object' && error !== null && 'code' in error && error.code === 4001) {
-    throw new UserRejectedRequestError(error instanceof Error ? error : new Error('Connection rejected.', { cause: error }));
-  }
+  if (error instanceof UserRejectedRequestError || error instanceof ResourceUnavailableRpcError) throw error;
+  if (isUserRejection(error)) throw new UserRejectedRequestError(asError(error, 'Connection rejected.'));
+  if (errorCode(error) === ResourceUnavailableRpcError.code) throw new ResourceUnavailableRpcError(asError(error, 'Connection already pending.'));
   throw error;
 }
 
@@ -38,7 +54,7 @@ export function robinhoodWallet(parameters: RobinhoodWalletParameters) {
   return createConnector<RobinhoodProvider, { cancelConnect(): void }>((config) => {
     let provider: RobinhoodProvider | undefined;
     let listenersAttached = false;
-    let connecting = false;
+    let pending: { chainId?: number; promise: Promise<Connected> } | undefined;
 
     const onAccountsChanged = (value: unknown) => {
       const accounts = addresses(value);
@@ -85,6 +101,41 @@ export function robinhoodWallet(parameters: RobinhoodWalletParameters) {
       return provider;
     };
 
+    const switchChain = async ({ chainId }: { chainId: number }) => {
+      const chain = config.chains.find((candidate) => candidate.id === chainId);
+      if (!chain) throw new SwitchChainError(new ChainNotConfiguredError());
+      try {
+        const wallet = getProvider();
+        await wallet.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: numberToHex(chainId) }] });
+        if ((await wallet.getChainId()) !== chainId) {
+          throw new Error('Robinhood Wallet did not confirm the requested chain.');
+        }
+        return chain;
+      } catch (error) {
+        if (isUserRejection(error)) throw new UserRejectedRequestError(asError(error, 'Chain switch rejected.'));
+        throw new SwitchChainError(error as Error);
+      }
+    };
+
+    const establish = async (wallet: RobinhoodProvider, chainId: number | undefined): Promise<Connected> => {
+      const result = await wallet.connect();
+      let current = chainNumber(result.chainId);
+      // As in wagmi's injected and walletConnect connectors, a requested chain is a preference: only a
+      // user rejection fails the connection, while any other switch failure keeps the wallet's chain.
+      if (chainId !== undefined && chainId !== current) {
+        try {
+          current = (await switchChain({ chainId })).id;
+        } catch (error) {
+          if (error instanceof UserRejectedRequestError) {
+            // wagmi records this connection as failed, so the provider must not keep it either.
+            await wallet.disconnect();
+            throw error;
+          }
+        }
+      }
+      return { accounts: addresses(await wallet.getAccounts()), chainId: current };
+    };
+
     return {
       id: ROBINHOOD_WALLET.id,
       name: ROBINHOOD_WALLET.name,
@@ -96,23 +147,26 @@ export function robinhoodWallet(parameters: RobinhoodWalletParameters) {
         if (isReconnecting && !(await wallet.isAuthorized())) {
           throw new Error('Robinhood Wallet has no approved session to reconnect.');
         }
-        if (connecting) {
-          throw new Error('A Robinhood Wallet connection is already pending.');
+        let shared = pending;
+        // A repeated request shares the pending one; a different chain cannot join it.
+        if (shared && shared.chainId !== chainId) {
+          throw new ResourceUnavailableRpcError(new Error('A Robinhood Wallet connection is already pending.'));
         }
-        connecting = true;
+        if (!shared) {
+          const current = { chainId, promise: establish(wallet, chainId) };
+          shared = pending = current;
+          void current.promise.then(() => undefined, () => undefined).then(() => { if (pending === current) pending = undefined; });
+        }
         try {
-          const result = await wallet.connect(chainId === undefined ? undefined : { chainId });
-          const accounts = addresses(result.accounts);
+          const { accounts, chainId: connectedChainId } = await shared.promise;
           return {
             accounts: (withCapabilities
               ? accounts.map((address) => ({ address, capabilities: {} }))
               : accounts) as never,
-            chainId: chainNumber(result.chainId),
+            chainId: connectedChainId,
           };
         } catch (error) {
           rethrowConnectionError(error);
-        } finally {
-          connecting = false;
         }
       },
       async disconnect() {
@@ -131,28 +185,25 @@ export function robinhoodWallet(parameters: RobinhoodWalletParameters) {
         return addresses(await getProvider().getAccounts());
       },
       async getChainId() {
-        return chainNumber(await getProvider().getChainId());
+        const wallet = getProvider();
+        if (!wallet.connected) {
+          // Like wagmi's injected connector, report an in-app wallet's current chain before connecting,
+          // so a host such as RainbowKit asks for no needless switch. eth_chainId needs no permission.
+          const injected = await discoverRobinhood(new AbortController().signal, 0);
+          if (injected) {
+            try {
+              return chainNumber(await injected.request({ method: 'eth_chainId' }));
+            } catch {
+              // Fall back to the configured chain below.
+            }
+          }
+        }
+        return chainNumber(await wallet.getChainId());
       },
       async isAuthorized() {
         return getProvider().isAuthorized();
       },
-      async switchChain({ chainId }) {
-        const chain = config.chains.find((candidate) => candidate.id === chainId);
-        if (!chain) throw new SwitchChainError(new ChainNotConfiguredError());
-        try {
-          const wallet = getProvider();
-          await wallet.request({ method: 'wallet_switchEthereumChain', params: [{ chainId: numberToHex(chainId) }] });
-          if ((await wallet.getChainId()) !== chainId) {
-            throw new Error('Robinhood Wallet did not confirm the requested chain.');
-          }
-          return chain;
-        } catch (error) {
-          if (typeof error === 'object' && error !== null && 'code' in error && error.code === 4001) {
-            throw new UserRejectedRequestError(error instanceof Error ? error : new Error('Chain switch rejected.', { cause: error }));
-          }
-          throw new SwitchChainError(error as Error);
-        }
-      },
+      switchChain,
       onAccountsChanged,
       onChainChanged,
       onDisconnect,

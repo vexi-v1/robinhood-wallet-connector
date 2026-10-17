@@ -8,6 +8,7 @@ import { getRobinhoodUri } from '../packages/core/src/metadata.js';
 // Synthetic, nonfunctional pairing material. No wallet or relay is contacted.
 const uri = `wc:${'a'.repeat(64)}@2?relay-protocol=irn&symKey=${'b'.repeat(64)}`;
 const secondUri = `wc:${'c'.repeat(64)}@2?relay-protocol=irn&symKey=${'d'.repeat(64)}`;
+const HOST_TAG = 'rhw-connector';
 const originalDocument = Object.getOwnPropertyDescriptor(globalThis, 'document');
 const originalHTMLElement = Object.getOwnPropertyDescriptor(globalThis, 'HTMLElement');
 let dom: JSDOM;
@@ -19,10 +20,29 @@ function modal(): RobinhoodModal {
   return value;
 }
 
+/** The dialog renders inside its host's shadow root; page nodes stay in the light tree. */
+function query<T extends Element = HTMLElement>(selector: string): T | null {
+  return dom.window.document.querySelector(HOST_TAG)?.shadowRoot?.querySelector<T>(selector) ?? dom.window.document.querySelector<T>(selector);
+}
+
 function element<T extends HTMLElement = HTMLElement>(selector: string): T {
-  const result = dom.window.document.querySelector<T>(selector);
+  const result = query<T>(selector);
   assert.ok(result, `Expected element matching ${selector}.`);
   return result;
+}
+
+/** The focused element, including focus inside shadow roots. */
+function focused(): Element | null {
+  let active = dom.window.document.activeElement;
+  while (active?.shadowRoot?.activeElement) active = active.shadowRoot.activeElement;
+  return active;
+}
+
+function key(target: Element, init: KeyboardEventInit): KeyboardEvent {
+  // Browser keyboard events are composed, so they cross the dialog's shadow boundary.
+  const event = new dom.window.KeyboardEvent('keydown', { bubbles: true, cancelable: true, composed: true, ...init });
+  target.dispatchEvent(event);
+  return event;
 }
 
 function stubQr(): void {
@@ -69,32 +89,44 @@ test('opens a named dialog, consumes Escape, cancels once, and restores host foc
   const dialog = element<HTMLDialogElement>('dialog');
   assert.equal(dialog.open, true);
   assert.equal(element(`#${dialog.getAttribute('aria-labelledby')}`).textContent, 'Connect your wallet');
+  assert.match(element(`#${dialog.getAttribute('aria-describedby')}`).textContent ?? '', /Scan with Robinhood Wallet/);
   assert.equal(dialog.getAttribute('aria-modal'), 'true');
+  assert.equal(dialog.lang, 'en');
   assert.equal(element('.rhw-stage').getAttribute('aria-busy'), 'true');
-  assert.equal(dom.window.document.activeElement, element('.rhw-close'));
-  const escape = new dom.window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true, cancelable: true });
-  element('.rhw-close').dispatchEvent(escape);
+  assert.equal(focused(), element('.rhw-close'));
+  const escape = key(element('.rhw-close'), { key: 'Escape' });
   assert.equal(escape.defaultPrevented, true);
   assert.equal(underlyingEscape, 0);
   assert.equal(cancelled, 1);
-  assert.equal(dom.window.document.querySelector('dialog'), null);
+  assert.equal(dom.window.document.querySelector(HOST_TAG), null);
   assert.equal(dom.window.document.activeElement, host);
   // A detached dialog's late cancel event cannot invoke an old callback again.
   dialog.dispatchEvent(new dom.window.Event('cancel', { cancelable: true }));
   value.close();
   assert.equal(cancelled, 1);
-  host.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+  key(host, { key: 'Escape' });
   assert.equal(underlyingEscape, 1);
+});
+
+test('renders inside an isolating shadow root and adds only its host to the page', () => {
+  modal().open({ onCancel() {} });
+  const host = dom.window.document.querySelector(HOST_TAG);
+  assert.ok(host?.shadowRoot, 'Expected an open shadow root for the dialog.');
+  assert.equal(host.parentElement, dom.window.document.body);
+  // Host page selectors cannot reach any dialog node or style rule.
+  assert.equal(dom.window.document.querySelector('dialog, button.rhw-close, canvas, style'), null);
+  assert.equal(host.shadowRoot.querySelector('dialog')?.className, 'rhw-connector-dialog');
+  assert.match(host.shadowRoot.querySelector('style')?.textContent ?? '', /:host \{ all: initial !important; display: contents !important; \}/);
 });
 
 test('keyboard focus wraps across visible controls, skipping hidden ready and error actions', () => {
   modal().open({ onCancel() {} });
   const first = element('.rhw-close');
   const last = element<HTMLAnchorElement>('.rhw-footer > a');
-  first.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'Tab', shiftKey: true, bubbles: true, cancelable: true }));
-  assert.equal(dom.window.document.activeElement, last);
-  last.dispatchEvent(new dom.window.KeyboardEvent('keydown', { key: 'Tab', bubbles: true, cancelable: true }));
-  assert.equal(dom.window.document.activeElement, first);
+  key(first, { key: 'Tab', shiftKey: true });
+  assert.equal(focused(), last);
+  key(last, { key: 'Tab' });
+  assert.equal(focused(), first);
 });
 
 test('restores an explicit disabled trigger after host settlement, including an idempotent second close', async () => {
@@ -121,6 +153,21 @@ test('restores an explicit disabled trigger after host settlement, including an 
   await Promise.resolve();
   frames.shift()!(0);
   assert.equal(dom.window.document.activeElement, host);
+});
+
+test('restores focus to a control inside another open shadow root', () => {
+  const container = dom.window.document.createElement('div');
+  dom.window.document.body.append(container);
+  const shadow = container.attachShadow({ mode: 'open' });
+  const option = dom.window.document.createElement('button');
+  option.textContent = 'Robinhood Wallet';
+  shadow.append(option);
+  option.focus();
+  const value = modal();
+  value.open({ onCancel() {} });
+  assert.equal(focused(), element('.rhw-close'));
+  value.close();
+  assert.equal(focused(), option);
 });
 
 test('deferred focus restoration cannot steal focus from another control or a newer dialog', () => {
@@ -150,7 +197,7 @@ test('deferred focus restoration cannot steal focus from another control or a ne
   newer.open({ onCancel() {} });
   host.disabled = false;
   oldFrame(0);
-  assert.equal(dom.window.document.activeElement, element('.rhw-close'));
+  assert.equal(focused(), element('.rhw-close'));
 });
 
 test('opening another connection cancels the previous attempt and keeps one dialog', () => {
@@ -163,10 +210,10 @@ test('opening another connection cancels the previous attempt and keeps one dial
   second.open({ onCancel() { secondCancelled++; } });
   assert.equal(firstCancelled, 1);
   assert.equal(previousDialog.isConnected, false);
-  assert.equal(dom.window.document.querySelectorAll('dialog').length, 1);
+  assert.equal(dom.window.document.querySelectorAll(HOST_TAG).length, 1);
   second.open({ onCancel() {} });
   assert.equal(secondCancelled, 1);
-  assert.equal(dom.window.document.querySelectorAll('dialog').length, 1);
+  assert.equal(dom.window.document.querySelectorAll(HOST_TAG).length, 1);
 });
 
 test('ready exposes a locally rendered QR, native app link, and copy success; failure clears the link', async () => {
@@ -192,12 +239,36 @@ test('ready exposes a locally rendered QR, native app link, and copy success; fa
   value.fail('The connection expired.');
   assert.equal(renderedCanvas.width, 0);
   assert.equal(renderedCanvas.height, 0);
-  assert.equal(dom.window.document.querySelector('canvas'), null);
+  assert.equal(query('canvas'), null);
   assert.equal(element('.rhw-app').hasAttribute('href'), false);
   assert.equal(element('.rhw-failed').hidden, false);
   assert.equal(element('.rhw-retry').hidden, true);
   assert.match(element('.rhw-error-hint').textContent ?? '', /select Robinhood Wallet again/);
-  assert.equal(dom.window.document.activeElement, element('.rhw-dismiss'));
+  assert.equal(focused(), element('.rhw-dismiss'));
+});
+
+test('QR resolution follows device pixel ratio and leaves its square display size to the dialog', async () => {
+  const widths: number[] = [];
+  mock.method(QRCode, 'toCanvas', async (canvas: HTMLCanvasElement, _text: string, options: { width: number }) => {
+    widths.push(options.width);
+    // Mirror qrcode's renderer, which pins the backing size and an inline CSS size.
+    canvas.width = canvas.height = options.width;
+    canvas.style.width = canvas.style.height = `${options.width}px`;
+    return canvas;
+  });
+  Object.defineProperty(dom.window, 'devicePixelRatio', { configurable: true, value: 2 });
+  const value = modal();
+  value.open({ onCancel() {} });
+  await value.ready(uri);
+  const canvas = element<HTMLCanvasElement>('canvas');
+  assert.equal(canvas.width, 560);
+  assert.equal(canvas.style.width, '');
+  assert.equal(canvas.style.height, '');
+  Object.defineProperty(dom.window, 'devicePixelRatio', { configurable: true, value: 9 });
+  await value.ready(secondUri);
+  Object.defineProperty(dom.window, 'devicePixelRatio', { configurable: true, value: 0 });
+  await value.ready(uri);
+  assert.deepEqual(widths, [560, 840, 280]);
 });
 
 test('late QR completion cannot update a reopened dialog or retain its old canvas', async () => {
@@ -267,7 +338,7 @@ test('custom-host retry closes and clears the old view before invoking its callb
     onCancel() { cancelled++; },
     onRetry() {
       retried++;
-      assert.equal(dom.window.document.querySelector('dialog'), null);
+      assert.equal(dom.window.document.querySelector(HOST_TAG), null);
       value.open({ onCancel() {} });
     },
   });
@@ -279,5 +350,5 @@ test('custom-host retry closes and clears the old view before invoking its callb
   assert.equal(cancelled, 0);
   assert.equal(element('.rhw-loading').hidden, false);
   assert.equal(element('.rhw-app').hasAttribute('href'), false);
-  assert.equal(dom.window.document.querySelector('canvas'), null);
+  assert.equal(query('canvas'), null);
 });

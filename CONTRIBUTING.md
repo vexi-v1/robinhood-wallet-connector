@@ -6,7 +6,7 @@ For integration help, start with [llms.txt](llms.txt) and the [AI integration gu
 
 ## Set up a checkout
 
-Use Node.js 22.12 or newer and npm. CI runs Node.js 24.
+Use Node.js 22.12 or newer and npm. CI runs the build, type check and unit tests on Node.js 22.12.0 and 24, and the packed framework matrix on 24.
 
 ```sh
 git clone https://github.com/vexi-v1/robinhood-wallet-connector.git
@@ -55,7 +55,7 @@ The vanilla example also provides `fixture.html`, which uses a synthetic transpo
 
 ## Validate a change
 
-For provider or adapter changes, run the root build, type check and unit tests above. Test the affected integrations against packed packages:
+For provider or adapter changes, run the root build, type check and unit tests above. The type check also covers the test files. Test the affected integrations against packed packages:
 
 ```sh
 node scripts/framework-matrix.mjs

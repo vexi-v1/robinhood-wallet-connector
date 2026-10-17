@@ -1,8 +1,11 @@
 import { discoverRobinhood } from './discovery.js';
 import { ProviderEmitter } from './emitter.js';
-import { hexChainId, parseAccounts, parseChainId, safeStorage } from './state.js';
+import { focusedElement, hexChainId, parseAccounts, parseChainId, safeStorage, sameAccounts, storagePrefix } from './state.js';
 import { ProviderRpcError } from './types.js';
 import type { ConnectionModal, ConnectionResult, EIP1193Provider, ProviderDependencies, ProviderListener, RemoteTransport, RequestArguments, RobinhoodProviderOptions, SessionStorage } from './types.js';
+
+/** Larger delays overflow browser and Node timers, which then fire immediately. */
+const MAX_TIMER_MS = 2_147_483_647;
 
 interface Attempt {
   controller: AbortController;
@@ -27,6 +30,8 @@ export class RobinhoodProvider extends ProviderEmitter implements EIP1193Provide
   private chainId: number;
   private destroyed = false;
   private revision = 0;
+  /** Advanced by cancel(); a connect() waiting on session recovery must not start a later attempt. */
+  private intent = 0;
   private readonly storage: SessionStorage;
   private readonly marker: string;
   private currentStatus: 'idle' | 'connecting' | 'connected' = 'idle';
@@ -38,10 +43,15 @@ export class RobinhoodProvider extends ProviderEmitter implements EIP1193Provide
     if (!options.chains.length) throw new ProviderRpcError(-32602, 'Configure at least one EVM network.');
     [...options.chains, ...(options.optionalChains ?? [])].forEach(parseChainId);
     if (!options.metadata?.name || !/^https?:\/\//.test(options.metadata.url)) throw new ProviderRpcError(-32602, 'Configure an application name and HTTP(S) URL.');
-    if ((options.connectTimeoutMs ?? 120_000) <= 0 || (options.discoveryTimeoutMs ?? 200) < 0) throw new ProviderRpcError(-32602, 'Connection timeouts must be positive.');
+    const connectTimeout = options.connectTimeoutMs ?? 120_000;
+    const discoveryTimeout = options.discoveryTimeoutMs ?? 200;
+    // NaN fails every comparison; delays beyond the timer range would expire immediately.
+    if (!(connectTimeout > 0 && connectTimeout <= MAX_TIMER_MS && discoveryTimeout >= 0 && discoveryTimeout <= MAX_TIMER_MS)) {
+      throw new ProviderRpcError(-32602, 'Connection timeouts must be finite: connect above 0 ms, discovery at least 0 ms, both at most 2147483647 ms.');
+    }
     this.chainId = options.chains[0];
     this.storage = dependencies.storage ?? safeStorage();
-    this.marker = `${options.storagePrefix ?? `vexi-robinhood-${options.projectId}`}:connected`;
+    this.marker = `${storagePrefix(options)}:connected`;
   }
 
   get status(): 'idle' | 'connecting' | 'connected' { return this.currentStatus; }
@@ -50,6 +60,7 @@ export class RobinhoodProvider extends ProviderEmitter implements EIP1193Provide
   async getAccounts(): Promise<string[]> { return [...this.accounts]; }
   async getChainId(): Promise<number> { return this.chainId; }
 
+  private configured(chainId: number): boolean { return [...this.options.chains, ...(this.options.optionalChains ?? [])].includes(chainId); }
   private active(attempt: Attempt): boolean { return this.attempt === attempt && !attempt.controller.signal.aborted && !this.destroyed; }
   private discover(signal: AbortSignal): Promise<EIP1193Provider | undefined> {
     return this.dependencies.discover?.(signal) ?? discoverRobinhood(signal, this.options.discoveryTimeoutMs);
@@ -66,18 +77,37 @@ export class RobinhoodProvider extends ProviderEmitter implements EIP1193Provide
   }
 
   connect(options: {chainId?: number} = {}): Promise<ConnectionResult> {
+    const settled = this.settled(options);
+    if (settled) return settled;
+    const returnFocus = focusedElement();
+    // As eth_requestAccounts does in other wallets, a previously approved and persisted session is
+    // recovered without asking again. A fresh approval is requested only when recovery fails.
+    if (!this.restorePromise && !this.storage.getItem(this.marker)) return this.begin(options, returnFocus);
+    const intent = this.intent;
+    return this.isAuthorized().then(() => {
+      const recovered = this.settled(options);
+      if (recovered) return recovered;
+      if (intent !== this.intent) throw new ProviderRpcError(4001, 'Connection cancelled.');
+      return this.begin(options, returnFocus);
+    });
+  }
+
+  /** Outcomes that need no new attempt: unusable input, a shared pending attempt, or the current connection. */
+  private settled(options: {chainId?: number}): Promise<ConnectionResult> | undefined {
     if (this.destroyed) return Promise.reject(new ProviderRpcError(4900, 'This provider has been destroyed.'));
-    if (options.chainId !== undefined && ![...this.options.chains, ...(this.options.optionalChains ?? [])].includes(options.chainId)) return Promise.reject(new ProviderRpcError(4901, 'This network is not configured.'));
+    if (options.chainId !== undefined && !this.configured(options.chainId)) return Promise.reject(new ProviderRpcError(4901, 'This network is not configured.'));
     if (this.attempt) {
       if (this.attempt.chainId !== options.chainId) return Promise.reject(new ProviderRpcError(-32002, 'Another connection request is already pending.'));
       return this.attempt.promise;
     }
-    if (this.connected) {
-      if (options.chainId !== undefined && options.chainId !== this.chainId) {
-        return this.request({method: 'wallet_switchEthereumChain', params: [{chainId: hexChainId(options.chainId)}]}).then(() => ({accounts: [...this.accounts], chainId: this.chainId}));
-      }
-      return Promise.resolve({accounts: [...this.accounts], chainId: this.chainId});
+    if (!this.connected) return undefined;
+    if (options.chainId !== undefined && options.chainId !== this.chainId) {
+      return this.request({method: 'wallet_switchEthereumChain', params: [{chainId: hexChainId(options.chainId)}]}).then(() => ({accounts: [...this.accounts], chainId: this.chainId}));
     }
+    return Promise.resolve({accounts: [...this.accounts], chainId: this.chainId});
+  }
+
+  private begin(options: {chainId?: number}, returnFocus: HTMLElement | undefined): Promise<ConnectionResult> {
     ++this.revision;
     this.errorModal?.close();
     this.errorModal = undefined;
@@ -85,8 +115,7 @@ export class RobinhoodProvider extends ProviderEmitter implements EIP1193Provide
     let reject!: Attempt['reject'];
     const promise = new Promise<ConnectionResult>((res, rej) => { resolve = res; reject = rej; });
     const attempt: Attempt = {
-      controller: new AbortController(), promise, resolve, reject, chainId: options.chainId,
-      returnFocus: typeof document !== 'undefined' && document.activeElement instanceof HTMLElement ? document.activeElement : undefined,
+      controller: new AbortController(), promise, resolve, reject, chainId: options.chainId, returnFocus,
       timer: setTimeout(() => this.fail(attempt, new ProviderRpcError(4001, 'Connection timed out. Try again from your app.')), this.options.connectTimeoutMs ?? 120_000),
     };
     this.attempt = attempt;
@@ -163,9 +192,14 @@ export class RobinhoodProvider extends ProviderEmitter implements EIP1193Provide
     attempt.reject(error);
   }
 
+  /**
+   * Cancels a pending connection, including recovery of a saved session, and closes its dialog.
+   * Requests on an established connection continue: recovery and attempts only run while idle.
+   */
   cancel(): void {
     const attempt = this.attempt;
-    ++this.revision;
+    ++this.intent;
+    if (this.restorePromise) ++this.revision;
     if (attempt) {
       this.attempt = undefined;
       this.currentStatus = 'idle';
@@ -192,11 +226,12 @@ export class RobinhoodProvider extends ProviderEmitter implements EIP1193Provide
       this.subscriptions.push([event, guarded]);
     };
     listen('accountsChanged', (accounts: unknown) => {
-      try {
-        this.accounts = parseAccounts(accounts);
-        this.emit('accountsChanged', [...this.accounts]);
-        if (!this.accounts.length) this.clearConnection(new ProviderRpcError(4100, 'Wallet account access was removed.'));
-      } catch { this.clearConnection(new ProviderRpcError(-32603, 'Wallet returned invalid account data.')); }
+      let next: string[];
+      try { next = parseAccounts(accounts); } catch { this.clearConnection(new ProviderRpcError(-32603, 'Wallet returned invalid account data.')); return; }
+      // clearConnection reports the empty account list once, followed by disconnect.
+      if (!next.length) { this.clearConnection(new ProviderRpcError(4100, 'Wallet account access was removed.')); return; }
+      this.accounts = next;
+      this.emit('accountsChanged', [...next]);
     });
     listen('chainChanged', (chainId: unknown) => {
       try { this.chainId = parseChainId(chainId); this.emit('chainChanged', hexChainId(this.chainId)); }
@@ -221,8 +256,9 @@ export class RobinhoodProvider extends ProviderEmitter implements EIP1193Provide
     this.currentStatus = 'idle';
     this.currentTransport = undefined;
     this.storage.removeItem(this.marker);
-    const revision = ++this.revision;
-    if (wasConnected) { this.emit('accountsChanged', []); if (this.revision === revision) this.emit('disconnect', error); }
+    ++this.revision;
+    // Both events describe the connection that ended, even when an accountsChanged listener reenters.
+    if (wasConnected) { this.emit('accountsChanged', []); this.emit('disconnect', error); }
   }
 
   async isAuthorized(): Promise<boolean> {
@@ -265,7 +301,7 @@ export class RobinhoodProvider extends ProviderEmitter implements EIP1193Provide
     if (args.method === 'wallet_switchEthereumChain') {
       const param = Array.isArray(args.params) ? args.params[0] : undefined;
       const chain = parseChainId((param as {chainId?: unknown})?.chainId);
-      if (![...this.options.chains, ...(this.options.optionalChains ?? [])].includes(chain)) throw new ProviderRpcError(4901, 'This network is not configured.');
+      if (!this.configured(chain)) throw new ProviderRpcError(4901, 'This network is not configured.');
       const result = await backend.request<T>(args);
       if (this.backend !== backend || revision !== this.revision) throw new ProviderRpcError(4900, 'Wallet disconnected before the request completed.');
       const actual = parseChainId(await backend.request({method: 'eth_chainId'}));
@@ -273,12 +309,14 @@ export class RobinhoodProvider extends ProviderEmitter implements EIP1193Provide
       if (actual !== chain) throw new ProviderRpcError(4901, 'The wallet did not switch to the requested network.');
       const accounts = parseAccounts(await backend.request({method: 'eth_accounts'}));
       if (this.backend !== backend || revision !== this.revision) throw new ProviderRpcError(4900, 'Wallet disconnected before the request completed.');
-      const changed = actual !== this.chainId;
+      // The backend's own events usually report the change already; emit only what remains unreported.
+      const chainChanged = actual !== this.chainId;
+      const accountsChanged = !sameAccounts(accounts, this.accounts);
       this.chainId = actual;
       this.accounts = accounts;
-      if (changed) this.emit('chainChanged', hexChainId(actual));
+      if (chainChanged) this.emit('chainChanged', hexChainId(actual));
       if (this.backend !== backend || revision !== this.revision) throw new ProviderRpcError(4900, 'Wallet disconnected before the request completed.');
-      this.emit('accountsChanged', [...accounts]);
+      if (accountsChanged) this.emit('accountsChanged', [...accounts]);
       return result;
     }
     const result = await backend.request<T>(args);
@@ -286,18 +324,22 @@ export class RobinhoodProvider extends ProviderEmitter implements EIP1193Provide
     return result;
   }
 
+  /**
+   * Local disconnection always completes. Wallet-side revocation is best effort: once the local
+   * session pointer is cleared, a failed revocation (for example while offline) cannot be retried.
+   */
   async disconnect(): Promise<void> {
     this.cancel();
     const remote = this.remote;
     const pendingRemote = this.remotePromise;
     this.clearConnection();
-    if (remote) await remote.disconnect();
+    if (remote) await remote.disconnect().catch(() => undefined);
     else if (pendingRemote) {
       // A retry waits for cleanup of the initialization already in flight.
       // This prevents cleanup from revoking a newer attempt's session.
-      const cleanup = pendingRemote.then(async (initialized) => { await initialized.disconnect(); return initialized; });
+      const cleanup = pendingRemote.then(async (initialized) => { await initialized.disconnect().catch(() => undefined); return initialized; });
       this.remotePromise = cleanup.catch((error) => { this.remotePromise = undefined; throw error; });
-      await this.remotePromise;
+      await this.remotePromise.catch(() => undefined);
     }
   }
 

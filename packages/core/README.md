@@ -65,10 +65,10 @@ Give distinct independent connector instances distinct stable `storagePrefix` va
 
 | API | Behavior |
 | --- | --- |
-| `connect({ chainId? }?)` | Returns `{ accounts: string[], chainId: number }`. Opens the remote dialog if no matching injected provider is found. |
-| `request({ method, params? })` | EIP-1193 request. `eth_requestAccounts` starts connection; `eth_accounts` reads the local cache; `eth_chainId` returns a hexadecimal chain ID. Other requests require a connection. |
-| `cancel()` | Cancels the pending attempt and closes its dialog. Does not disconnect an established connection. |
-| `disconnect()` | Cancels pending work, clears local account/session selection, and disconnects this transport's approved remote session. Injected wallet permissions are not revoked. |
+| `connect({ chainId? }?)` | Returns `{ accounts: string[], chainId: number }`. First recovers this connector's previously approved, persisted session without a new approval request. Otherwise opens the remote dialog if no matching injected provider is found. |
+| `request({ method, params? })` | EIP-1193 request. `eth_requestAccounts` starts connection, with the same session recovery as `connect()`; `eth_accounts` reads the local cache; `eth_chainId` returns a hexadecimal chain ID. Other requests require a connection. |
+| `cancel()` | Cancels a pending attempt, or the session recovery that `connect()` is waiting on, and closes its dialog. Does not disconnect an established connection or interrupt its requests. |
+| `disconnect()` | Cancels pending work, clears local account/session selection, and disconnects this transport's approved remote session and its pairing. Injected wallet permissions are not revoked. Wallet-side revocation is best effort: when the wallet cannot be reached, local state is still cleared and the promise resolves. |
 | `destroy()` | Releases this provider's UI and listeners. Preserves an approved persisted session for a later provider instance; does not revoke it. The destroyed instance cannot reconnect. |
 | `isAuthorized()` | Attempts to recover this connector's previously approved session without requesting account permission. Returns `boolean`; may initialize remote transport to inspect saved state. |
 | `getAccounts()` | Returns a copy of the current cached accounts, or an empty list before connection/recovery. |
@@ -86,9 +86,13 @@ The provider emits `connect` with `{ chainId: string }`, `accountsChanged` with 
 
 Keep connection state current through events instead of assuming a connection remains valid indefinitely. Remove your listeners when the host component is disposed. A changed chain or empty account list must be handled by the host application.
 
+Events report actual changes: a chain switch or session update that leaves the account list unchanged does not emit `accountsChanged`. When the wallet removes every account, the provider emits one empty `accountsChanged` and then `disconnect`, even if a listener disconnects in between. A listener that throws is reported through the platform `reportError()` where available, as `EventTarget` does, and never interrupts the provider.
+
 ### Retry and cancellation
 
 Matching concurrent core connection requests share the current attempt; a conflicting requested chain is rejected. Closing the SDK dialog or pressing Escape rejects the pending attempt with code `4001`. A timeout also terminates the attempt. Late remote approval is cleaned up for its original session topic instead of adopting it after cancellation.
+
+A wallet that rejects the connection proposal or a request with WalletConnect's `USER_REJECTED` codes (`5000`–`5003`) is reported with EIP-1193 code `4001`; the original WalletConnect error is kept as `data`.
 
 The default error view keeps a Close action and explains how to retry from the application. Call `connect()` again from a new host action to create a fresh request. The framework adapters retain their framework's normal error and connection state.
 
@@ -104,9 +108,13 @@ Your UI must offer cancellation through `provider.cancel()`, clear its QR/link o
 
 Discovery checks the published `com.robinhood.wallet` EIP-6963 identity and the `isRobinhoodMobileWallet` injected-provider flag. It does not select an arbitrary `window.ethereum` provider and change its label. These hints distinguish compatible provider advertisements; they are not cryptographic vendor authentication.
 
-Remote connections use `@walletconnect/sign-client` **2.26.0**. The core owns its approved session topic and requests only within its authorized EVM namespace. Read calls use the corresponding configured `rpcMap` endpoint. The SDK uses browser persistence where available, while WalletConnect maintains its own session/key storage. A restored session is validated for expiry and approved accounts/chains before adoption.
+Remote connections use `@walletconnect/sign-client` **2.26.0**. The core owns its approved session topic and requests only within its authorized EVM namespace. Read calls use the corresponding configured `rpcMap` endpoint. The SDK uses browser persistence where available, while WalletConnect maintains its own session/key storage. Providers that share a storage prefix share one SignClient per page, created with the first provider's project ID and metadata, because WalletConnect keeps one Core per prefix; a provider created after `destroy()` reuses it.
 
-Imports and construction are safe without a browser. Interactive use requires a browser; the default modal requires native `HTMLDialogElement.showModal()`. CSS is included in the lazy modal module, and the icon is an embedded data URL. A restrictive Content Security Policy must permit the module's inline styles and image data URLs, or the application should supply its own UI.
+A restored session is validated for expiry and approved accounts/chains before adoption. It keeps the saved chain and account selection while the session still approves them; if the saved chain is no longer configured, it uses another configured chain the session approved. A session that approves none of the configured chains is revoked rather than left approved.
+
+Switching between chains the session already approved is local, as in WalletConnect's `UniversalProvider`: every request names its chain, so the wallet is not prompted. A chain the session did not approve is rejected with `4901`. Session events may encode chains as numbers, hexadecimal or decimal strings, or CAIP-2 IDs, and accounts as addresses or CAIP-10 IDs; the decoded values are still checked against the session's approval. A wallet's session extension is honored.
+
+Imports and construction are safe without a browser. Interactive use requires a browser; the default modal requires native `HTMLDialogElement.showModal()` and Shadow DOM. The dialog renders in a shadow root under a single `<rhw-connector>` element, so host page CSS does not restyle it. Where constructable stylesheets are supported, its CSS is applied without an inline `<style>` element, so a `style-src 'self'` Content Security Policy works; other browsers fall back to an inline style element. The icon is an embedded data URL, so the policy must still allow `img-src data:`, or the application should supply its own UI.
 
 ## Verification and licensing
 
