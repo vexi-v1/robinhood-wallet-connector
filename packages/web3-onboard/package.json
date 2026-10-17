@@ -29,7 +29,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/vexi-v1/-robinhood-wallet-connector.git",
+    "url": "git+https://github.com/vexi-v1/robinhood-wallet-connector.git",
     "directory": "packages/web3-onboard"
   }
 }

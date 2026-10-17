@@ -1,6 +1,8 @@
 # Verification record
 
-Working record for **TK-465**, dated **2026-10-17**. Checks below concern the local working tree unless a commit or packaged artifact is explicitly identified. A command listed under reproduction is an instruction, not evidence that it has passed.
+Verification record for **TK-465**, dated **2026-10-17**, at source `f6958cf6798c0c7e35961e2ee2779af855239249`, merged as `c117311a621af2f7819bdf6a407115733feccd3e` with an identical Git tree. A command listed under reproduction is an instruction, not evidence that it has passed.
+
+The repository was subsequently renamed to `vexi-v1/robinhood-wallet-connector`, and repository URLs were corrected in package metadata and documentation. Provider and adapter source did not change. Recorded tarball hashes identify the tested artifacts before that metadata correction; newly packed artifacts can have different hashes.
 
 ## Recorded checks
 
