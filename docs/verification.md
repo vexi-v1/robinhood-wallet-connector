@@ -1,6 +1,6 @@
 # Verification record
 
-Verification record for **TK-465**, dated **2026-10-17**, at source `f6958cf6798c0c7e35961e2ee2779af855239249`, merged as `c117311a621af2f7819bdf6a407115733feccd3e` with an identical Git tree. A command listed under reproduction is an instruction, not evidence that it has passed.
+Verification recorded on **2026-10-17**, at source `f6958cf6798c0c7e35961e2ee2779af855239249`, merged as `c117311a621af2f7819bdf6a407115733feccd3e` with an identical Git tree. A command listed under reproduction is an instruction, not evidence that it has passed.
 
 The repository was subsequently renamed to `vexi-v1/robinhood-wallet-connector`, and repository URLs were corrected in package metadata and documentation. Provider and adapter source did not change. Recorded tarball hashes identify the tested artifacts before that metadata correction; newly packed artifacts can have different hashes.
 
@@ -10,9 +10,9 @@ The repository was subsequently renamed to `vexi-v1/robinhood-wallet-connector`,
 | --- | --- | --- |
 | All four SDK packages | **Build passed** | TypeScript build of core and three adapters. |
 | Core behavioral suite | **40 passed** | Discovery 5, modal 10, provider 16, transport 9; synthetic EIP-1193 / SignClient fixtures and JSDOM. |
-| Packed framework consumers | **4 builds/type contracts and 14 runtime tests passed** | Real wagmi v2/v3, RainbowKit and Onboard packages; [exact versions, tarball hashes, method and logs](evidence/tk-465/framework-matrix.json). Four initially fresh installs followed by the final core-only offline refresh and repeated checks. |
+| Packed framework consumers | **4 builds/type contracts and 14 runtime tests passed** | Real wagmi v2/v3, RainbowKit and Onboard packages; [exact versions, tarball hashes, method and logs](evidence/2026-10-17/framework-matrix.json). Four initially fresh installs followed by the final core-only offline refresh and repeated checks. |
 | Actual browser flow | **Passed within the scope below** | Local examples in a Chromium browser; desktop 1280×720 and narrow 390×844 fixture layout. Real relay proposal generation without wallet approval. |
-| Independent code review | **No remaining actionable blocker in reviewed paths** | Cancellation, session ownership, account permissions, asynchronous switching and event reentrancy; regressions recorded in [review evidence](evidence/tk-465/review.json). |
+| AI code review | **No remaining actionable blocker in reviewed paths** | Cancellation, session ownership, account permissions, asynchronous switching and event reentrancy; regressions recorded in [review evidence](evidence/2026-10-17/review.json). |
 | Dependency audit | **Core and wagmi v3: zero reported findings; legacy frameworks have findings** | Onboard includes inherited critical findings. See [dependency notes](dependency-notes.md); this is not a security certification. |
 | Embedded icon hash | **Matched** recorded SHA-256 | See [asset provenance](architecture.md#asset-provenance). |
 | Real mobile wallet pairing, signatures, transactions | **Not performed** | No physical-device or chain certification. |
@@ -36,7 +36,7 @@ Declared framework baselines are wagmi `2.19.5` / core `2.22.1`, wagmi `3.7.7` /
 
 ## Observed browser checks
 
-The [browser record](evidence/tk-465/browser.json) separates synthetic layout checks from actual relay initialization. Screenshots use a deliberately inert fixture QR and must never be used for wallet pairing.
+The [browser record](evidence/2026-10-17/browser.json) separates synthetic layout checks from actual relay initialization. Screenshots use a deliberately inert fixture QR and must never be used for wallet pairing.
 
 | Scenario | Observed result |
 | --- | --- |
@@ -47,19 +47,19 @@ The [browser record](evidence/tk-465/browser.json) separates synthetic layout ch
 | Web3-Onboard real relay | Selecting the module opens the ready SDK dialog. Expiry clears pairing data and shows an actionable error. Close/ Escape returns to the host rejection state; Back to wallets and the host Retry action both lead to a fresh ready SDK dialog. |
 | wagmi v3 real relay | Connect opens the ready SDK dialog. Escape returns to disconnected; another Connect opens a fresh ready dialog. The final host focus refinement restores focus to Connect after cancellation and both wagmi examples passed renewed type/build checks. |
 
-![Desktop fixture with inert QR](evidence/tk-465/desktop-fixture.jpg)
+![Desktop fixture with inert QR](evidence/2026-10-17/desktop-fixture.jpg)
 
-![Narrow fixture with inert QR](evidence/tk-465/mobile-fixture.jpg)
+![Narrow fixture with inert QR](evidence/2026-10-17/mobile-fixture.jpg)
 
 ## Physical-device validation remains separate
 
-An authorized human should record device model, OS, browser, Robinhood Wallet version, app origin, connector commit/tarball hash, and tested chain for each result. Use a dedicated test wallet and do not put addresses, pairing URIs, session keys, or signing material in public evidence.
+For manual device testing, record the device model, OS, browser, Robinhood Wallet version, app origin, connector commit/tarball hash, and tested chain for each result. Use a dedicated test wallet and do not put addresses, pairing URIs, session keys, or signing material in public evidence.
 
 1. Desktop QR to real iOS and Android wallet: scan, approve, verify account/chain result, reject, cancel, timeout, and retry.
 2. Same-device app handoff: explicit app-link click, successful return to the dapp, and browser behavior when the wallet is not installed.
 3. Injected Robinhood in-app browser: discovery, user-triggered permission request, account changes, and rejected/removed authorization.
 4. Reload recovery and disconnect: recover only the intended prior approval; disconnect removes it; stale approval cannot revive a cancelled request.
-5. Each intended network: approve it, verify actual chain selection, and exercise supported switch/rejection behavior. Record mainnet `4663` and testnet `46630` separately if requested.
-6. Signing and transactions: only under an explicit separate test scope, with the exact method, user review, expected outcome, and network recorded. SDK connection testing does not require these operations.
+5. Each intended network: approve it, verify actual chain selection, and exercise supported switch/rejection behavior. Record each mainnet and testnet separately.
+6. Signing and transactions: connection checks do not require either operation. If you test them separately, use a dedicated test wallet, review every wallet prompt, and record the exact method, expected outcome and network.
 
 Until that evidence exists, this project must not advertise physical-wallet certification or universal EVM/Robinhood Chain support.

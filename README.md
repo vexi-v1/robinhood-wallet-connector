@@ -157,6 +157,10 @@ The matrix packs the packages, installs real framework dependencies in isolated 
 
 See [architecture](docs/architecture.md), [verification](docs/verification.md), and [upstream assessment](docs/upstream-contributions.md). Package publication, upstream inclusion, deployment, and physical-wallet certification are separate delivery stages.
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for local setup, examples, compatibility checks and pull request guidance.
+
 ## License and wallet identity
 
 Project code is covered by the [MIT license](LICENSE). Robinhood's name, icon, and other third-party marks remain the property of their owners; this license does not grant rights to those marks or imply endorsement. The bundled icon's source and SHA-256 are recorded in [architecture](docs/architecture.md#asset-provenance).

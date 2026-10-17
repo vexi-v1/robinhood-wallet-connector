@@ -1,5 +1,7 @@
 # Robinhood Wallet for Web3-Onboard
 
+These packages are not published to npm. Follow the [tarball installation guide](https://github.com/vexi-v1/robinhood-wallet-connector#install-from-this-repository) before using this adapter.
+
 A standard wallet module for Blocknative Web3-Onboard, now maintained at `thirdweb-dev/web3-onboard`.
 
 ```ts

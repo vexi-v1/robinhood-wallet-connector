@@ -1,7 +1,6 @@
 {
-  "task": "TK-465",
   "observedAt": "2026-10-16T20:59:51.051690+00:00",
-  "method": "Actual local browser automation through CUA; no wallet approval, signing or transaction submission.",
+  "method": "Browser checks in local Chromium examples; no wallet approval, signing or transaction submission.",
   "synthetic": {
     "fixture": "examples/vanilla/fixture.html",
     "desktop": [
@@ -24,7 +23,7 @@
     "qr": "Deliberately inert synthetic URI; never approve or use this fixture for pairing."
   },
   "actualRelay": {
-    "projectId": "Owner-supplied browser project configuration; omitted from this evidence.",
+    "projectId": "Application project configuration was supplied for relay checks; omitted from this record.",
     "walletApproved": false,
     "pairingMaterialStoredInEvidence": false,
     "vanilla": [

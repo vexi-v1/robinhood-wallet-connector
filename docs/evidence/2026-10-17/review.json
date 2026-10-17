@@ -1,7 +1,6 @@
 {
-  "task": "TK-465",
   "reviewedAt": "2026-10-17",
-  "reviewType": "Independent agent code review, not human approval or security audit",
+  "reviewType": "AI code review, not an independent security audit",
   "verdict": "No remaining actionable blocker found in reviewed provider/transport/modal paths after regression fixes.",
   "checks": {
     "coreSuite": {

@@ -1,6 +1,5 @@
 {
   "schemaVersion": 1,
-  "task": "TK-465",
   "generatedAt": "2026-10-16T20:53:05.942Z",
   "environment": {
     "node": "24.19.0",

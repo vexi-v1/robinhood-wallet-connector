@@ -1,14 +1,14 @@
-# Robinhood Wallet connector — contributor instructions
+# Guidance for coding assistants
 
-Follow the parent Vexi workspace agreement. Product behavior is governed by `vexi-spec`; start with TK-465 and its accepted RDR and acceptance criteria. Keep product work on a branch containing its ticket number.
+This is a standalone SDK repository. Read [README.md](README.md) for installation and public APIs, and [CONTRIBUTING.md](CONTRIBUTING.md) for setup, repository layout, checks and pull requests. All development instructions are maintained in this repository.
 
-- Use English for code, documentation, and user-facing text. Discuss work with the owner in Traditional Chinese.
-- Scope commits to explicit paths. Preserve unrelated changes. Do not bypass hooks or force-push.
-- Never request signatures, transactions, or wallet approval during automated UI verification. Synthetic providers and actual device tests are separate evidence.
-- Never log WalletConnect pairing URIs, session keys, accounts, or authentication material in committed artifacts.
-- Only identify a discovered Robinhood provider using published wallet metadata; do not relabel an arbitrary injected provider.
+- Use English for code, comments, documentation and interface text.
+- Keep changes focused and preserve unrelated working-tree changes. Do not bypass hooks or force-push.
 - Keep imports safe without a browser. Initialize transport only when needed; request accounts only after explicit connection intent.
-- Test cancellation, late completion, retry, disconnect, restored sessions, and event cleanup at their behavioral boundaries.
-- Verify supported framework versions using real packages and package-consumer builds. Do not advertise untested version ranges or chain support.
-- Do not imply Robinhood endorsement. Brand names belong to their respective owners.
-- Package publication, upstream acceptance, physical-wallet certification, and deployment need separate evidence.
+- Identify Robinhood providers using the documented discovery metadata. Never relabel an arbitrary injected provider.
+- Cover cancellation, late completion, retry, disconnect, restored sessions and event cleanup when changing those behaviors.
+- Validate compatibility using the real framework packages and packed consumers. Do not claim support for untested versions or networks.
+- Use synthetic wallets for automated checks. Do not approve real wallet prompts, request signatures or send transactions during automated UI tests.
+- Keep pairing URIs, session keys, account information and authentication material out of logs, screenshots and committed artifacts.
+- Preserve the distinction between synthetic tests, browser checks and physical-device results when updating verification records.
+- Do not imply Robinhood endorsement. Keep third-party asset attribution and license notices intact.

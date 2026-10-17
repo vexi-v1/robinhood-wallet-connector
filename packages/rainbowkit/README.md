@@ -1,5 +1,7 @@
 # Robinhood Wallet for RainbowKit
 
+These packages are not published to npm. Follow the [tarball installation guide](https://github.com/vexi-v1/robinhood-wallet-connector#install-from-this-repository) before using this adapter.
+
 Add Robinhood first in your wallet list:
 
 ```ts
