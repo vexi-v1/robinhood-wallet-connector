@@ -10,7 +10,7 @@
     "docs:check": "node scripts/llms-docs.mjs check",
     "build": "npm run build -w @vexi/robinhood-wallet && npm run build -w @vexi/robinhood-wallet-wagmi && npm run build -w @vexi/robinhood-wallet-rainbowkit && npm run build -w @vexi/robinhood-wallet-onboard",
     "test": "tsx --test tests/*.test.ts",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present && tsc -p tests/tsconfig.json"
   },
   "devDependencies": {
     "@rainbow-me/rainbowkit": "^2.2.11",

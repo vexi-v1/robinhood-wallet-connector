@@ -1,0 +1,445 @@
+{
+  "schemaVersion": 1,
+  "reviewedAt": "2026-10-17",
+  "reviewedSource": "c117311, the merged original delivery",
+  "submittedOn": "main at fc8774a; its commits since c117311 changed documentation, CI and package metadata only",
+  "reviewType": "AI follow-up code review: one primary and two independent AI reviewers, covering the core lifecycle and the adapters against real wagmi, RainbowKit, Web3-Onboard and WalletConnect source. Not a human approval or an independent security audit.",
+  "verificationBoundary": "Synthetic EIP-1193 and SignClient fixtures, real framework packages in packed consumers, and headless Chromium. No real relay pairing, wallet approval, signature or transaction was performed or requested.",
+  "findings": [
+    {
+      "id": "F01",
+      "area": "core/provider",
+      "severity": "medium",
+      "summary": "cancel() without a pending attempt invalidated in-flight requests on an established connection, so a signed result was rejected with 4900.",
+      "disposition": "fixed",
+      "test": "provider: cancel without a pending attempt keeps an established connection and its in-flight requests"
+    },
+    {
+      "id": "F02",
+      "area": "core/provider",
+      "severity": "medium",
+      "summary": "disconnect() rejected after local state was already cleared when WalletConnect revocation failed (for example offline), leaving wagmi's store connected.",
+      "disposition": "fixed",
+      "test": "provider: disconnect completes locally and stays retryable when wallet-side revocation fails"
+    },
+    {
+      "id": "F03",
+      "area": "core/provider",
+      "severity": "low",
+      "summary": "A failed revocation during transport initialization discarded the initialized transport, so a retry created a second SignClient transport.",
+      "disposition": "fixed",
+      "test": "provider: failed revocation during transport initialization keeps that transport for the next attempt"
+    },
+    {
+      "id": "F04",
+      "area": "core/provider",
+      "severity": "medium",
+      "summary": "connect() and eth_requestAccounts never recovered a persisted approved session, so Web3-Onboard reloads opened a new pairing and orphaned the old session.",
+      "disposition": "fixed",
+      "test": "provider: explicit connection recovers a persisted approved session before asking for a new approval; consumer (Onboard): a new Onboard module instance recovers the approved session without another prompt"
+    },
+    {
+      "id": "F05",
+      "area": "core/provider",
+      "severity": "low",
+      "summary": "A disconnect() called from an accountsChanged([]) listener suppressed the disconnect event for every listener.",
+      "disposition": "fixed",
+      "test": "provider: an empty-account listener that disconnects still lets every listener receive disconnect"
+    },
+    {
+      "id": "F06",
+      "area": "core/provider",
+      "severity": "low",
+      "summary": "Removing every account emitted accountsChanged([]) twice.",
+      "disposition": "fixed",
+      "test": "provider: wallet removal of every account reports one empty account list, then disconnect"
+    },
+    {
+      "id": "F07",
+      "area": "core/provider",
+      "severity": "low",
+      "summary": "A confirmed chain switch emitted accountsChanged again even when the backend had reported it or nothing changed.",
+      "disposition": "fixed",
+      "test": "provider: a confirmed chain switch reports each change once"
+    },
+    {
+      "id": "F08",
+      "area": "core/provider",
+      "severity": "low",
+      "summary": "NaN, Infinity and delays above 2147483647 ms were accepted as timeouts and expired immediately.",
+      "disposition": "fixed",
+      "test": "provider: rejects timeouts that a timer cannot represent"
+    },
+    {
+      "id": "F09",
+      "area": "core/transport",
+      "severity": "medium",
+      "summary": "chainChanged data as a CAIP-2 ID and accountsChanged entries as CAIP-10 accounts, both accepted by WalletConnect's UniversalProvider, disconnected valid sessions.",
+      "disposition": "fixed",
+      "test": "transport: session events accept CAIP-2 chains and CAIP-10 accounts without widening permissions"
+    },
+    {
+      "id": "F10",
+      "area": "core/transport",
+      "severity": "medium",
+      "summary": "Switching between session-approved chains required a wallet round trip and wallet approval of wallet_switchEthereumChain; UniversalProvider switches locally because each request names its chain.",
+      "disposition": "fixed",
+      "test": "transport: switching between session-approved chains is local, like UniversalProvider, and needs no wallet method; a chain removed by session_update can no longer be selected"
+    },
+    {
+      "id": "F11",
+      "area": "core/transport",
+      "severity": "medium",
+      "summary": "A session_update replaced the wallet-selected account with every approved account and persisted that.",
+      "disposition": "fixed",
+      "test": "transport: a session update keeps the wallet-selected account while it stays approved"
+    },
+    {
+      "id": "F12",
+      "area": "core/transport",
+      "severity": "medium",
+      "summary": "A provider recreated with the same storage prefix initialized a second SignClient on WalletConnect's shared global Core, stacking a second engine on one relayer.",
+      "disposition": "fixed",
+      "test": "transport: one SignClient serves every transport for a storage prefix; a failed initialization can be retried"
+    },
+    {
+      "id": "F13",
+      "area": "core/transport",
+      "severity": "low",
+      "summary": "Restore discarded a still-valid session when the saved chain was no longer configured, and never revoked a session it could not use.",
+      "disposition": "fixed",
+      "test": "transport: restore adopts only the saved topic, stays within its approval, and revokes a session no configured chain can use"
+    },
+    {
+      "id": "F14",
+      "area": "core/transport",
+      "severity": "medium",
+      "summary": "Wallet rejections arrived as WalletConnect code 5000 objects instead of EIP-1193 4001, so wagmi and Web3-Onboard did not recognize them as user rejections.",
+      "disposition": "fixed",
+      "test": "transport: wallet rejections use EIP-1193 code 4001 and keep the WalletConnect error as data"
+    },
+    {
+      "id": "F15",
+      "area": "core/transport",
+      "severity": "low",
+      "summary": "A wallet session extension was ignored, so requests failed at the original expiry.",
+      "disposition": "fixed",
+      "test": "transport: a wallet session extension keeps requests available past the original expiry"
+    },
+    {
+      "id": "F16",
+      "area": "core/transport",
+      "severity": "low",
+      "summary": "Disconnect and wallet deletion kept the session's pairing (with its key material and relay subscription).",
+      "disposition": "fixed",
+      "test": "transport: disconnect and wallet deletion also release the session pairing"
+    },
+    {
+      "id": "F17",
+      "area": "core/state",
+      "severity": "low",
+      "summary": "The storage memory fallback masked a removal made by another tab.",
+      "disposition": "fixed",
+      "test": "storage: persistent storage stays authoritative, so a removal by another tab is not masked"
+    },
+    {
+      "id": "F18",
+      "area": "core/emitter",
+      "severity": "low",
+      "summary": "removeListener(event, fn) did not cancel a once(event, fn) registration.",
+      "disposition": "fixed",
+      "test": "provider: removeListener cancels a once registration of the same listener"
+    },
+    {
+      "id": "F19",
+      "area": "core/emitter",
+      "severity": "low",
+      "summary": "Listener exceptions were discarded silently instead of reported as EventTarget does.",
+      "disposition": "fixed",
+      "test": "provider: consumer callback failures are reported without preventing settlement or later event consumers"
+    },
+    {
+      "id": "F20",
+      "area": "core/modal",
+      "severity": "medium",
+      "summary": "qrcode's inline pixel size overrode the dialog CSS, so the QR was 240x280 CSS pixels at viewports up to 480 px wide; it was also rendered at 1x on high-density screens.",
+      "disposition": "fixed",
+      "test": "modal: QR resolution follows device pixel ratio and leaves its square display size to the dialog; browser measurements below"
+    },
+    {
+      "id": "F21",
+      "area": "core/modal",
+      "severity": "medium",
+      "summary": "Host page CSS restyled the light-DOM dialog: the repository's own example offset the close icon by (9, 7) px, and a hostile stylesheet shrank the QR to 40x40 px.",
+      "disposition": "fixed",
+      "test": "modal: renders inside an isolating shadow root and adds only its host to the page; browser measurements below"
+    },
+    {
+      "id": "F22",
+      "area": "core/modal",
+      "severity": "medium",
+      "summary": "Under a style-src 'self' Content Security Policy the inline <style> was blocked and the dialog rendered unstyled.",
+      "disposition": "fixed",
+      "test": "browser measurement csp.html"
+    },
+    {
+      "id": "F23",
+      "area": "core/modal",
+      "severity": "low",
+      "summary": "Focus was not restored to a trigger inside another open shadow root, such as Web3-Onboard's chooser.",
+      "disposition": "fixed",
+      "test": "modal: restores focus to a control inside another open shadow root"
+    },
+    {
+      "id": "F24",
+      "area": "adapters/wagmi",
+      "severity": "medium",
+      "summary": "RainbowKit always passes a chainId; the adapter made it mandatory, so a wallet session without that chain was revoked and rejected (4901), and a declined or unsupported in-app switch failed the connection. Before connecting, getChainId reported the configured default instead of the in-app wallet's chain.",
+      "disposition": "fixed",
+      "test": "consumer (wagmi v2, wagmi v3, RainbowKit): a requested chain is a preference: the in-app chain is reported, kept after a failed switch, and lost only on rejection"
+    },
+    {
+      "id": "F25",
+      "area": "adapters/wagmi",
+      "severity": "low",
+      "summary": "A repeated connect while one was pending failed with a code-less Error instead of sharing the request or using ResourceUnavailableRpcError.",
+      "disposition": "fixed",
+      "test": "consumer (wagmi v2, wagmi v3, RainbowKit): a repeated wagmi connect shares the pending wallet prompt"
+    },
+    {
+      "id": "F26",
+      "area": "repository",
+      "severity": "low",
+      "summary": "Test files were never type-checked, and CI ran neither typecheck nor the declared minimum Node.js 22.12.",
+      "disposition": "fixed",
+      "test": "npm run typecheck includes tests/tsconfig.json; CI matrix runs Node 22.12.0 and 24"
+    },
+    {
+      "id": "R01",
+      "area": "core/provider",
+      "severity": "low",
+      "summary": "A connection timeout is reported with 4001, the same code as a user cancellation. Hosts such as Web3-Onboard and RainbowKit rely on it to show their retry state.",
+      "disposition": "kept, documented"
+    },
+    {
+      "id": "R02",
+      "area": "core/provider",
+      "severity": "low",
+      "summary": "Cancelling during saved-session recovery and reconnecting before that recovery settles starts a fresh pairing instead of retrying recovery.",
+      "disposition": "open"
+    },
+    {
+      "id": "R03",
+      "area": "adapters/rainbowkit",
+      "severity": "low",
+      "summary": "After the SDK dialog closes, RainbowKit's own detail pane shows its generic 'Confirm connection in the extension' copy, and focus returns to the page body because RainbowKit disables the selected option.",
+      "disposition": "open (RainbowKit-owned copy and focus)"
+    },
+    {
+      "id": "R04",
+      "area": "core/metadata",
+      "severity": "low",
+      "summary": "The embedded 512x512 icon adds about 58 KB of base64 to every bundle that imports the core. Changing it changes the recorded asset provenance.",
+      "disposition": "open (owner decision)"
+    },
+    {
+      "id": "R05",
+      "area": "core/transport",
+      "severity": "low",
+      "summary": "The shared SignClient keeps its relay connection for the page lifetime; WalletConnect offers no supported teardown for a global Core.",
+      "disposition": "documented"
+    },
+    {
+      "id": "R06",
+      "area": "adapters/web3-onboard",
+      "severity": "low",
+      "summary": "Default WalletConnect metadata.url falls back to appMetadata.explore, as Onboard's own WalletConnect module does; a mismatched URL can trigger the wallet's domain verification warning.",
+      "disposition": "kept, documented upstream behavior"
+    },
+    {
+      "id": "R07",
+      "area": "mobile",
+      "severity": "medium",
+      "summary": "On a same-device mobile connection, later signing requests do not reopen Robinhood Wallet automatically. That needs a physical-device design and test.",
+      "disposition": "open (requires device evidence)"
+    }
+  ],
+  "checks": {
+    "coreSuite": {
+      "total": 63,
+      "passed": 63,
+      "discovery": 5,
+      "modal": 13,
+      "provider": 27,
+      "transport": 16,
+      "storage": 2,
+      "node": [
+        "24.19.0",
+        "22.12.0"
+      ]
+    },
+    "typecheck": "Workspace packages and tests/tsconfig.json passed.",
+    "originalCodeComparison": "62 of the 63 core tests can run against the base commit sources; the shared-SignClient test needs a new export. There, 24 failed (the new regression tests, plus two modal tests updated for the shadow-root host) and the other 38 passed.",
+    "packedFrameworkMatrix": {
+      "command": "node scripts/framework-matrix.mjs",
+      "generatedAt": "2026-10-17T07:00:03.559Z",
+      "environment": {
+        "node": "24.19.0",
+        "npm": "12.0.2",
+        "platform": "darwin",
+        "architecture": "arm64"
+      },
+      "method": "Packed all four SDK packages from the final tree, rebased on main with its corrected repository metadata, and installed them into four fresh standalone consumers with exact framework dependencies; ran production builds, public TypeScript contracts and synthetic runtime tests.",
+      "artifacts": {
+        "@vexi/robinhood-wallet": "b8d7bbc700c994c9fde7daf871eaacbe6cca5a6952512cf7bec8a805238429cc",
+        "@vexi/robinhood-wallet-wagmi": "4e56d0ae9fd43a224f8f6722fe44bff3d107bf2baf65fd761e67f803e40ce8ce",
+        "@vexi/robinhood-wallet-rainbowkit": "c3f2ae3dbdedbd355b7c0279e407c29c509a5d99309c3b753264dc793e4b32e0",
+        "@vexi/robinhood-wallet-onboard": "accf582675ad45b385f69be13c0599a5c4acfac23bd56e12865f81c2a3488271"
+      },
+      "results": [
+        {
+          "name": "wagmi-v2",
+          "status": "passed",
+          "runtimeTests": 5,
+          "versions": {
+            "wagmi": "2.19.5",
+            "@wagmi/core": "2.22.1",
+            "viem": "2.57.7"
+          }
+        },
+        {
+          "name": "wagmi-v3",
+          "status": "passed",
+          "runtimeTests": 5,
+          "versions": {
+            "wagmi": "3.7.7",
+            "@wagmi/core": "3.6.5",
+            "viem": "2.57.7"
+          }
+        },
+        {
+          "name": "rainbowkit",
+          "status": "passed",
+          "runtimeTests": 7,
+          "versions": {
+            "@rainbow-me/rainbowkit": "2.2.11",
+            "wagmi": "2.19.5",
+            "@wagmi/core": "2.22.1",
+            "viem": "2.57.7"
+          }
+        },
+        {
+          "name": "onboard",
+          "status": "passed",
+          "runtimeTests": 4,
+          "versions": {
+            "@web3-onboard/core": "2.24.1",
+            "@web3-onboard/common": "2.4.2"
+          }
+        }
+      ],
+      "totals": {
+        "buildsAndTypeContracts": 4,
+        "runtimeTests": 21,
+        "failed": 0
+      }
+    }
+  },
+  "browser": {
+    "engine": "Chrome for Testing 153 (headless) driven by playwright-core 1.56.1",
+    "syntheticFixture": "examples/vanilla/fixture.html content with its inert URI, served against the working-tree core; an aggressive host stylesheet page; and a page with Content-Security-Policy style-src 'self'.",
+    "before": [
+      {
+        "page": "fixture",
+        "viewport": "1280x720",
+        "qrCss": "280x280",
+        "qrBackingPx": 280,
+        "closeIconOffsetPx": [
+          9,
+          7
+        ]
+      },
+      {
+        "page": "fixture",
+        "viewport": "390x844 @3x",
+        "qrCss": "240x280",
+        "qrBackingPx": 280,
+        "closeIconOffsetPx": [
+          9,
+          7
+        ]
+      },
+      {
+        "page": "hostile CSS",
+        "viewport": "390x844 @3x",
+        "qrCss": "40x40",
+        "titleColor": "rgb(255, 0, 0)",
+        "closeButtonOverflowsDialog": true
+      },
+      {
+        "page": "style-src 'self'",
+        "viewport": "1280x720",
+        "cspViolations": [
+          "style-src-elem inline"
+        ],
+        "dialogRadius": "0px",
+        "unstyled": true
+      }
+    ],
+    "after": [
+      {
+        "page": "fixture, hostile CSS and style-src 'self'",
+        "viewports": [
+          "1280x720 @1x",
+          "1280x720 @2x",
+          "390x844 @3x",
+          "320x640 @3x"
+        ],
+        "qrCss": "280x280 desktop, 240x240 narrow",
+        "qrBackingPx": "280 @1x, 560 @2x, 840 @3x",
+        "closeIconOffsetPx": [
+          0,
+          0
+        ],
+        "hostStylesApplied": false,
+        "cspViolations": [],
+        "horizontalOverflow": false,
+        "lightDomDialogs": 0
+      }
+    ],
+    "keyboard": "Initial focus on Close; Tab and Shift+Tab cycle only through the dialog's visible controls; the page behind is inert; Close and Escape each remove the dialog, return the provider to idle and restore focus to Connect.",
+    "accessibility": "Role queries resolve the dialog named 'Connect your wallet' with its description, the 'Cancel wallet connection' button, the app link and the QR image inside the shadow root.",
+    "frameworkBuilds": {
+      "method": "Production builds from the packed-consumer matrix, served from 127.0.0.1. Every request and WebSocket to any other host was blocked, so connect attempts remained in the dialog's loading state.",
+      "rainbowkit": "One top-layer SDK dialog over the RainbowKit chooser; the chooser cannot take focus while it is open; Escape closes only the SDK dialog; RainbowKit's Retry opens a fresh SDK dialog; Close removes it.",
+      "web3Onboard": "Selecting the module opens one top-layer SDK dialog; Escape closes it and Onboard shows 'Connection Rejected! Click here to try again'.",
+      "wagmiV3": "At 390x844, Connect opens the SDK dialog; Escape returns status to disconnected and focus to Connect.",
+      "blockedExternalHosts": {
+        "rainbowkit": [
+          "api.web3modal.org",
+          "pulse.walletconnect.org",
+          "relay.walletconnect.org (WebSocket)"
+        ],
+        "web3Onboard": [
+          "rsms.me",
+          "relay.walletconnect.org (WebSocket)"
+        ],
+        "wagmiV3": [
+          "relay.walletconnect.org (WebSocket)"
+        ]
+      },
+      "note": "Only the RainbowKit page, which also includes RainbowKit's own WalletConnect connector, attempted the WalletConnect telemetry and AppKit configuration hosts."
+    },
+    "screenshots": [
+      "desktop-fixture.jpg",
+      "mobile-fixture.jpg"
+    ],
+    "qr": "Deliberately inert synthetic URI; never approve or use this fixture for pairing."
+  },
+  "notReRun": [
+    "The 2026-10-16 real-relay browser flows in browser.json (vanilla, RainbowKit, Web3-Onboard, wagmi v3 with an owner-supplied project ID) predate these changes and were not repeated.",
+    "Physical iOS or Android pairing, app routing, signing and transactions",
+    "Robinhood Chain 4663 or 46630 support",
+    "npm publication, deployment and external upstream acceptance"
+  ]
+}

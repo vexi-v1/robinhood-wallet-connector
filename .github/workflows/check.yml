@@ -6,7 +6,39 @@ on:
 permissions:
   contents: read
 jobs:
+  docs:
+    name: Documentation freshness and links
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      # Uses Node.js built-ins only, so it needs no dependency install.
+      - run: npm run docs:check
   test:
+    name: Build, types and core tests (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        # The declared minimum and the current LTS used by the framework matrix.
+        node: ['22.12.0', '24']
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npm run build
+      - run: npm run typecheck
+      - run: npm test
+  frameworks:
+    name: Packed framework consumers
+    needs: test
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -15,8 +47,6 @@ jobs:
         with:
           node-version: 24
           cache: npm
-      - run: npm run docs:check
       - run: npm ci --ignore-scripts
       - run: npm run build
-      - run: npm test
       - run: node scripts/framework-matrix.mjs

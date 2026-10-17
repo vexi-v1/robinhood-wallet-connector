@@ -94,6 +94,8 @@ export const config = createConfig({
 
 Use the resulting connector with wagmi's normal connection hooks or actions. A user selecting **Connect** starts the permission request. The adapter exposes `cancelConnect()` for custom host controls. The runnable examples include the React provider setup.
 
+As with wagmi's built-in connectors, a `chainId` passed to `connect` is a preference: if switching to it fails while the wallet remains connected, the connection stays on the wallet's chain. User rejection, cancellation, disconnection or destruction still rejects the connection attempt. A previously approved session is recovered on reconnect, and by `connect` itself, without a new approval.
+
 ## Use with RainbowKit
 
 ```ts
@@ -138,7 +140,7 @@ async function connectWallet() {
 }
 ```
 
-Onboard supplies the configured chains, RPC endpoints, and application metadata to the module. Its interface exposes the EIP-1193 provider and the same `RobinhoodProvider` as `instance`.
+Onboard supplies the configured chains, RPC endpoints, and application metadata to the module. Its interface exposes the EIP-1193 provider and the same `RobinhoodProvider` as `instance`. When Onboard reconnects through `eth_requestAccounts`, the provider recovers the previously approved session instead of starting a new pairing.
 
 The tested Onboard dependency tree includes inherited critical and high-severity registry advisories. Review the [dependency notes](docs/dependency-notes.md) before adopting this integration; a passing framework test is not a security certification.
 
@@ -158,6 +160,8 @@ RainbowKit's listed baseline uses wagmi v2. The separate wagmi v3 example does n
 ## Connection and verification boundaries
 
 The desktop layout presents a locally generated QR code; narrow viewports use a bottom sheet with the same explicit app-opening action. The SDK does not infer that an app is installed from viewport size. It never signs or sends a transaction automatically. A later application request can ask the connected wallet to approve a supported operation.
+
+The dialog renders inside a shadow root, so the host page's CSS cannot restyle its QR code or controls. In browsers with constructable stylesheets it needs no inline `<style>` element, so it also works under a `style-src 'self'` Content Security Policy; the embedded icon still needs `img-src data:`.
 
 Configured EVM chain IDs are application inputs, not proof of wallet support. Remote sessions must approve the requested chain, account, and method. Robinhood Chain mainnet `4663` and testnet `46630` require separate device and network evidence; neither is certified by this delivery.
 
