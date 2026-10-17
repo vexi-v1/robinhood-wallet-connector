@@ -1,0 +1,387 @@
+{
+  "schemaVersion": 1,
+  "task": "TK-465",
+  "generatedAt": "2026-10-16T20:53:05.942Z",
+  "environment": {
+    "node": "24.19.0",
+    "npm": "12.0.2",
+    "platform": "darwin",
+    "architecture": "arm64"
+  },
+  "workspace": "Fresh packed consumer workspace, separate from the repository and without workspace links.",
+  "method": {
+    "initial": {
+      "completedAt": "2026-10-16T20:51:49.862Z",
+      "description": "Packed all four SDK packages, installed their tarballs into four fresh standalone consumers with exact framework dependencies, and ran production builds, public TypeScript contracts, synthetic lifecycle tests, and dependency-tree checks.",
+      "command": "node scripts/framework-matrix.mjs",
+      "artifacts": {
+        "@vexi/robinhood-wallet": {
+          "filename": "vexi-robinhood-wallet-0.1.0.tgz",
+          "sha256": "4b7220e5d9b7103a7fef7b81f9c52bd38a7dcb0b8769dfbe18050c56ac1ae9a5"
+        },
+        "@vexi/robinhood-wallet-wagmi": {
+          "filename": "vexi-robinhood-wallet-wagmi-0.1.0.tgz",
+          "sha256": "578c445bed8b48b214697eff93a8efcf4ffbb946b199d168166c8184a5ec4a47"
+        },
+        "@vexi/robinhood-wallet-rainbowkit": {
+          "filename": "vexi-robinhood-wallet-rainbowkit-0.1.0.tgz",
+          "sha256": "c6b9307d120c01abffbcca82c9e1088604290fdf4e63e5eb525821e04e87e4fd"
+        },
+        "@vexi/robinhood-wallet-onboard": {
+          "filename": "vexi-robinhood-wallet-onboard-0.1.0.tgz",
+          "sha256": "eb51d3e3399868bff8c1bae8f7edbe9b1b16a3fb019fbbd041f1c4945e203db9"
+        }
+      }
+    },
+    "final": {
+      "description": "After the final core regression fix, repacked only the core. Reused each existing consumer and its framework dependencies; installed the new core tarball offline with lifecycle scripts disabled, then repeated production builds, public TypeScript contracts, synthetic lifecycle tests, and dependency-tree checks. Adapter tarballs were unchanged.",
+      "freshInstall": false,
+      "artifacts": {
+        "@vexi/robinhood-wallet": {
+          "filename": "vexi-robinhood-wallet-0.1.0.tgz",
+          "sha256": "e635001e95f65fa43bb2fad1831a97b56f6c28af1a6feb6e18f79617ba9d7335"
+        },
+        "@vexi/robinhood-wallet-wagmi": {
+          "filename": "vexi-robinhood-wallet-wagmi-0.1.0.tgz",
+          "sha256": "578c445bed8b48b214697eff93a8efcf4ffbb946b199d168166c8184a5ec4a47"
+        },
+        "@vexi/robinhood-wallet-rainbowkit": {
+          "filename": "vexi-robinhood-wallet-rainbowkit-0.1.0.tgz",
+          "sha256": "c6b9307d120c01abffbcca82c9e1088604290fdf4e63e5eb525821e04e87e4fd"
+        },
+        "@vexi/robinhood-wallet-onboard": {
+          "filename": "vexi-robinhood-wallet-onboard-0.1.0.tgz",
+          "sha256": "eb51d3e3399868bff8c1bae8f7edbe9b1b16a3fb019fbbd041f1c4945e203db9"
+        }
+      }
+    },
+    "buildProjectId": "Nonempty synthetic project ID, so connection code was included in production builds. No real wallet approval was requested."
+  },
+  "results": [
+    {
+      "name": "wagmi-v2",
+      "status": "passed",
+      "dependencies": {
+        "@tanstack/react-query": "5.104.3",
+        "@types/node": "24.10.1",
+        "@types/react-dom": "19.3.0",
+        "@types/react": "19.3.0",
+        "@vexi/robinhood-wallet-wagmi": "0.1.0",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "@wagmi/core": "2.22.1",
+        "jsdom": "27.0.1",
+        "react-dom": "19.3.1",
+        "react": "19.3.1",
+        "typescript": "5.9.3",
+        "viem": "2.57.7",
+        "vite": "8.3.4",
+        "wagmi": "2.19.5"
+      },
+      "initialFreshConsumer": {
+        "status": "passed",
+        "elapsedMs": 29521,
+        "install": "npm install --no-audit --no-fund",
+        "build": "passed",
+        "publicTypeContracts": "passed",
+        "runtimeTests": "passed"
+      },
+      "finalCoreRefresh": {
+        "at": "2026-10-16T20:52:59.054Z",
+        "elapsedMs": 2377,
+        "offlineInstall": true,
+        "build": "passed",
+        "runtimeTests": "passed",
+        "install": "npm install --ignore-scripts --offline --no-audit --no-fund <final-core-tarball>",
+        "publicTypeContracts": "passed",
+        "dependencyTree": "npm ls --depth=0 --json passed"
+      },
+      "runtimeTests": {
+        "tests": 3,
+        "suites": 0,
+        "pass": 3,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 232.976417,
+        "cases": [
+          {
+            "name": "packed entrypoints import without a browser or prompting a wallet",
+            "durationMs": 91.514292,
+            "status": "passed"
+          },
+          {
+            "name": "actual wagmi actions connect, propagate events, switch, disconnect, and reconnect",
+            "durationMs": 87.310667,
+            "status": "passed"
+          },
+          {
+            "name": "cancelling an actual wagmi pending connect rejects and ignores late injected approval",
+            "durationMs": 17.002417,
+            "status": "passed"
+          }
+        ]
+      },
+      "warnings": {
+        "moduleLevelDirectives": 82,
+        "reactPeerResolutionWarning": true,
+        "note": "Install warnings are retained in the log. Directive warnings concern use client boundaries in this Vite client application. Neither warnings nor passing tests establish security or general version compatibility."
+      },
+      "logs": {
+        "tests": "framework-logs/wagmi-v2-tests.log",
+        "buildSummary": "framework-logs/wagmi-v2-build-summary.log",
+        "install": "framework-logs/wagmi-v2-install.log"
+      }
+    },
+    {
+      "name": "wagmi-v3",
+      "status": "passed",
+      "dependencies": {
+        "@tanstack/react-query": "5.104.3",
+        "@types/node": "24.10.1",
+        "@types/react-dom": "19.3.0",
+        "@types/react": "19.3.0",
+        "@vexi/robinhood-wallet-wagmi": "0.1.0",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "@wagmi/core": "3.6.5",
+        "jsdom": "27.0.1",
+        "react-dom": "19.3.1",
+        "react": "19.3.1",
+        "typescript": "5.9.3",
+        "viem": "2.57.7",
+        "vite": "8.3.4",
+        "wagmi": "3.7.7"
+      },
+      "initialFreshConsumer": {
+        "status": "passed",
+        "elapsedMs": 16186,
+        "install": "npm install --no-audit --no-fund",
+        "build": "passed",
+        "publicTypeContracts": "passed",
+        "runtimeTests": "passed"
+      },
+      "finalCoreRefresh": {
+        "at": "2026-10-16T20:53:01.219Z",
+        "elapsedMs": 2164,
+        "offlineInstall": true,
+        "build": "passed",
+        "runtimeTests": "passed",
+        "install": "npm install --ignore-scripts --offline --no-audit --no-fund <final-core-tarball>",
+        "publicTypeContracts": "passed",
+        "dependencyTree": "npm ls --depth=0 --json passed"
+      },
+      "runtimeTests": {
+        "tests": 3,
+        "suites": 0,
+        "pass": 3,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 219.693416,
+        "cases": [
+          {
+            "name": "packed entrypoints import without a browser or prompting a wallet",
+            "durationMs": 87.125709,
+            "status": "passed"
+          },
+          {
+            "name": "actual wagmi actions connect, propagate events, switch, disconnect, and reconnect",
+            "durationMs": 82.529333,
+            "status": "passed"
+          },
+          {
+            "name": "cancelling an actual wagmi pending connect rejects and ignores late injected approval",
+            "durationMs": 15.588125,
+            "status": "passed"
+          }
+        ]
+      },
+      "warnings": {
+        "moduleLevelDirectives": 85,
+        "reactPeerResolutionWarning": false,
+        "note": "Install warnings are retained in the log. Directive warnings concern use client boundaries in this Vite client application. Neither warnings nor passing tests establish security or general version compatibility."
+      },
+      "logs": {
+        "tests": "framework-logs/wagmi-v3-tests.log",
+        "buildSummary": "framework-logs/wagmi-v3-build-summary.log",
+        "install": "framework-logs/wagmi-v3-install.log"
+      }
+    },
+    {
+      "name": "rainbowkit",
+      "status": "passed",
+      "dependencies": {
+        "@rainbow-me/rainbowkit": "2.2.11",
+        "@tanstack/react-query": "5.104.3",
+        "@types/node": "24.10.1",
+        "@types/react-dom": "19.3.0",
+        "@types/react": "19.3.0",
+        "@vexi/robinhood-wallet-rainbowkit": "0.1.0",
+        "@vexi/robinhood-wallet-wagmi": "0.1.0",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "@wagmi/core": "2.22.1",
+        "jsdom": "27.0.1",
+        "react-dom": "19.3.1",
+        "react": "19.3.1",
+        "typescript": "5.9.3",
+        "viem": "2.57.7",
+        "vite": "8.3.4",
+        "wagmi": "2.19.5"
+      },
+      "initialFreshConsumer": {
+        "status": "passed",
+        "elapsedMs": 26076,
+        "install": "npm install --no-audit --no-fund",
+        "build": "passed",
+        "publicTypeContracts": "passed",
+        "runtimeTests": "passed"
+      },
+      "finalCoreRefresh": {
+        "at": "2026-10-16T20:53:04.333Z",
+        "elapsedMs": 3114,
+        "offlineInstall": true,
+        "build": "passed",
+        "runtimeTests": "passed",
+        "install": "npm install --ignore-scripts --offline --no-audit --no-fund <final-core-tarball>",
+        "publicTypeContracts": "passed",
+        "dependencyTree": "npm ls --depth=0 --json passed"
+      },
+      "runtimeTests": {
+        "tests": 5,
+        "suites": 0,
+        "pass": 5,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 421.265459,
+        "cases": [
+          {
+            "name": "packed entrypoints import without a browser or prompting a wallet",
+            "durationMs": 85.083625,
+            "status": "passed"
+          },
+          {
+            "name": "actual wagmi actions connect, propagate events, switch, disconnect, and reconnect",
+            "durationMs": 92.472416,
+            "status": "passed"
+          },
+          {
+            "name": "cancelling an actual wagmi pending connect rejects and ignores late injected approval",
+            "durationMs": 17.3425,
+            "status": "passed"
+          },
+          {
+            "name": "RainbowKit SSR configuration initializes and checks authorization without window",
+            "durationMs": 177.095666,
+            "status": "passed"
+          },
+          {
+            "name": "actual RainbowKit creates the branded connector with its metadata and one UI owner",
+            "durationMs": 0.167459,
+            "status": "passed"
+          }
+        ]
+      },
+      "warnings": {
+        "moduleLevelDirectives": 314,
+        "reactPeerResolutionWarning": true,
+        "note": "Install warnings are retained in the log. Directive warnings concern use client boundaries in this Vite client application. Neither warnings nor passing tests establish security or general version compatibility."
+      },
+      "logs": {
+        "tests": "framework-logs/rainbowkit-tests.log",
+        "buildSummary": "framework-logs/rainbowkit-build-summary.log",
+        "install": "framework-logs/rainbowkit-install.log"
+      }
+    },
+    {
+      "name": "onboard",
+      "status": "passed",
+      "dependencies": {
+        "@types/node": "24.10.1",
+        "@vexi/robinhood-wallet-onboard": "0.1.0",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "@web3-onboard/common": "2.4.2",
+        "@web3-onboard/core": "2.24.1",
+        "jsdom": "27.0.1",
+        "typescript": "5.9.3",
+        "vite": "8.3.4"
+      },
+      "initialFreshConsumer": {
+        "status": "passed",
+        "elapsedMs": 8205,
+        "install": "npm install --no-audit --no-fund",
+        "build": "passed",
+        "publicTypeContracts": "passed",
+        "runtimeTests": "passed"
+      },
+      "finalCoreRefresh": {
+        "at": "2026-10-16T20:53:05.942Z",
+        "elapsedMs": 1609,
+        "offlineInstall": true,
+        "build": "passed",
+        "runtimeTests": "passed",
+        "install": "npm install --ignore-scripts --offline --no-audit --no-fund <final-core-tarball>",
+        "publicTypeContracts": "passed",
+        "dependencyTree": "npm ls --depth=0 --json passed"
+      },
+      "runtimeTests": {
+        "tests": 3,
+        "suites": 0,
+        "pass": 3,
+        "fail": 0,
+        "cancelled": 0,
+        "skipped": 0,
+        "todo": 0,
+        "duration_ms": 427.046416,
+        "cases": [
+          {
+            "name": "packed entrypoints import without a browser or prompting a wallet",
+            "durationMs": 2.839916,
+            "status": "passed"
+          },
+          {
+            "name": "Onboard public module creates a lazy EIP-1193 interface and preserves disconnect",
+            "durationMs": 2.201958,
+            "status": "passed"
+          },
+          {
+            "name": "actual Onboard core accepts the module and initializes without requesting accounts",
+            "durationMs": 386.27525,
+            "status": "passed"
+          }
+        ]
+      },
+      "warnings": {
+        "moduleLevelDirectives": 0,
+        "reactPeerResolutionWarning": false,
+        "note": "Install warnings are retained in the log. Directive warnings concern use client boundaries in this Vite client application. Neither warnings nor passing tests establish security or general version compatibility."
+      },
+      "logs": {
+        "tests": "framework-logs/onboard-tests.log",
+        "buildSummary": "framework-logs/onboard-build-summary.log",
+        "install": "framework-logs/onboard-install.log"
+      }
+    }
+  ],
+  "totals": {
+    "frameworkConsumers": 4,
+    "runtimeTests": 14,
+    "runtimePassed": 14,
+    "runtimeFailed": 0
+  },
+  "boundaries": [
+    "Synthetic provider fixtures exercise lifecycle behavior; they do not establish physical Robinhood Wallet pairing, signing, transactions, or network support.",
+    "The last core was verified by an offline tarball update in the previously clean consumer installs, not by four new installs from scratch.",
+    "Dependency audit findings are recorded separately in dependency-audit.json and ../../dependency-notes.md."
+  ],
+  "exampleOnlyRefinement": {
+    "description": "After the recorded package matrix, both wagmi example hosts retained their trigger focus while pending and added guarded settlement focus restoration. Core and adapter tarballs did not change.",
+    "validation": "Both exact-version isolated examples passed TypeScript and complete Vite production builds; actual wagmi v3 browser cancellation restored Connect focus.",
+    "files": [
+      "examples/wagmi-v2/src/main.tsx",
+      "examples/wagmi-v3/src/main.tsx"
+    ]
+  }
+}

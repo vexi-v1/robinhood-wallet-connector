@@ -1,0 +1,865 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-10-16T20:55:04.289Z",
+  "task": "TK-465",
+  "commands": [
+    "npm audit --json",
+    "npm explain <affected packages> --json"
+  ],
+  "scope": "Isolated packed-package consumer installs, including development dependencies; standalone core contains only the packed core and its runtime dependencies.",
+  "interpretation": "Counts are npm audit dependency findings including propagated entries, not unique vulnerabilities or demonstrated exploitability. No override, force-fix, major framework upgrade, or production-readiness certification was applied.",
+  "artifacts": {
+    "@vexi/robinhood-wallet": {
+      "sha256": "e635001e95f65fa43bb2fad1831a97b56f6c28af1a6feb6e18f79617ba9d7335"
+    },
+    "@vexi/robinhood-wallet-wagmi": {
+      "sha256": "578c445bed8b48b214697eff93a8efcf4ffbb946b199d168166c8184a5ec4a47"
+    },
+    "@vexi/robinhood-wallet-rainbowkit": {
+      "sha256": "c6b9307d120c01abffbcca82c9e1088604290fdf4e63e5eb525821e04e87e4fd"
+    },
+    "@vexi/robinhood-wallet-onboard": {
+      "sha256": "eb51d3e3399868bff8c1bae8f7edbe9b1b16a3fb019fbbd041f1c4945e203db9"
+    }
+  },
+  "cases": [
+    {
+      "name": "standalone-core",
+      "versions": {
+        "@vexi/robinhood-wallet": "0.1.0",
+        "@walletconnect/sign-client": "2.26.0",
+        "qrcode": "1.5.4"
+      },
+      "counts": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "advisories": []
+    },
+    {
+      "name": "wagmi-v2",
+      "versions": {
+        "@tanstack/react-query": "5.104.3",
+        "@types/node": "24.10.1",
+        "@types/react-dom": "19.3.0",
+        "@types/react": "19.3.0",
+        "@vexi/robinhood-wallet-wagmi": "0.1.0",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "@wagmi/core": "2.22.1",
+        "jsdom": "27.0.1",
+        "react-dom": "19.3.1",
+        "react": "19.3.1",
+        "typescript": "5.9.3",
+        "viem": "2.57.7",
+        "vite": "8.3.4",
+        "wagmi": "2.19.5"
+      },
+      "counts": {
+        "info": 0,
+        "low": 0,
+        "moderate": 22,
+        "high": 1,
+        "critical": 0,
+        "total": 23
+      },
+      "advisories": [
+        {
+          "package": "decode-uri-component",
+          "severity": "moderate",
+          "directDependency": false,
+          "affectedRange": "<=0.4.2",
+          "advisories": [
+            {
+              "title": "decode-uri-component: Denial of service via exponential decoding of malformed percent-encoded input",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-vcc3-ghjq-m6fr",
+              "affectedRange": "<=0.4.2"
+            }
+          ]
+        },
+        {
+          "package": "uuid",
+          "severity": "moderate",
+          "directDependency": false,
+          "affectedRange": "<11.1.1",
+          "advisories": [
+            {
+              "title": "uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-w5hq-g745-h8pq",
+              "affectedRange": "<11.1.1"
+            }
+          ]
+        },
+        {
+          "package": "ws",
+          "severity": "high",
+          "directDependency": false,
+          "affectedRange": "8.0.0 - 8.20.1",
+          "advisories": [
+            {
+              "title": "ws: Uninitialized memory disclosure",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-58qx-3vcg-4xpx",
+              "affectedRange": ">=8.0.0 <8.20.1"
+            },
+            {
+              "title": "ws: Memory exhaustion DoS from tiny fragments and data chunks",
+              "severity": "high",
+              "url": "https://github.com/advisories/GHSA-96hv-2xvq-fx4p",
+              "affectedRange": ">=8.0.0 <8.21.0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "wagmi-v3",
+      "versions": {
+        "@tanstack/react-query": "5.104.3",
+        "@types/node": "24.10.1",
+        "@types/react-dom": "19.3.0",
+        "@types/react": "19.3.0",
+        "@vexi/robinhood-wallet-wagmi": "0.1.0",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "@wagmi/core": "3.6.5",
+        "jsdom": "27.0.1",
+        "react-dom": "19.3.1",
+        "react": "19.3.1",
+        "typescript": "5.9.3",
+        "viem": "2.57.7",
+        "vite": "8.3.4",
+        "wagmi": "3.7.7"
+      },
+      "counts": {
+        "info": 0,
+        "low": 0,
+        "moderate": 0,
+        "high": 0,
+        "critical": 0,
+        "total": 0
+      },
+      "advisories": []
+    },
+    {
+      "name": "rainbowkit",
+      "versions": {
+        "@rainbow-me/rainbowkit": "2.2.11",
+        "@tanstack/react-query": "5.104.3",
+        "@types/node": "24.10.1",
+        "@types/react-dom": "19.3.0",
+        "@types/react": "19.3.0",
+        "@vexi/robinhood-wallet-rainbowkit": "0.1.0",
+        "@vexi/robinhood-wallet-wagmi": "0.1.0",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "@wagmi/core": "2.22.1",
+        "jsdom": "27.0.1",
+        "react-dom": "19.3.1",
+        "react": "19.3.1",
+        "typescript": "5.9.3",
+        "viem": "2.57.7",
+        "vite": "8.3.4",
+        "wagmi": "2.19.5"
+      },
+      "counts": {
+        "info": 0,
+        "low": 0,
+        "moderate": 24,
+        "high": 1,
+        "critical": 0,
+        "total": 25
+      },
+      "advisories": [
+        {
+          "package": "decode-uri-component",
+          "severity": "moderate",
+          "directDependency": false,
+          "affectedRange": "<=0.4.2",
+          "advisories": [
+            {
+              "title": "decode-uri-component: Denial of service via exponential decoding of malformed percent-encoded input",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-vcc3-ghjq-m6fr",
+              "affectedRange": "<=0.4.2"
+            }
+          ]
+        },
+        {
+          "package": "uuid",
+          "severity": "moderate",
+          "directDependency": false,
+          "affectedRange": "<11.1.1",
+          "advisories": [
+            {
+              "title": "uuid: Missing buffer bounds check in v3/v5/v6 when buf is provided",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-w5hq-g745-h8pq",
+              "affectedRange": "<11.1.1"
+            }
+          ]
+        },
+        {
+          "package": "ws",
+          "severity": "high",
+          "directDependency": false,
+          "affectedRange": "8.0.0 - 8.20.1",
+          "advisories": [
+            {
+              "title": "ws: Uninitialized memory disclosure",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-58qx-3vcg-4xpx",
+              "affectedRange": ">=8.0.0 <8.20.1"
+            },
+            {
+              "title": "ws: Memory exhaustion DoS from tiny fragments and data chunks",
+              "severity": "high",
+              "url": "https://github.com/advisories/GHSA-96hv-2xvq-fx4p",
+              "affectedRange": ">=8.0.0 <8.21.0"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "onboard",
+      "versions": {
+        "@types/node": "24.10.1",
+        "@vexi/robinhood-wallet-onboard": "0.1.0",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "@web3-onboard/common": "2.4.2",
+        "@web3-onboard/core": "2.24.1",
+        "jsdom": "27.0.1",
+        "typescript": "5.9.3",
+        "vite": "8.3.4"
+      },
+      "counts": {
+        "info": 0,
+        "low": 0,
+        "moderate": 4,
+        "high": 5,
+        "critical": 3,
+        "total": 12
+      },
+      "advisories": [
+        {
+          "package": "crypto-es",
+          "severity": "critical",
+          "directDependency": false,
+          "affectedRange": "<2.1.0",
+          "advisories": [
+            {
+              "title": "crypto-es PBKDF2 1,000 times weaker than specified in 1993 and 1.3M times weaker than current standard",
+              "severity": "critical",
+              "url": "https://github.com/advisories/GHSA-mpj8-q39x-wq5h",
+              "affectedRange": "<2.1.0"
+            }
+          ]
+        },
+        {
+          "package": "esbuild",
+          "severity": "moderate",
+          "directDependency": false,
+          "affectedRange": "<=0.24.2",
+          "advisories": [
+            {
+              "title": "esbuild enables any website to send any requests to the development server and read the response",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-67mh-4wv8-2f99",
+              "affectedRange": "<=0.24.2"
+            }
+          ]
+        },
+        {
+          "package": "joi",
+          "severity": "high",
+          "directDependency": false,
+          "affectedRange": "<=17.13.7",
+          "advisories": [
+            {
+              "title": "joi has an uncaught RangeError on deeply nested input through recursive `link()` schemas",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-q7cg-457f-vx79",
+              "affectedRange": "<17.13.4"
+            },
+            {
+              "title": "joi: Prototype pollution via a `__proto__` language key in custom messages",
+              "severity": "low",
+              "url": "https://github.com/advisories/GHSA-6w3j-5fw6-r9vr",
+              "affectedRange": ">=17.2.0 <17.13.6"
+            },
+            {
+              "title": "joi: object().rename() with a template target can set the validated object's prototype",
+              "severity": "low",
+              "url": "https://github.com/advisories/GHSA-gg4h-3hg2-grpc",
+              "affectedRange": ">=16.0.0 <17.13.5"
+            },
+            {
+              "title": "joi messages compilation allows prototype replacement through __proto__ error codes",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-wr44-6hxh-3jwq",
+              "affectedRange": "<17.13.8"
+            },
+            {
+              "title": "joi: Quadratic regular-expression backtracking in `Joi.string().isoDate()`",
+              "severity": "high",
+              "url": "https://github.com/advisories/GHSA-6h2x-m376-mqjq",
+              "affectedRange": ">=17.2.0 <17.13.7"
+            }
+          ]
+        },
+        {
+          "package": "nanoid",
+          "severity": "high",
+          "directDependency": false,
+          "affectedRange": "4.0.0 - 5.1.15",
+          "advisories": [
+            {
+              "title": "Predictable results in nanoid generation when given non-integer values",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-mwcw-c2x4-8c55",
+              "affectedRange": ">=4.0.0 <5.0.9"
+            },
+            {
+              "title": "nanoid: non-secure generators can loop indefinitely with negative size",
+              "severity": "high",
+              "url": "https://github.com/advisories/GHSA-28wg-ghj8-5hjv",
+              "affectedRange": ">=4.0.0 <5.1.16"
+            },
+            {
+              "title": "nanoid: custom generators can loop indefinitely when size is zero",
+              "severity": "high",
+              "url": "https://github.com/advisories/GHSA-2v37-7h3g-55p8",
+              "affectedRange": ">=4.0.0 <5.1.6"
+            },
+            {
+              "title": "nanoid: Integer Overflow or Wraparound",
+              "severity": "high",
+              "url": "https://github.com/advisories/GHSA-xwg4-73v4-xw9w",
+              "affectedRange": ">=4.0.0 <5.1.11"
+            }
+          ]
+        },
+        {
+          "package": "svelte",
+          "severity": "moderate",
+          "directDependency": false,
+          "affectedRange": "<=5.55.6",
+          "advisories": [
+            {
+              "title": "Svelte has a potential mXSS vulnerability due to improper HTML escaping",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-8266-84wp-wv5c",
+              "affectedRange": "<4.2.19"
+            },
+            {
+              "title": "Svelte SSR attribute spreading includes inherited properties from prototype chain",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-crpf-4hrx-3jrp",
+              "affectedRange": "<=5.51.4"
+            },
+            {
+              "title": "Svelte SSR does not validate dynamic element tag names in `<svelte:element>`",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-m56q-vw4c-c2cp",
+              "affectedRange": "<=5.51.4"
+            },
+            {
+              "title": "Svelte affected by cross-site scripting via spread attributes in Svelte SSR",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-f7gr-6p89-r883",
+              "affectedRange": "<=5.51.4"
+            },
+            {
+              "title": "Svelte vulnerable to XSS during SSR with contenteditable `bind:innerText` and `bind:textContent`",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-phwv-c562-gvmh",
+              "affectedRange": "<=5.53.4"
+            },
+            {
+              "title": "Svelte Vulnerable to XSS via DOM Clobbering of Internal Framework State",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-rcqx-6q8c-2c42",
+              "affectedRange": "<=5.55.6"
+            },
+            {
+              "title": "Svelte SSR vulnerable to cross-site scripting via spread attributes",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-pr6f-5x2q-rwfp",
+              "affectedRange": "<=5.55.6"
+            }
+          ]
+        },
+        {
+          "package": "ws",
+          "severity": "high",
+          "directDependency": false,
+          "affectedRange": "8.0.0 - 8.20.1",
+          "advisories": [
+            {
+              "title": "ws affected by a DoS when handling a request with many HTTP headers",
+              "severity": "high",
+              "url": "https://github.com/advisories/GHSA-3h5v-q93c-6h6q",
+              "affectedRange": ">=8.0.0 <8.17.1"
+            },
+            {
+              "title": "ws: Uninitialized memory disclosure",
+              "severity": "moderate",
+              "url": "https://github.com/advisories/GHSA-58qx-3vcg-4xpx",
+              "affectedRange": ">=8.0.0 <8.20.1"
+            },
+            {
+              "title": "ws: Memory exhaustion DoS from tiny fragments and data chunks",
+              "severity": "high",
+              "url": "https://github.com/advisories/GHSA-96hv-2xvq-fx4p",
+              "affectedRange": ">=8.0.0 <8.21.0"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "dependencyPaths": [
+    {
+      "consumer": "wagmi-v2",
+      "package": "ws",
+      "version": "8.18.0",
+      "installedAt": "node_modules/@reown/appkit-controllers/node_modules/ws",
+      "parents": [
+        {
+          "package": "viem",
+          "version": "2.23.2",
+          "installedAt": "node_modules/@reown/appkit-controllers/node_modules/@walletconnect/utils/node_modules/viem"
+        },
+        {
+          "package": "isows",
+          "version": "1.0.6",
+          "installedAt": "node_modules/@reown/appkit-controllers/node_modules/isows"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "ws",
+      "version": "8.18.0",
+      "installedAt": "node_modules/@reown/appkit-utils/node_modules/ws",
+      "parents": [
+        {
+          "package": "viem",
+          "version": "2.23.2",
+          "installedAt": "node_modules/@reown/appkit-utils/node_modules/@walletconnect/utils/node_modules/viem"
+        },
+        {
+          "package": "isows",
+          "version": "1.0.6",
+          "installedAt": "node_modules/@reown/appkit-utils/node_modules/isows"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "ws",
+      "version": "8.18.0",
+      "installedAt": "node_modules/@reown/appkit/node_modules/ws",
+      "parents": [
+        {
+          "package": "viem",
+          "version": "2.23.2",
+          "installedAt": "node_modules/@reown/appkit/node_modules/@walletconnect/utils/node_modules/viem"
+        },
+        {
+          "package": "isows",
+          "version": "1.0.6",
+          "installedAt": "node_modules/@reown/appkit/node_modules/isows"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "ws",
+      "version": "8.22.0",
+      "installedAt": "node_modules/@solana/rpc-subscriptions-channel-websocket/node_modules/ws",
+      "parents": [
+        {
+          "package": "@solana/rpc-subscriptions-channel-websocket",
+          "version": "5.5.1",
+          "installedAt": "node_modules/@solana/rpc-subscriptions-channel-websocket"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "ws",
+      "version": "8.18.0",
+      "installedAt": "node_modules/@walletconnect/ethereum-provider/node_modules/ws",
+      "parents": [
+        {
+          "package": "isows",
+          "version": "1.0.6",
+          "installedAt": "node_modules/@walletconnect/ethereum-provider/node_modules/isows"
+        },
+        {
+          "package": "viem",
+          "version": "2.23.2",
+          "installedAt": "node_modules/@walletconnect/ethereum-provider/node_modules/viem"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "ws",
+      "version": "8.18.0",
+      "installedAt": "node_modules/@walletconnect/universal-provider/node_modules/ws",
+      "parents": [
+        {
+          "package": "isows",
+          "version": "1.0.6",
+          "installedAt": "node_modules/@walletconnect/universal-provider/node_modules/isows"
+        },
+        {
+          "package": "viem",
+          "version": "2.23.2",
+          "installedAt": "node_modules/@walletconnect/universal-provider/node_modules/viem"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "ws",
+      "version": "8.21.3",
+      "installedAt": "node_modules/engine.io-client/node_modules/ws",
+      "parents": [
+        {
+          "package": "engine.io-client",
+          "version": "6.6.7",
+          "installedAt": "node_modules/engine.io-client"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "ws",
+      "version": "8.22.0",
+      "installedAt": "node_modules/jsdom/node_modules/ws",
+      "parents": [
+        {
+          "package": "jsdom",
+          "version": "27.0.1",
+          "installedAt": "node_modules/jsdom"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "ws",
+      "version": "8.21.0",
+      "installedAt": "node_modules/viem/node_modules/ws",
+      "parents": [
+        {
+          "package": "viem",
+          "version": "2.57.7",
+          "installedAt": "node_modules/viem"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "ws",
+      "version": "7.5.13",
+      "installedAt": "node_modules/ws",
+      "parents": [
+        {
+          "package": "@walletconnect/jsonrpc-ws-connection",
+          "version": "1.0.16",
+          "installedAt": "node_modules/@walletconnect/jsonrpc-ws-connection"
+        },
+        {
+          "package": "isows",
+          "version": "1.0.7",
+          "installedAt": "node_modules/isows"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "decode-uri-component",
+      "version": "0.2.2",
+      "installedAt": "node_modules/decode-uri-component",
+      "parents": [
+        {
+          "package": "query-string",
+          "version": "7.1.3",
+          "installedAt": "node_modules/query-string"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "uuid",
+      "version": "9.0.1",
+      "installedAt": "node_modules/@metamask/eth-json-rpc-provider/node_modules/uuid",
+      "parents": [
+        {
+          "package": "@metamask/utils",
+          "version": "8.5.0",
+          "installedAt": "node_modules/@metamask/eth-json-rpc-provider/node_modules/@metamask/json-rpc-engine/node_modules/@metamask/utils"
+        },
+        {
+          "package": "@metamask/utils",
+          "version": "9.3.0",
+          "installedAt": "node_modules/@metamask/eth-json-rpc-provider/node_modules/@metamask/rpc-errors/node_modules/@metamask/utils"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "uuid",
+      "version": "9.0.1",
+      "installedAt": "node_modules/@metamask/json-rpc-engine/node_modules/uuid",
+      "parents": [
+        {
+          "package": "@metamask/utils",
+          "version": "9.3.0",
+          "installedAt": "node_modules/@metamask/json-rpc-engine/node_modules/@metamask/rpc-errors/node_modules/@metamask/utils"
+        },
+        {
+          "package": "@metamask/utils",
+          "version": "8.5.0",
+          "installedAt": "node_modules/@metamask/json-rpc-engine/node_modules/@metamask/utils"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "uuid",
+      "version": "9.0.1",
+      "installedAt": "node_modules/@metamask/json-rpc-middleware-stream/node_modules/uuid",
+      "parents": [
+        {
+          "package": "@metamask/utils",
+          "version": "8.5.0",
+          "installedAt": "node_modules/@metamask/json-rpc-middleware-stream/node_modules/@metamask/utils"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "uuid",
+      "version": "9.0.1",
+      "installedAt": "node_modules/@metamask/providers/node_modules/uuid",
+      "parents": [
+        {
+          "package": "@metamask/utils",
+          "version": "9.3.0",
+          "installedAt": "node_modules/@metamask/providers/node_modules/@metamask/rpc-errors/node_modules/@metamask/utils"
+        },
+        {
+          "package": "@metamask/utils",
+          "version": "8.5.0",
+          "installedAt": "node_modules/@metamask/providers/node_modules/@metamask/utils"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "uuid",
+      "version": "9.0.1",
+      "installedAt": "node_modules/@metamask/utils/node_modules/uuid",
+      "parents": [
+        {
+          "package": "@metamask/utils",
+          "version": "11.12.1",
+          "installedAt": "node_modules/@metamask/utils"
+        }
+      ]
+    },
+    {
+      "consumer": "wagmi-v2",
+      "package": "uuid",
+      "version": "8.3.2",
+      "installedAt": "node_modules/uuid",
+      "parents": [
+        {
+          "package": "@metamask/sdk",
+          "version": "0.33.1",
+          "installedAt": "node_modules/@metamask/sdk"
+        },
+        {
+          "package": "@metamask/sdk-communication-layer",
+          "version": "0.33.1",
+          "installedAt": "node_modules/@metamask/sdk-communication-layer"
+        }
+      ]
+    },
+    {
+      "consumer": "onboard",
+      "package": "crypto-es",
+      "version": "1.2.7",
+      "installedAt": "node_modules/crypto-es",
+      "parents": [
+        {
+          "package": "bnc-sdk",
+          "version": "4.6.9",
+          "installedAt": "node_modules/bnc-sdk"
+        }
+      ]
+    },
+    {
+      "consumer": "onboard",
+      "package": "joi",
+      "version": "17.9.1",
+      "installedAt": "node_modules/joi",
+      "parents": [
+        {
+          "package": "@web3-onboard/common",
+          "version": "2.4.2",
+          "installedAt": "node_modules/@web3-onboard/common"
+        },
+        {
+          "package": "@web3-onboard/core",
+          "version": "2.24.1",
+          "installedAt": "node_modules/@web3-onboard/core"
+        }
+      ]
+    },
+    {
+      "consumer": "onboard",
+      "package": "ws",
+      "version": "7.5.13",
+      "installedAt": "node_modules/ws",
+      "parents": [
+        {
+          "package": "isows",
+          "version": "1.0.4",
+          "installedAt": "node_modules/isows"
+        },
+        {
+          "package": "@walletconnect/jsonrpc-ws-connection",
+          "version": "1.0.16",
+          "installedAt": "node_modules/@walletconnect/jsonrpc-ws-connection"
+        }
+      ]
+    },
+    {
+      "consumer": "onboard",
+      "package": "ws",
+      "version": "8.22.0",
+      "installedAt": "node_modules/jsdom/node_modules/ws",
+      "parents": [
+        {
+          "package": "jsdom",
+          "version": "27.0.1",
+          "installedAt": "node_modules/jsdom"
+        }
+      ]
+    },
+    {
+      "consumer": "onboard",
+      "package": "ws",
+      "version": "8.13.0",
+      "installedAt": "node_modules/viem/node_modules/ws",
+      "parents": [
+        {
+          "package": "viem",
+          "version": "2.12.0",
+          "installedAt": "node_modules/viem"
+        }
+      ]
+    },
+    {
+      "consumer": "onboard",
+      "package": "esbuild",
+      "version": "0.28.2",
+      "installedAt": "node_modules/esbuild",
+      "parents": [
+        {
+          "package": "vite",
+          "version": "8.3.4",
+          "installedAt": "node_modules/vite"
+        }
+      ]
+    },
+    {
+      "consumer": "onboard",
+      "package": "esbuild",
+      "version": "0.19.12",
+      "installedAt": "node_modules/svelte-i18n/node_modules/esbuild",
+      "parents": [
+        {
+          "package": "svelte-i18n",
+          "version": "4.0.1",
+          "installedAt": "node_modules/svelte-i18n"
+        }
+      ]
+    },
+    {
+      "consumer": "onboard",
+      "package": "nanoid",
+      "version": "4.0.2",
+      "installedAt": "node_modules/nanoid",
+      "parents": [
+        {
+          "package": "@web3-onboard/core",
+          "version": "2.24.1",
+          "installedAt": "node_modules/@web3-onboard/core"
+        }
+      ]
+    },
+    {
+      "consumer": "onboard",
+      "package": "nanoid",
+      "version": "3.3.20",
+      "installedAt": "node_modules/bnc-sdk/node_modules/nanoid",
+      "parents": [
+        {
+          "package": "bnc-sdk",
+          "version": "4.6.9",
+          "installedAt": "node_modules/bnc-sdk"
+        }
+      ]
+    },
+    {
+      "consumer": "onboard",
+      "package": "nanoid",
+      "version": "3.3.20",
+      "installedAt": "node_modules/postcss/node_modules/nanoid",
+      "parents": [
+        {
+          "package": "postcss",
+          "version": "8.5.30",
+          "installedAt": "node_modules/postcss"
+        }
+      ]
+    },
+    {
+      "consumer": "onboard",
+      "package": "svelte",
+      "version": "3.59.2",
+      "installedAt": "node_modules/svelte",
+      "parents": [
+        {
+          "package": "svelte-i18n",
+          "version": "4.0.1",
+          "installedAt": "node_modules/svelte-i18n"
+        },
+        {
+          "package": "@web3-onboard/core",
+          "version": "2.24.1",
+          "installedAt": "node_modules/@web3-onboard/core"
+        }
+      ]
+    }
+  ],
+  "onboardBundleInspection": {
+    "sourceMaps": 18,
+    "sources": 803,
+    "bncSdk": [],
+    "cryptoEs": [],
+    "method": "Vite 8.3.4 production build with a nonempty synthetic project ID and source maps enabled. No bnc-sdk or crypto-es source entries were present among the generated source maps. This does not remove the installed dependency findings or establish exploitability.",
+    "publicOption": "connect.disableUDResolution is deprecated and relates to optional Unstoppable Domains resolution, not analytics; no connect.disableUD option exists in the tested public types.",
+    "source": "https://github.com/thirdweb-dev/web3-onboard/blob/03b25b0ade48b7cc8d48dd408741c7e211cf22ac/packages/core/src/types.ts"
+  }
+}

@@ -1,0 +1,21 @@
+{
+  "name": "robinhood-example-onboard",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@vexi/robinhood-wallet": "file:../../packages/core",
+    "@vexi/robinhood-wallet-onboard": "file:../../packages/web3-onboard",
+    "@web3-onboard/core": "2.24.1",
+    "@web3-onboard/common": "2.4.2"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vite": "8.3.4"
+  }
+}

@@ -1,0 +1,11 @@
+✔ packed entrypoints import without a browser or prompting a wallet (2.839916ms)
+✔ Onboard public module creates a lazy EIP-1193 interface and preserves disconnect (2.201958ms)
+✔ actual Onboard core accepts the module and initializes without requesting accounts (386.27525ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 427.046416

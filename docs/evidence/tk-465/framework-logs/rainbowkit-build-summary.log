@@ -1,0 +1,15 @@
+Consumer: rainbowkit
+Phase: final core-only offline refresh
+Command: npm run build (tsc --noEmit && vite build)
+Exit status: 0
+This is an extracted summary of the full build log; emitted asset lists and repeated directive warning detail are omitted.
+Full original build log SHA-256: 2e9c7e01cbb32419ffc6e1c158e557c4aefefbdc5418896da93c448203b76c52
+
+vite v8.3.4 building client environment for production...
+✓ 6080 modules transformed.
+✓ built in 486ms
+npm notice run robinhood-example-rainbowkit@0.1.0 build
+npm notice run tsc --noEmit && vite build
+
+MODULE_LEVEL_DIRECTIVE warning count: 314
+Representative warning: [MODULE_LEVEL_DIRECTIVE] The semantics of the module level directive "use client" in "node_modules/@tanstack/react-query/build/modern/QueryClientProvider.js" may not be preserved when bundling.

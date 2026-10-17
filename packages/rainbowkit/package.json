@@ -1,0 +1,38 @@
+{
+  "name": "@vexi/robinhood-wallet-rainbowkit",
+  "version": "0.1.0",
+  "description": "Robinhood Wallet entry for RainbowKit with dedicated connection UI",
+  "type": "module",
+  "sideEffects": false,
+  "license": "MIT",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@vexi/robinhood-wallet": "0.1.0",
+    "@vexi/robinhood-wallet-wagmi": "0.1.0"
+  },
+  "peerDependencies": {
+    "@rainbow-me/rainbowkit": "2.2.11",
+    "wagmi": "2.19.5",
+    "viem": "2.57.7"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vexi-v1/-robinhood-wallet-connector.git",
+    "directory": "packages/rainbowkit"
+  }
+}
