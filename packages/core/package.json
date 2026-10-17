@@ -12,5 +12,5 @@
   "scripts": {"build": "tsc -p tsconfig.json", "typecheck": "tsc -p tsconfig.json --noEmit"},
   "dependencies": {"@walletconnect/sign-client": "2.26.0", "qrcode": "1.5.4"},
   "engines": {"node": ">=22.12"},
-  "repository": {"type": "git", "url": "git+https://github.com/vexi-v1/-robinhood-wallet-connector.git", "directory": "packages/core"}
+  "repository": {"type": "git", "url": "git+https://github.com/vexi-v1/robinhood-wallet-connector.git", "directory": "packages/core"}
 }
