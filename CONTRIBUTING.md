@@ -2,6 +2,8 @@
 
 This repository contains the provider, connection UI, framework adapters, examples and tests. You can develop it from a single checkout.
 
+For integration help, start with [llms.txt](llms.txt) and the [AI integration guide](docs/ai-integration.md).
+
 ## Set up a checkout
 
 Use Node.js 22.12 or newer and npm. CI runs Node.js 24.
@@ -29,6 +31,9 @@ The packages are currently unpublished. For installation in another application,
 | `tests` | Synthetic provider, transport, modal and framework consumer checks |
 | `scripts/framework-matrix.mjs` | Packed-package compatibility checks |
 | `docs` | Architecture, verification records, dependency notes and upstream contribution guidance |
+| `llms.txt` | Curated documentation index for AI agents |
+| `llms-full.txt` | Generated full-text integration documentation |
+| `scripts/llms-docs.mjs` | Documentation bundle generation, freshness and link checks |
 
 Rebuild the packages after changing their source; examples consume their generated exports.
 
@@ -63,6 +68,21 @@ Available cases are `wagmi-v2`, `wagmi-v3`, `rainbowkit` and `onboard`. The scri
 Add regression coverage when changing connection behavior, particularly cancellation, late results, session recovery, account/chain events and teardown. Browser presentation changes also need desktop and narrow-viewport checks. Use the [verification guide](docs/verification.md) to record what was actually tested; a rendered QR does not prove successful mobile pairing.
 
 For documentation-only changes, check links, examples, JSON records and whitespace. A full wallet test run is unnecessary when executable code and package configuration are unchanged.
+
+## Maintain the AI documentation
+
+Documentation is part of the change. Whenever public APIs, options, connection behavior, installation, package versions, supported frameworks, publication status or verification claims change, update the affected guides in the same PR and review `llms.txt` and `docs/ai-integration.md`. If their content remains accurate, explain that in the PR checklist.
+
+`llms.txt` is a short, curated map with direct text links. `llms-full.txt` is generated from the canonical guides listed in `scripts/llms-docs.mjs`; edit those guides instead of the generated file. Include new or moved documentation in the index and bundle source list when relevant, then run:
+
+```sh
+npm run docs:generate
+npm run docs:check
+```
+
+Commit the resulting `llms-full.txt` update with its source changes. The documentation commands use Node.js built-ins and do not require installing wallet dependencies. CI rejects stale generated content and broken local or same-repository documentation links. It does not establish that external websites are reachable or that an API description matches runtime behavior; review those separately.
+
+Keep the README's agent entry points prominent and package keywords and GitHub About accurate. Publishing an index improves navigation; it does not guarantee search ranking or automatic adoption by an AI service.
 
 ## Submit a pull request
 

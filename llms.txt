@@ -1,0 +1,49 @@
+# Robinhood Wallet Connector
+
+> A community TypeScript toolkit for connecting Robinhood Wallet to frontend applications through wagmi v2/v3, RainbowKit, Web3-Onboard, or a framework-independent EIP-1193 provider. Includes a dedicated connection dialog and WalletConnect transport.
+
+Built and maintained by Vexi Lab (an onchain options protocol). This is not an official Robinhood SDK and is not affiliated with or endorsed by Robinhood. It runs independently of the Vexi protocol.
+
+The four SDK packages are currently unpublished. Build and pack this repository, then install the required local tarballs together as described in the installation guide. Do not assume that `npm install @vexi/robinhood-wallet` can install a published release. Packages provide ESM imports and TypeScript declarations.
+
+Implemented integrations are wagmi v2/v3, RainbowKit on its documented wagmi v2 baseline, and Web3-Onboard. Other framework adapters are not included. The wagmi and RainbowKit packages both export `robinhoodWallet`, but their APIs differ: use the guide for the correct package.
+
+Wallet interaction requires a browser, an explicit user action, and an application-owned WalletConnect project ID for remote pairing. Never supply a private key or recovery phrase. A configured chain or displayed QR code does not prove wallet support or successful pairing. Physical-wallet pairing, iOS/Android handoff and signing remain unverified; consult the verification record. Use documentation from the same commit as the code when pinning a revision.
+
+## Start here
+
+- [AI integration guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/ai-integration.md): Choose an adapter, install unpublished packages, supply required configuration, connect from user actions and verify the integration.
+- [README and installation](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/README.md): Package map, build-and-pack commands, integration snippets and exact framework baselines.
+- [Full documentation](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms-full.txt): Generated single-fetch version of the integration guides, examples, architecture and verification notes.
+
+## Public APIs
+
+- [Core provider](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/core/README.md): `@vexi/robinhood-wallet`; `RobinhoodProvider`, configuration, connection state, events, modal controls and SSR boundaries.
+- [wagmi connector](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/wagmi/README.md): `@vexi/robinhood-wallet-wagmi`; call `robinhoodWallet(options)` in the wagmi connectors array.
+- [RainbowKit wallet entry](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/rainbowkit/README.md): `@vexi/robinhood-wallet-rainbowkit`; pass the `robinhoodWallet` factory to `connectorsForWallets`.
+- [Web3-Onboard module](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/packages/web3-onboard/README.md): `@vexi/robinhood-wallet-onboard`; add `robinhoodModule(options)` to Onboard's wallets array.
+
+## Runnable examples
+
+- [Vanilla TypeScript](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/vanilla/README.md): Direct core provider integration and an inert UI fixture that cannot pair a real wallet.
+- [wagmi v2](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/wagmi-v2/README.md): React application using the wagmi v2 connector.
+- [wagmi v3](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/wagmi-v3/README.md): Separate React application using the wagmi v3 connector.
+- [RainbowKit](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/rainbowkit/README.md): Robinhood entry in a recommended group with the SDK's dedicated dialog.
+- [Web3-Onboard](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/onboard/README.md): Wallet module, chain configuration and host connection controls.
+
+## Compatibility and verification
+
+- [Verification record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md): Exact tested versions, source commits, synthetic tests, browser observations, reproduction commands and unverified device behavior.
+- [Dependency notes](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/dependency-notes.md): Recorded dependency findings, including inherited critical findings in the tested Onboard tree; inspect before choosing a framework.
+
+## Contributing
+
+- [Contributor guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/CONTRIBUTING.md): Standalone setup, checks, PR workflow and the rule to update agent documentation with relevant changes.
+- [Coding assistant rules](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/AGENTS.md): Repository editing guidance, evidence boundaries and mandatory documentation maintenance.
+- [Documentation generator](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/scripts/llms-docs.mjs): Source list for `llms-full.txt`; run `npm run docs:generate` and `npm run docs:check` after documentation changes.
+
+## Optional
+
+- [Architecture](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/architecture.md): Provider discovery, transport, lifecycle ownership, modal behavior and asset attribution.
+- [Upstream contributions](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/upstream-contributions.md): Framework extension APIs and requirements for proposing an upstream integration.
+- [License](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/LICENSE): MIT license for project code; third-party wallet names and marks remain their owners' property.

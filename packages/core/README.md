@@ -1,5 +1,7 @@
 # Robinhood Wallet provider
 
+> **AI integration docs:** [llms.txt](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt) · [Integration guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/ai-integration.md)
+
 `@vexi/robinhood-wallet` provides a framework-independent EIP-1193 provider and a dedicated Robinhood Wallet connection dialog for frontend applications. It is the shared core behind this toolkit's wagmi, RainbowKit and Web3-Onboard adapters.
 
 Built and maintained by **[Vexi Lab](https://vexi-protocol.ai) (an onchain options protocol)**. This is an independent community project, **not an official Robinhood SDK**, and is not affiliated with or endorsed by Robinhood.
