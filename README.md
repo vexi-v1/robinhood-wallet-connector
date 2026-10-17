@@ -1,5 +1,7 @@
 # Robinhood Wallet Connector
 
+> **AI agents: start with [llms.txt](llms.txt).** [Raw text](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt) · [Full documentation](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms-full.txt) · [Integration guide](docs/ai-integration.md)
+
 **Connect Robinhood Wallet to mainstream frontend wallet SDKs.**
 
 An open-source integration toolkit for dApp developers, with adapters for **wagmi v2/v3, RainbowKit, and Web3-Onboard**, plus a framework-independent **EIP-1193 provider**. Use it to add a recognizable Robinhood Wallet entry and a dedicated connection dialog to your application.
@@ -18,6 +20,19 @@ A matching injected Robinhood provider is used when available; otherwise, the SD
 | `@vexi/robinhood-wallet-onboard` | Standard Web3-Onboard wallet module | [Guide](packages/web3-onboard/README.md) · [Example](examples/onboard) |
 
 The core owns its connection lifecycle and native HTML dialog. It uses `@walletconnect/sign-client` directly and does not depend on AppKit modal internals or patches to a framework wallet chooser. Construction and imports do not request accounts or launch a wallet.
+
+## AI agent documentation
+
+For coding assistants integrating a Robinhood Wallet connector into a TypeScript or React dApp:
+
+| Start here | What it provides |
+| --- | --- |
+| [llms.txt](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt) | A compact project summary and direct links to plain-text documentation |
+| [Integration guide](docs/ai-integration.md) | Adapter selection, installation, configuration, public entry points and common mistakes |
+| [llms-full.txt](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms-full.txt) | The integration documentation in a single generated text file |
+| [AGENTS.md](AGENTS.md) | Repository contribution rules, including documentation maintenance |
+
+The files are public and can be fetched without a GitHub login. Follow the guide for the framework you use; the documented support matrix and verification limits apply to agent-generated integrations too. When working from a pinned commit, read the documentation from that same commit.
 
 ## Install from this repository
 

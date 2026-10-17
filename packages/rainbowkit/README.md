@@ -1,5 +1,7 @@
 # Robinhood Wallet for RainbowKit
 
+> **AI integration docs:** [llms.txt](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt) · [Integration guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/ai-integration.md)
+
 Add a Robinhood Wallet entry to RainbowKit with the toolkit's dedicated connection dialog.
 
 Built and maintained by **[Vexi Lab](https://vexi-protocol.ai) (an onchain options protocol)**. This is an independent community project, **not an official Robinhood SDK**, and is not affiliated with or endorsed by Robinhood.
