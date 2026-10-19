@@ -1,0 +1,373 @@
+npm notice run test:all
+npm notice run npm run build && npm run typecheck && npm test && npm run docs:check && npm run test:integrations
+npm notice run build
+npm notice run npm run build -w @vexi/robinhood-wallet && npm run build -w @vexi/robinhood-wallet-wagmi && npm run build -w @vexi/robinhood-wallet-rainbowkit && npm run build -w @vexi/robinhood-wallet-onboard && npm run build -w @vexi/robinhood-wallet-thirdweb && npm run build -w @vexi/robinhood-wallet-dynamic && npm run build -w @vexi/robinhood-wallet-privy
+npm notice run @vexi/robinhood-wallet@0.1.0 build
+npm notice run tsc -p tsconfig.json
+npm notice run @vexi/robinhood-wallet-wagmi@0.1.0 build
+npm notice run tsc -p tsconfig.json
+npm notice run @vexi/robinhood-wallet-rainbowkit@0.1.0 build
+npm notice run tsc -p tsconfig.json
+npm notice run @vexi/robinhood-wallet-onboard@0.1.0 build
+npm notice run tsc -p tsconfig.json
+npm notice run @vexi/robinhood-wallet-thirdweb@0.1.0 build
+npm notice run tsc -p tsconfig.json
+npm notice run @vexi/robinhood-wallet-dynamic@0.1.0 build
+npm notice run tsc -p tsconfig.json
+npm notice run @vexi/robinhood-wallet-privy@0.1.0 build
+npm notice run tsc -p tsconfig.json
+npm notice run typecheck
+npm notice run npm run typecheck --workspaces --if-present
+npm notice run @vexi/robinhood-wallet@0.1.0 typecheck
+npm notice run tsc -p tsconfig.json --noEmit
+npm notice run @vexi/robinhood-wallet-dynamic@0.1.0 typecheck
+npm notice run @vexi/robinhood-wallet-privy@0.1.0 typecheck
+npm notice run @vexi/robinhood-wallet-rainbowkit@0.1.0 typecheck
+npm notice run @vexi/robinhood-wallet-thirdweb@0.1.0 typecheck
+npm notice run @vexi/robinhood-wallet-wagmi@0.1.0 typecheck
+npm notice run @vexi/robinhood-wallet-onboard@0.1.0 typecheck
+npm notice run test
+npm notice run tsx --test tests/*.test.ts
+✔ EIP-6963 exact rdns announcement wins over unrelated injected providers without requesting accounts (18.865792ms)
+✔ late discovery inside the bounded discovery window is selected (8.161291ms)
+✔ legacy fallback requires exact published flag and a valid request/event interface (5.282459ms)
+✔ aborted discovery settles promptly and ignores later matching announcements (2.523125ms)
+✔ native app links encode a valid WCv2 URI and reject arbitrary schemes or malformed secrets (0.566209ms)
+✔ opens a named dialog, consumes Escape, cancels once, and restores host focus (66.559625ms)
+✔ keyboard focus wraps across visible controls, skipping hidden ready and error actions (13.284292ms)
+✔ restores an explicit disabled trigger after host settlement, including an idempotent second close (7.966208ms)
+✔ deferred focus restoration cannot steal focus from another control or a newer dialog (16.506792ms)
+✔ opening another connection cancels the previous attempt and keeps one dialog (12.440166ms)
+✔ ready exposes a locally rendered QR, native app link, and copy success; failure clears the link (13.357208ms)
+✔ late QR completion cannot update a reopened dialog or retain its old canvas (15.581208ms)
+✔ rejects invalid pairing links before QR rendering or assigning a link (6.533375ms)
+✔ copy failures are actionable and late clipboard completion cannot overwrite a new view (7.335583ms)
+✔ custom-host retry closes and clears the old view before invoking its callback (8.753333ms)
+✔ constructor, getProvider-style reads and unapproved restoration never request accounts (0.704667ms)
+✔ explicit injected connect is single flight and returns actual wallet accounts and chain (1.977916ms)
+✔ cancel settles immediately; late injected approval cannot revive old or replace newer attempt (0.517084ms)
+✔ cancel during remote initialization never opens a late pairing; retry reuses initialized transport safely (0.418333ms)
+✔ old remote completion and URI callbacks cannot complete a new attempt (0.324375ms)
+✔ connection rejection preserves the wallet error and releases the retry gate (0.784083ms)
+✔ timeout aborts remote operation and settles outward connection promise (22.36325ms)
+✔ failed QR rendering aborts transport, shows error and rejects instead of remaining pending (0.299125ms)
+✔ event forwarding is scoped to current provider and disconnect removes old listeners (0.198334ms)
+✔ unsupported and rejected switching cannot report a changed chain (0.129292ms)
+✔ initial connection uses the account selected by the wallet after a requested chain switch (0.110792ms)
+✔ session recovery is scoped by marker and cannot win over disconnect during restore (0.469625ms)
+✔ destroy during discovery settles once and forbids later account requests (0.275167ms)
+✔ a connect listener may disconnect without a stale nonempty account event afterward (0.1095ms)
+✔ consumer callback failures do not prevent settlement or later event consumers (0.065458ms)
+✔ disconnect during post-switch chain read prevents stale account or chain writes (0.268417ms)
+✔ remote proposal exposes only a validated local URI and actual authorized account/network result (2.462708ms)
+✔ cancelled late approval is revoked by exact topic and never persisted or exposed (0.394458ms)
+✔ late old approval cannot disconnect or overwrite a newer session (0.396083ms)
+✔ cancel in the approval-to-host-adoption microtask gap revokes the approved session (1.139666ms)
+✔ account event, eth_accounts and restored selection stay consistent and scoped (0.374667ms)
+✔ unapproved accounts and networks disconnect rather than expanding session permissions (0.200958ms)
+✔ chain permission removed while switching is revalidated after wallet response (0.357542ms)
+✔ only the explicitly approved topic may be restored; expired and invalid markers are rejected (0.117958ms)
+✔ disconnect while transport initializes revokes the original stored topic before retry can pair (0.682458ms)
+ℹ tests 40
+ℹ suites 0
+ℹ pass 40
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 657.42575
+npm notice run docs:check
+npm notice run node scripts/llms-docs.mjs check
+Documentation checks passed: 29 documents, generated bundle and local link targets.
+npm notice run test:integrations
+npm notice run node scripts/framework-matrix.mjs --browser
+Packed-package framework matrix: <temporary matrix directory>
+vanilla: installing packed packages and actual framework dependencies
+vanilla: production build, public type contracts, and runtime lifecycle tests passed
+wagmi-v2: installing packed packages and actual framework dependencies
+wagmi-v2: production build, public type contracts, and runtime lifecycle tests passed
+wagmi-v3: installing packed packages and actual framework dependencies
+wagmi-v3: production build, public type contracts, and runtime lifecycle tests passed
+rainbowkit: installing packed packages and actual framework dependencies
+rainbowkit: production build, public type contracts, and runtime lifecycle tests passed
+onboard: installing packed packages and actual framework dependencies
+onboard: production build, public type contracts, and runtime lifecycle tests passed
+appkit: installing packed packages and actual framework dependencies
+appkit: production build, public type contracts, and runtime lifecycle tests passed
+connectkit: installing packed packages and actual framework dependencies
+connectkit: production build, public type contracts, and runtime lifecycle tests passed
+ethers: installing packed packages and actual framework dependencies
+ethers: production build, public type contracts, and runtime lifecycle tests passed
+viem: installing packed packages and actual framework dependencies
+viem: production build, public type contracts, and runtime lifecycle tests passed
+thirdweb: installing packed packages and actual framework dependencies
+thirdweb: production build, public type contracts, and runtime lifecycle tests passed
+dynamic: installing packed packages and actual framework dependencies
+dynamic: production build, public type contracts, and runtime lifecycle tests passed
+privy: installing packed packages and actual framework dependencies
+privy: production build, public type contracts, and runtime lifecycle tests passed
+Report: <temporary matrix directory>/report.json
+Running browser checks against all selected packed consumers
+vanilla 1280: synthetic lifecycle and keyboard cancellation passed
+vanilla 390: synthetic lifecycle and keyboard cancellation passed
+wagmi-v2 1280: synthetic lifecycle and keyboard cancellation passed
+wagmi-v2 390: synthetic lifecycle and keyboard cancellation passed
+wagmi-v3 1280: synthetic lifecycle and keyboard cancellation passed
+wagmi-v3 390: synthetic lifecycle and keyboard cancellation passed
+rainbowkit 1280: synthetic lifecycle and keyboard cancellation passed
+rainbowkit 390: synthetic lifecycle and keyboard cancellation passed
+onboard 1280: synthetic lifecycle and keyboard cancellation passed
+onboard 390: synthetic lifecycle and keyboard cancellation passed
+appkit 1280: synthetic lifecycle and keyboard cancellation passed
+appkit 390: synthetic lifecycle and keyboard cancellation passed
+connectkit 1280: synthetic lifecycle and keyboard cancellation passed
+connectkit 390: synthetic lifecycle and keyboard cancellation passed
+ethers 1280: synthetic lifecycle and keyboard cancellation passed
+ethers 390: synthetic lifecycle and keyboard cancellation passed
+viem 1280: synthetic lifecycle and keyboard cancellation passed
+viem 390: synthetic lifecycle and keyboard cancellation passed
+thirdweb 1280: synthetic lifecycle and keyboard cancellation passed
+thirdweb 390: synthetic lifecycle and keyboard cancellation passed
+dynamic 1280: synthetic lifecycle and keyboard cancellation passed
+dynamic 390: synthetic lifecycle and keyboard cancellation passed
+privy 1280: synthetic lifecycle and keyboard cancellation passed
+privy 390: synthetic lifecycle and keyboard cancellation passed
+Browser report: <temporary matrix directory>/browser/report.json
+
+
+vanilla: packed runtime tests
+✔ packed adapter constructs without a browser, transport, or permission request (2.459583ms)
+✔ packed connection follows account and chain events across disconnect and reconnect (25.496083ms)
+✔ cancel ignores late approval and allows an explicit retry (45.948917ms)
+✔ disconnect ignores late approval and allows an explicit retry (46.306083ms)
+✔ a rejected permission request is not retried automatically (25.271792ms)
+✔ destroy preserves approved recovery; disconnect clears it without new permission requests (3.199083ms)
+✔ an arbitrary injected provider is never relabeled as Robinhood (1.741166ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 182.615291
+
+wagmi-v2: packed runtime tests
+✔ packed entrypoints import without a browser or prompting a wallet (77.132542ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (69.518458ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (17.095041ms)
+✔ a fresh packed connector restores approval without a permission prompt and clears listeners (1.925958ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 196.702083
+
+wagmi-v3: packed runtime tests
+✔ packed entrypoints import without a browser or prompting a wallet (77.158083ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (77.260916ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (16.937333ms)
+✔ a fresh packed connector restores approval without a permission prompt and clears listeners (3.286166ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 205.309083
+
+rainbowkit: packed runtime tests
+✔ packed entrypoints import without a browser or prompting a wallet (79.655959ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (74.312125ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (16.993166ms)
+✔ a fresh packed connector restores approval without a permission prompt and clears listeners (1.921542ms)
+✔ the generic browser entry restores only its own explicit connection, not Robinhood approval (411.016542ms)
+✔ RainbowKit SSR configuration initializes and checks authorization without window (2.118875ms)
+✔ actual RainbowKit creates the branded connector with its metadata and one UI owner (0.482834ms)
+ℹ tests 7
+ℹ suites 0
+ℹ pass 7
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 641.585958
+
+onboard: packed runtime tests
+✔ packed entrypoints import without a browser or prompting a wallet (2.777792ms)
+✔ Onboard public module creates a lazy EIP-1193 interface and preserves disconnect (2.014083ms)
+✔ actual Onboard core accepts the module and initializes without requesting accounts (246.783875ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 285.254167
+
+appkit: packed runtime tests
+✔ packed entrypoints import without a browser or prompting a wallet (82.0425ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (200.379208ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (17.573208ms)
+✔ a fresh packed connector restores approval without a permission prompt and clears listeners (3.481875ms)
+✔ actual AppKit example config is SSR-safe and its public adapter connects and disconnects (46.485125ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 388.360458
+
+connectkit: packed runtime tests
+✔ packed entrypoints import without a browser or prompting a wallet (79.3425ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (76.695417ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (16.924291ms)
+✔ a fresh packed connector restores approval without a permission prompt and clears listeners (1.912625ms)
+✔ actual ConnectKit providers accept the example config during SSR without wallet permission (258.757584ms)
+✔ ConnectKit routing hint never relabels or prompts an unrelated injected provider (3.45225ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 473.035375
+
+ethers: packed runtime tests
+✔ packed SDK and actual client construct without a browser or account request (54.813917ms)
+✔ actual client reads connected state, follows accounts and chains, and releases event listeners (16.798208ms)
+✔ cancellation rejects the client, ignores late approval, and permits a new explicit attempt (31.359958ms)
+✔ wallet rejection does not automatically repeat a permission request (4.491958ms)
+✔ new clients recover saved approval without prompting, while disconnect clears recovery (7.036167ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 146.040542
+
+viem: packed runtime tests
+✔ packed SDK and actual client construct without a browser or account request (81.301375ms)
+✔ actual client reads connected state, follows accounts and chains, and releases event listeners (4.630167ms)
+✔ cancellation rejects the client, ignores late approval, and permits a new explicit attempt (29.448583ms)
+✔ wallet rejection does not automatically repeat a permission request (3.099875ms)
+✔ new clients recover saved approval without prompting, while disconnect clears recovery (3.213ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 154.373833
+
+thirdweb: packed runtime tests
+✔ packed adapter constructs without a browser, transport, or permission request (325.6415ms)
+✔ packed connection follows account and chain events across disconnect and reconnect (27.439791ms)
+✔ cancel ignores late approval and allows an explicit retry (45.758833ms)
+✔ disconnect ignores late approval and allows an explicit retry (47.355417ms)
+✔ a rejected permission request is not retried automatically (25.412458ms)
+✔ destroy preserves approved recovery; disconnect clears it without new permission requests (3.767084ms)
+✔ an arbitrary injected provider is never relabeled as Robinhood (1.744625ms)
+✔ actual React host imports and renders without browser permission requests (181.29925ms)
+✔ cancelling during core adoption clears the partially connected session (3.466709ms)
+ℹ tests 9
+ℹ suites 0
+ℹ pass 9
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 696.671875
+
+dynamic: packed runtime tests
+✔ packed adapter constructs without a browser, transport, or permission request (264.4645ms)
+✔ packed connection follows account and chain events across disconnect and reconnect (30.106375ms)
+✔ cancel ignores late approval and allows an explicit retry (46.431667ms)
+✔ disconnect ignores late approval and allows an explicit retry (44.9045ms)
+✔ a rejected permission request is not retried automatically (25.198792ms)
+✔ destroy preserves approved recovery; disconnect clears it without new permission requests (3.380917ms)
+✔ an arbitrary injected provider is never relabeled as Robinhood (1.746959ms)
+✔ actual React host imports and renders without browser permission requests (1038.455459ms)
+ℹ tests 8
+ℹ suites 0
+ℹ pass 8
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 30305.158917
+
+privy: packed runtime tests
+✔ packed adapter constructs without a browser, transport, or permission request (64.782167ms)
+✔ packed connection follows account and chain events across disconnect and reconnect (25.265542ms)
+✔ cancel ignores late approval and allows an explicit retry (46.468583ms)
+✔ disconnect ignores late approval and allows an explicit retry (45.282875ms)
+✔ a rejected permission request is not retried automatically (25.102875ms)
+✔ destroy preserves approved recovery; disconnect clears it without new permission requests (3.149ms)
+✔ an arbitrary injected provider is never relabeled as Robinhood (1.760875ms)
+✔ actual React host imports and renders without browser permission requests (212.235625ms)
+✔ headless login requires an existing connection and a separate explicit sign-in action (4.098291ms)
+✔ headless login stops stale cancel completion before signature submission (23.393625ms)
+✔ headless login stops stale account completion before signature submission (22.4315ms)
+✔ headless login stops stale chain completion before signature submission (23.645166ms)
+✔ headless login stops stale disconnect completion before signature submission (23.640584ms)
+✔ late authenticated completion is signed out after cancellation (23.778208ms)
+✔ signature rejection does not submit login and a deliberate retry succeeds (1.707ms)
+✔ destroy removes login listeners immediately while message generation is pending (23.776625ms)
+ℹ tests 16
+ℹ suites 0
+ℹ pass 16
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 613.337042
+
+$ node scripts/browser-integrations.mjs /path/to/matrix/report.json
+vanilla 1280: synthetic lifecycle and keyboard cancellation passed
+vanilla 390: synthetic lifecycle and keyboard cancellation passed
+wagmi-v2 1280: synthetic lifecycle and keyboard cancellation passed
+wagmi-v2 390: synthetic lifecycle and keyboard cancellation passed
+wagmi-v3 1280: synthetic lifecycle and keyboard cancellation passed
+wagmi-v3 390: synthetic lifecycle and keyboard cancellation passed
+rainbowkit 1280: synthetic lifecycle and keyboard cancellation passed
+rainbowkit 390: synthetic lifecycle and keyboard cancellation passed
+onboard 1280: synthetic lifecycle and keyboard cancellation passed
+onboard 390: synthetic lifecycle and keyboard cancellation passed
+appkit 1280: synthetic lifecycle and keyboard cancellation passed
+appkit 390: synthetic lifecycle and keyboard cancellation passed
+connectkit 1280: synthetic lifecycle and keyboard cancellation passed
+connectkit 390: synthetic lifecycle and keyboard cancellation passed
+ethers 1280: synthetic lifecycle and keyboard cancellation passed
+ethers 390: synthetic lifecycle and keyboard cancellation passed
+viem 1280: synthetic lifecycle and keyboard cancellation passed
+viem 390: synthetic lifecycle and keyboard cancellation passed
+thirdweb 1280: synthetic lifecycle and keyboard cancellation passed
+thirdweb 390: synthetic lifecycle and keyboard cancellation passed
+dynamic 1280: synthetic lifecycle and keyboard cancellation passed
+dynamic 390: synthetic lifecycle and keyboard cancellation passed
+privy 1280: synthetic lifecycle and keyboard cancellation passed
+privy 390: synthetic lifecycle and keyboard cancellation passed
+Browser report: <temporary matrix directory>/browser/report.json
+
+$ npm run docs:generate && npm run docs:check
+npm notice run docs:generate
+npm notice run node scripts/llms-docs.mjs generate
+Generated llms-full.txt from 26 source documents.
+npm notice run docs:check
+npm notice run node scripts/llms-docs.mjs check
+Documentation checks passed: 29 documents, generated bundle and local link targets.
+
+$ git diff --check
+Passed.

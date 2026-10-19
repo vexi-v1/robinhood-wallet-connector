@@ -1,0 +1,125 @@
+wagmi-v2
+Build: passed (TypeScript --noEmit and Vite production build)
+✔ packed entrypoints import without a browser or prompting a wallet (149.8765ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (105.023334ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (16.277584ms)
+✔ a fresh packed connector restores approval without a permission prompt and clears listeners (3.904625ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 312.343542
+
+wagmi-v3
+Build: passed (TypeScript --noEmit and Vite production build)
+✔ packed entrypoints import without a browser or prompting a wallet (108.608417ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (87.107833ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (15.125666ms)
+✔ a fresh packed connector restores approval without a permission prompt and clears listeners (3.494917ms)
+ℹ tests 4
+ℹ suites 0
+ℹ pass 4
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 252.455875
+
+rainbowkit
+Build: passed (TypeScript --noEmit and Vite production build)
+✔ packed entrypoints import without a browser or prompting a wallet (89.496666ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (81.449958ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (16.972542ms)
+✔ a fresh packed connector restores approval without a permission prompt and clears listeners (2.21225ms)
+✔ RainbowKit SSR configuration initializes and checks authorization without window (182.143125ms)
+✔ actual RainbowKit creates the branded connector with its metadata and one UI owner (0.178917ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 419.093458
+
+onboard
+Build: passed (TypeScript --noEmit and Vite production build)
+✔ packed entrypoints import without a browser or prompting a wallet (5.1905ms)
+✔ Onboard public module creates a lazy EIP-1193 interface and preserves disconnect (3.343584ms)
+✔ actual Onboard core accepts the module and initializes without requesting accounts (473.985708ms)
+ℹ tests 3
+ℹ suites 0
+ℹ pass 3
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 550.535042
+
+appkit
+Build: passed (TypeScript --noEmit and Vite production build)
+✔ packed entrypoints import without a browser or prompting a wallet (80.362083ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (202.95775ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (16.763292ms)
+✔ a fresh packed connector restores approval without a permission prompt and clears listeners (3.40925ms)
+✔ actual AppKit example config is SSR-safe and its public adapter connects and disconnects (46.881042ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 386.514833
+
+connectkit
+Build: passed (TypeScript --noEmit and Vite production build)
+✔ packed entrypoints import without a browser or prompting a wallet (82.370917ms)
+✔ actual wagmi actions connect, propagate events, switch, disconnect, and reconnect (78.122125ms)
+✔ cancelling an actual wagmi pending connect rejects and ignores late injected approval (16.020042ms)
+✔ a fresh packed connector restores approval without a permission prompt and clears listeners (3.513416ms)
+✔ actual ConnectKit providers accept the example config during SSR without wallet permission (262.980125ms)
+✔ ConnectKit routing hint never relabels or prompts an unrelated injected provider (3.892542ms)
+ℹ tests 6
+ℹ suites 0
+ℹ pass 6
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 484.613708
+
+ethers
+Build: passed (TypeScript --noEmit and Vite production build)
+✔ packed SDK and actual client construct without a browser or account request (56.339875ms)
+✔ actual client reads connected state, follows accounts and chains, and releases event listeners (16.97525ms)
+✔ cancellation rejects the client, ignores late approval, and permits a new explicit attempt (32.085125ms)
+✔ wallet rejection does not automatically repeat a permission request (4.498ms)
+✔ new clients recover saved approval without prompting, while disconnect clears recovery (7.380292ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 149.898792
+
+viem
+Build: passed (TypeScript --noEmit and Vite production build)
+✔ packed SDK and actual client construct without a browser or account request (89.634ms)
+✔ actual client reads connected state, follows accounts and chains, and releases event listeners (3.8015ms)
+✔ cancellation rejects the client, ignores late approval, and permits a new explicit attempt (29.700375ms)
+✔ wallet rejection does not automatically repeat a permission request (3.216959ms)
+✔ new clients recover saved approval without prompting, while disconnect clears recovery (3.259ms)
+ℹ tests 5
+ℹ suites 0
+ℹ pass 5
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 162.604042

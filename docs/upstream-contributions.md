@@ -4,13 +4,19 @@ Applications can integrate this SDK through each framework's public extension AP
 
 ## Functional integration
 
-All three integrations use public extension contracts without changing upstream source:
+The integrations use public extension contracts without changing upstream source:
 
 | Framework | Public integration point | Repository deliverable |
 | --- | --- | --- |
 | wagmi | `createConnector` from `@wagmi/core` | `@vexi/robinhood-wallet-wagmi` |
 | RainbowKit | A custom `Wallet` factory passed to `connectorsForWallets` | `@vexi/robinhood-wallet-rainbowkit` |
 | Web3-Onboard | An independently supplied `WalletInit` module | `@vexi/robinhood-wallet-onboard` |
+| AppKit | Custom wagmi connector in `WagmiAdapter` | [Example](../examples/appkit/README.md), existing wagmi package |
+| ConnectKit | `robinhoodWalletForConnectKit` in the config consumed by `ConnectKitProvider` | [Example](../examples/connectkit/README.md), existing wagmi package |
+| ethers v6 / viem | `BrowserProvider` / `custom` with EIP-1193 | [ethers](../examples/ethers/README.md) and [viem](../examples/viem/README.md) examples, existing core package |
+| thirdweb | Public Wallet interface and EIP-1193 adapter | [Adapter](../packages/thirdweb/README.md), custom React connection button |
+| Dynamic React | Public EthereumWalletConnector base and walletConnectors factory | [Adapter](../packages/dynamic/README.md), connect-only example |
+| Privy | Public useLoginWithSiwe headless API | [Helper](../packages/privy/README.md), separate sign-in action; no built-in wallet-list entry |
 
 The SDK supplies its own transport and connection dialog. Applications do not need to fork a framework to use these adapters.
 

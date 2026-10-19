@@ -1,9 +1,9 @@
 {
   "name": "@vexi/robinhood-wallet",
   "version": "0.1.0",
-  "description": "Community Robinhood Wallet EIP-1193 provider and dedicated connection dialog",
+  "description": "Community Robinhood Wallet EIP-1193 provider for ethers, viem and frontend adapters",
   "author": "Vexi Lab",
-  "keywords": ["robinhood-wallet", "wallet-connector", "walletconnect", "eip-1193", "ethereum", "evm", "typescript", "frontend-sdk"],
+  "keywords": ["robinhood-wallet", "wallet-connector", "walletconnect", "eip-1193", "ethereum", "evm", "typescript", "frontend-sdk", "ethers", "viem"],
   "homepage": "https://github.com/vexi-v1/robinhood-wallet-connector/tree/main/packages/core#readme",
   "bugs": {"url": "https://github.com/vexi-v1/robinhood-wallet-connector/issues"},
   "type": "module",

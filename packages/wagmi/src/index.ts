@@ -253,4 +253,15 @@ export function robinhoodWallet(parameters: RobinhoodWalletParameters) {
   });
 }
 
+/** ConnectKit 1.9.2 routes EIP-1193 SDK connections through its injected UI. */
+export function robinhoodWalletForConnectKit(parameters: RobinhoodWalletParameters) {
+  const createRobinhood = robinhoodWallet(parameters);
+  return createConnector<RobinhoodProvider, { cancelConnect(): void }>((config) => ({
+    ...createRobinhood(config),
+    // This is a chooser routing hint, not detection of an installed wallet.
+    // Discovery and the injected/remote choice remain owned by RobinhoodProvider.
+    type: 'injected',
+  }));
+}
+
 export default robinhoodWallet;

@@ -2,7 +2,7 @@
 
 > **AI integration docs:** [llms.txt](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/llms.txt) · [Integration guide](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/ai-integration.md)
 
-`@vexi/robinhood-wallet` provides a framework-independent EIP-1193 provider and a dedicated Robinhood Wallet connection dialog for frontend applications. It is the shared core behind this toolkit's wagmi, RainbowKit and Web3-Onboard adapters.
+`@vexi/robinhood-wallet` provides a framework-independent EIP-1193 provider and a dedicated Robinhood Wallet connection dialog for frontend applications. It is the shared core behind this toolkit's wagmi, RainbowKit, Web3-Onboard, thirdweb and Dynamic adapters, and its Privy headless SIWE helper. AppKit and ConnectKit reuse wagmi; ethers and viem consume the provider directly.
 
 Built and maintained by **[Vexi Lab](https://vexi-protocol.ai) (an onchain options protocol)**. This is an independent community project, **not an official Robinhood SDK**, and is not affiliated with or endorsed by Robinhood.
 
@@ -42,6 +42,10 @@ async function disconnectWallet() {
 ```
 
 Constructing the provider does not request accounts, initialize the remote transport, or open a dialog. Invoke `connect()` or `eth_requestAccounts` only after the user chooses to connect. A real WalletConnect project ID with the application's origin allowed is required for remote pairing.
+
+## Direct ethers and viem clients
+
+Use this package directly with ethers **6.17.0** or viem **2.57.7**; neither integration requires wagmi or an additional adapter package. The [ethers example](https://github.com/vexi-v1/robinhood-wallet-connector/blob/main/examples/ethers/README.md) wraps it in `BrowserProvider`. The [viem example](https://github.com/vexi-v1/robinhood-wallet-connector/blob/main/examples/viem/README.md) uses `custom(provider, { retryCount: 0 })`. Both include cancellation, non-prompting recovery, account/chain events and teardown. EIP-1193 events remain on this core provider, and disposing a client wrapper does not log out of the SDK session.
 
 ## Options
 

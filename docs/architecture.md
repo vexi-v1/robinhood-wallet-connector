@@ -10,6 +10,9 @@ flowchart TD
   Wagmi[wagmi adapter] --> Core
   RainbowKit[RainbowKit wallet entry] --> Wagmi
   Onboard[Web3-Onboard module] --> Core
+  Thirdweb[thirdweb Wallet adapter] --> Core
+  Dynamic[Dynamic custom EVM connector] --> Core
+  Privy[Privy headless SIWE helper] --> Core
   Core --> Discovery[Published Robinhood identity discovery]
   Discovery --> Injected[Matching EIP-1193 provider]
   Core --> Remote[WalletConnect SignClient transport]
@@ -20,6 +23,10 @@ flowchart TD
 ```
 
 The core owns connection intent, timeout, cancellation, current accounts, events, and recovery. The transport owns its approved WalletConnect session topic and translates session events into EIP-1193 state. The modal owns presentation and user cancellation. Framework adapters translate public framework contracts into that common core.
+
+The thirdweb adapter connects with core, then passively adopts accounts through the public EIP-1193 adapter. Its stable outer Wallet recreates internal subscriptions after disconnect, and prevents thirdweb's automatic account-request retries. Dynamic's custom connector translates core account/chain/disconnect events and restores through `getConnectedAccounts()` without requesting permission. The Dynamic example uses connect-only mode.
+
+Privy uses a different boundary: the core owns the wallet connection, while an explicit sign-in action calls Privy's public headless SIWE methods. Its helper invalidates account/chain changes and cancelled operations; if an already-submitted request authenticates late, it calls the host's logout handler. A completed authentication session and wallet connection have independent lifecycles. This does not register a custom Privy wallet-list connector.
 
 `@walletconnect/sign-client` is pinned to **2.26.0**, and `qrcode` to **1.5.4**. There is no AppKit UI dependency and no private RainbowKit controller patch. Framework packages can bring their own unrelated wallet dependencies; this SDK does not assume ownership of their sessions.
 
@@ -80,3 +87,9 @@ The project does not modify the icon to impersonate a new wallet identity. Robin
 ## Evidence boundaries
 
 The implementation and tests are separate from real-device behavior, registry publication, upstream acceptance, and deployment. See [verification](verification.md) and [upstream contributions](upstream-contributions.md). No Robinhood Chain environment is certified by accepting an arbitrary numeric chain ID.
+
+## Additional frontend consumers
+
+AppKit React uses the existing wagmi connector through `WagmiAdapter` and shares its config with `WagmiProvider`. ConnectKit reads `robinhoodWalletForConnectKit` from its surrounding wagmi provider. That small factory delegates all behavior to the normal connector and uses `type: 'injected'` for ConnectKit 1.9.2's EIP-1193 UI route. It is not a wallet-installation signal and does not change provider discovery. Their choosers do not own the SDK's pairing session or dialog. AppKit is checked on the pinned wagmi v3 baseline; ConnectKit uses wagmi v2 and React 18.
+
+The ethers v6 and viem examples wrap the same core EIP-1193 provider through `BrowserProvider` and `custom`, respectively. Client construction is lazy with respect to account permission. Core owns cancellation, discovery, restoration and disconnect; applications observe core events and clear their own selected signer/account state. The wrappers add no separate transport or SDK package. See the [integration guide](ai-integration.md) for entry points and exact version limits.

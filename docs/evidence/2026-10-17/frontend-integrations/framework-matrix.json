@@ -1,0 +1,286 @@
+{
+  "generatedAt": "2026-10-17T07:44:55.359Z",
+  "directory": "<temporary matrix directory>",
+  "source": {
+    "baseCommit": "fc8774a6a3231a4c1af143091dc8f34f517b2054",
+    "workingTreeModified": true,
+    "inputs": {
+      "tests/frameworks/consumer.test.mjs": "711bed25363610532571acbff7e19218932aead94a3d6caa4968b7db6a3ed223",
+      "tests/frameworks/ethers-types.ts": "ac81f26a2e6d6f8b61134821521996b74ded04189c4652c023d6f9e86edf8d19",
+      "tests/frameworks/onboard-types.ts": "db079bc341684e961bf0a954a984c741a8a5db9198a25b11c83417e582b642c7",
+      "tests/frameworks/provider-consumer.test.mjs": "64521314dd6dc24348e1b20330ced8a44c62938c3432e120c9e0137e08f932c2",
+      "tests/frameworks/viem-types.ts": "fa635f412a6460d9502f80f50c2957d1b23a356ba9128c6009b03a88871cd466",
+      "tests/frameworks/wagmi-types.ts": "afa0d05977b6aacbf6cc9f67fc2f65b4f9619ff463eafd50a00d83f19c89b06a",
+      "examples/wagmi-v2/src/main.tsx": "ffc151a16bf22b9680f503b2fef63a33aca4e536b00627766ce7308f5b07edd0",
+      "examples/wagmi-v2/src/style.css": "a9dbc5ee6b924139cc69d1088de3a3ee1a10ecb0e9fa1e4bd69032323293ddbf",
+      "examples/wagmi-v2/package.json": "73c356682f7b9a2766598a7a76d815edd961a1be4bd3db39fd5ad4a0b27e8afa",
+      "examples/wagmi-v2/tsconfig.json": "610a5e533f99493b6208afa6c306b0a510598043c96d0084123e08d906bce83b",
+      "examples/wagmi-v2/index.html": "aca324c68e956871c63e5e4e5f60e16dde95d7512fd625b4a4a398cb0d7221d3",
+      "examples/wagmi-v3/src/main.tsx": "ab912ee78ad2c686e18fabe7769de58c314a0dfb8c97c1b04d502c91c7b5b487",
+      "examples/wagmi-v3/src/style.css": "a9dbc5ee6b924139cc69d1088de3a3ee1a10ecb0e9fa1e4bd69032323293ddbf",
+      "examples/wagmi-v3/package.json": "07d8246eb86b03f378d443561ff449348cebee63b5746b6802e311c629bffdac",
+      "examples/wagmi-v3/tsconfig.json": "610a5e533f99493b6208afa6c306b0a510598043c96d0084123e08d906bce83b",
+      "examples/wagmi-v3/index.html": "be0ba5063ba3337b8e21b8afe7dbe9d4ca6f7a9063892d6c4719f57e4c53ee2f",
+      "examples/rainbowkit/src/main.tsx": "b0fcdb1bc6f49f0857b9016e55ea71cb8b0e037785100b86fa5f4dc582414dea",
+      "examples/rainbowkit/src/style.css": "a9dbc5ee6b924139cc69d1088de3a3ee1a10ecb0e9fa1e4bd69032323293ddbf",
+      "examples/rainbowkit/package.json": "6693a7481ba732ce76a2c88daba297f8e76e06b5b995ffe78bc91b89387dca4c",
+      "examples/rainbowkit/tsconfig.json": "610a5e533f99493b6208afa6c306b0a510598043c96d0084123e08d906bce83b",
+      "examples/rainbowkit/index.html": "b866152acdca5a2bc098904ebf92d45406343bbd110c84e883b67dc79b8e6f16",
+      "examples/onboard/src/main.ts": "9da8b2a32144ee0421a51e8011f4a0b17d3cbe101a8f087f36ca326ba99c73fa",
+      "examples/onboard/src/style.css": "a9dbc5ee6b924139cc69d1088de3a3ee1a10ecb0e9fa1e4bd69032323293ddbf",
+      "examples/onboard/package.json": "1747ca9a0e271d17acd9b7b061476b11cf377ca47fde4c5c03f01aafa5de99fa",
+      "examples/onboard/tsconfig.json": "610a5e533f99493b6208afa6c306b0a510598043c96d0084123e08d906bce83b",
+      "examples/onboard/index.html": "906685f5db60fde92a46c62897c517a643e3936968e9c2ae46f64f4d0155e537",
+      "examples/appkit/src/config.ts": "93aa07b6bf347461eb723fcd95e9add83520a413cc2c9f9f0e32222d3fc2c428",
+      "examples/appkit/src/main.tsx": "bd9fc92c0e11e962e931a96999911af0c86064a337bc4a04b95ad089ab60abe5",
+      "examples/appkit/src/style.css": "a9dbc5ee6b924139cc69d1088de3a3ee1a10ecb0e9fa1e4bd69032323293ddbf",
+      "examples/appkit/package.json": "72c664fb1a73fc14c43578b40c8b2f4f1764fb49eb753455e65c113dd2c7d4d3",
+      "examples/appkit/tsconfig.json": "610a5e533f99493b6208afa6c306b0a510598043c96d0084123e08d906bce83b",
+      "examples/appkit/index.html": "74e3b8f31e1ea4e5bb4df5a81de18ff00efa248658ed0862ede94d724d6b6784",
+      "examples/connectkit/src/config.ts": "793f0dab50ffb0f8f04518009372e823a167b686240d65527169796525d01d57",
+      "examples/connectkit/src/main.tsx": "9f987b3b013f204f131d487c79ce071d8bb805d1d87da7789f19205951047889",
+      "examples/connectkit/src/style.css": "a9dbc5ee6b924139cc69d1088de3a3ee1a10ecb0e9fa1e4bd69032323293ddbf",
+      "examples/connectkit/package.json": "414e55192938d7f25c5cd473c56d45b88aae98adb9795c117c6f945b672af447",
+      "examples/connectkit/tsconfig.json": "610a5e533f99493b6208afa6c306b0a510598043c96d0084123e08d906bce83b",
+      "examples/connectkit/index.html": "ef61135bcc07b1ffe5eb89ad67c0611df2ecab54bbc6ec836eb3173ef93afdad",
+      "examples/ethers/src/client.ts": "bf4f360b21279d5ec5ae38f4a176c0a2dafc4ba36a5c0819815124145461882c",
+      "examples/ethers/src/main.ts": "afa22e490e9f6888b3da25d7fa1654193022575efc2fcf467039802606ad5fa4",
+      "examples/ethers/src/style.css": "a9dbc5ee6b924139cc69d1088de3a3ee1a10ecb0e9fa1e4bd69032323293ddbf",
+      "examples/ethers/package.json": "b147bc3efbcb83cfb99eb2e1b90fc011fa802368919726485ac10465aa6ad05b",
+      "examples/ethers/tsconfig.json": "610a5e533f99493b6208afa6c306b0a510598043c96d0084123e08d906bce83b",
+      "examples/ethers/index.html": "fd1c84df9c2974b94f16f0cea84d283b9c78b3abcba929953affa46019a1a872",
+      "examples/viem/src/client.ts": "e4caf960662d4f2de53c0bb526fdaafcf4e3abd7fc3be4aebf8fadde173485a9",
+      "examples/viem/src/main.ts": "548b37459851046cb7cafbd55c06ef859109e19a10c6e38bd571b3342c4aff70",
+      "examples/viem/src/style.css": "a9dbc5ee6b924139cc69d1088de3a3ee1a10ecb0e9fa1e4bd69032323293ddbf",
+      "examples/viem/package.json": "44e652958a4de64e75c28b7780bc28299d6bf3dd50514d07e4c3e6a289bd2553",
+      "examples/viem/tsconfig.json": "610a5e533f99493b6208afa6c306b0a510598043c96d0084123e08d906bce83b",
+      "examples/viem/index.html": "0954556b0d6cb0c611752a8063814ceabcd0a715bd3abab983310f0fe359ab0b",
+      "scripts/framework-matrix.mjs": "951d8b6a7af8ac871ea23edda06ccb95935bf9894c33d7e8371503d173d01baf"
+    },
+    "sdkSourceSha256": {
+      "packages/core/src/discovery.ts": "4f3ebc9153cf9acc74de8c14c7793fb390d08a45d50645ad23ce7f2b34fc7a9d",
+      "packages/core/src/emitter.ts": "258789b625f0af051ee80c027e1a4bce2962a45104dbce3b40b2fd388421f401",
+      "packages/core/src/index.ts": "7016bbb93d9a8b1ee14bf99a327c1abc9bf4e7650fd4d798d23faf013a4dc2bf",
+      "packages/core/src/metadata.ts": "23dd460f94d3d2098f5e6f2bb6a6f315638d5601c1addc664e04d032e4ce2bc8",
+      "packages/core/src/modal.ts": "4aa00da35ae6760d7e92b896bacd824a5aeac7c9b04da89c6ca031670b89b49d",
+      "packages/core/src/provider.ts": "012479ef7778c6e84a68c400b03d28acf04f85431c1d05b2810296ed15b3f577",
+      "packages/core/src/state.ts": "88f4b59149cc86f4c848e0c3bb09fda41f51cceaec762b6baf6569007ef45a01",
+      "packages/core/src/transport.ts": "bfe3dc70012f967f2970adc1c803ad8cc41a77cc822d2b5b4b69a16217b25ceb",
+      "packages/core/src/types.ts": "4c02d01cf84ede21165a0df5b667382ebc9d57e3d01c007294fcc283ca5ca33e",
+      "packages/rainbowkit/src/index.ts": "b462f43d6f8e0e505daddddf5e048fe9eb723e0ec717b24a2192d5146464f267",
+      "packages/wagmi/src/index.ts": "15420072ada6f04259762909446dd841fc44c1aa6d608fdd5e10ac8e752f925c",
+      "packages/web3-onboard/src/index.ts": "e081e2573f9c743211a09b634341f4c151c3d25117386dfb29f4108ccc8a7bc1"
+    }
+  },
+  "artifacts": {
+    "@vexi/robinhood-wallet": {
+      "path": "vexi-robinhood-wallet-0.1.0.tgz",
+      "sha256": "3530d588f6390e996b53abeb317d6d3cd2819615faf2dc6c35cdd5544379a0bf"
+    },
+    "@vexi/robinhood-wallet-wagmi": {
+      "path": "vexi-robinhood-wallet-wagmi-0.1.0.tgz",
+      "sha256": "56b8e58c4715229154a214e53c9f1bdc9b871a3c586b5833c0e8754a73b8a602"
+    },
+    "@vexi/robinhood-wallet-rainbowkit": {
+      "path": "vexi-robinhood-wallet-rainbowkit-0.1.0.tgz",
+      "sha256": "9bfd978ff814456d386f14e0e8779caa123a318c0587dc6b078d0cae17f49de5"
+    },
+    "@vexi/robinhood-wallet-onboard": {
+      "path": "vexi-robinhood-wallet-onboard-0.1.0.tgz",
+      "sha256": "2c994849686ba9c67aae31003c822f6c756cb6ceb80cbc2957db1a212de15295"
+    }
+  },
+  "results": [
+    {
+      "name": "wagmi-v2",
+      "status": "passed",
+      "elapsedMs": 14466,
+      "dependencies": {
+        "@tanstack/react-query": "5.104.3",
+        "@types/node": "24.10.1",
+        "@types/react-dom": "19.3.0",
+        "@types/react": "19.3.0",
+        "@vexi/robinhood-wallet-wagmi": "0.1.0",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "@wagmi/core": "2.22.1",
+        "jsdom": "27.0.1",
+        "react-dom": "19.3.1",
+        "react": "19.3.1",
+        "typescript": "5.9.3",
+        "viem": "2.57.7",
+        "vite": "8.3.4",
+        "wagmi": "2.19.5"
+      },
+      "directory": "wagmi-v2",
+      "runtimeTests": 4
+    },
+    {
+      "name": "wagmi-v3",
+      "status": "passed",
+      "elapsedMs": 9269,
+      "dependencies": {
+        "@tanstack/react-query": "5.104.3",
+        "@types/node": "24.10.1",
+        "@types/react-dom": "19.3.0",
+        "@types/react": "19.3.0",
+        "@vexi/robinhood-wallet-wagmi": "0.1.0",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "@wagmi/core": "3.6.5",
+        "jsdom": "27.0.1",
+        "react-dom": "19.3.1",
+        "react": "19.3.1",
+        "typescript": "5.9.3",
+        "viem": "2.57.7",
+        "vite": "8.3.4",
+        "wagmi": "3.7.7"
+      },
+      "directory": "wagmi-v3",
+      "runtimeTests": 4
+    },
+    {
+      "name": "rainbowkit",
+      "status": "passed",
+      "elapsedMs": 15317,
+      "dependencies": {
+        "@rainbow-me/rainbowkit": "2.2.11",
+        "@tanstack/react-query": "5.104.3",
+        "@types/node": "24.10.1",
+        "@types/react-dom": "19.3.0",
+        "@types/react": "19.3.0",
+        "@vexi/robinhood-wallet-rainbowkit": "0.1.0",
+        "@vexi/robinhood-wallet-wagmi": "0.1.0",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "@wagmi/core": "2.22.1",
+        "jsdom": "27.0.1",
+        "react-dom": "19.3.1",
+        "react": "19.3.1",
+        "typescript": "5.9.3",
+        "viem": "2.57.7",
+        "vite": "8.3.4",
+        "wagmi": "2.19.5"
+      },
+      "directory": "rainbowkit",
+      "runtimeTests": 6
+    },
+    {
+      "name": "onboard",
+      "status": "passed",
+      "elapsedMs": 5868,
+      "dependencies": {
+        "@esbuild/darwin-arm64": "0.28.2",
+        "@types/node": "24.10.1",
+        "@vexi/robinhood-wallet-onboard": "0.1.0",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "@web3-onboard/common": "2.4.2",
+        "@web3-onboard/core": "2.24.1",
+        "esbuild": "0.28.2",
+        "jsdom": "27.0.1",
+        "typescript": "5.9.3",
+        "vite": "8.3.4"
+      },
+      "directory": "onboard",
+      "runtimeTests": 3
+    },
+    {
+      "name": "appkit",
+      "status": "passed",
+      "elapsedMs": 26536,
+      "dependencies": {
+        "@base-org/account": "2.5.13",
+        "@reown/appkit-adapter-wagmi": "1.8.24",
+        "@reown/appkit": "1.8.24",
+        "@tanstack/react-query": "5.104.3",
+        "@types/node": "24.10.1",
+        "@types/react-dom": "19.3.0",
+        "@types/react": "19.3.0",
+        "@vexi/robinhood-wallet-wagmi": "0.1.0",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "@wagmi/core": "3.6.5",
+        "brotli-wasm": "3.0.1",
+        "jsdom": "27.0.1",
+        "react-dom": "19.3.1",
+        "react": "19.3.1",
+        "typescript": "5.9.3",
+        "viem": "2.57.7",
+        "vite": "8.3.4",
+        "wagmi": "3.7.7"
+      },
+      "directory": "appkit",
+      "runtimeTests": 5
+    },
+    {
+      "name": "connectkit",
+      "status": "passed",
+      "elapsedMs": 29869,
+      "dependencies": {
+        "@tanstack/react-query": "5.104.3",
+        "@types/node": "24.10.1",
+        "@types/react-dom": "18.3.7",
+        "@types/react": "18.3.31",
+        "@vexi/robinhood-wallet-wagmi": "0.1.0",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "@wagmi/core": "2.22.1",
+        "connectkit": "1.9.2",
+        "jsdom": "27.0.1",
+        "react-dom": "18.3.1",
+        "react": "18.3.1",
+        "typescript": "5.9.3",
+        "viem": "2.57.7",
+        "vite": "8.3.4",
+        "wagmi": "2.19.5"
+      },
+      "directory": "connectkit",
+      "runtimeTests": 6
+    },
+    {
+      "name": "ethers",
+      "status": "passed",
+      "elapsedMs": 3883,
+      "dependencies": {
+        "@types/node": "24.10.1",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "ethers": "6.17.0",
+        "jsdom": "27.0.1",
+        "typescript": "5.9.3",
+        "vite": "8.3.4"
+      },
+      "directory": "ethers",
+      "runtimeTests": 5
+    },
+    {
+      "name": "viem",
+      "status": "passed",
+      "elapsedMs": 4969,
+      "dependencies": {
+        "@types/node": "24.10.1",
+        "@vexi/robinhood-wallet": "0.1.0",
+        "jsdom": "27.0.1",
+        "typescript": "5.9.3",
+        "viem": "2.57.7",
+        "vite": "8.3.4"
+      },
+      "directory": "viem",
+      "runtimeTests": 5
+    }
+  ],
+  "originalReportSha256": "ae929bbe4fafd7376fbac9abeb2deaf40f6197eed13cb15890114ee25ffc6164",
+  "environment": {
+    "node": "24.19.0",
+    "npm": "12.0.2",
+    "platform": "macOS"
+  },
+  "method": "Fresh isolated npm installs from packed SDK tarballs; production builds and public type contracts; synthetic runtime tests. No real wallet approval.",
+  "rootChecks": {
+    "build": "passed",
+    "typecheck": "passed",
+    "unitTests": {
+      "passed": 40,
+      "failed": 0
+    }
+  },
+  "summary": {
+    "consumers": 8,
+    "buildsPassed": 8,
+    "runtimeTestsPassed": 38
+  }
+}

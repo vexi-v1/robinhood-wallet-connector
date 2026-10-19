@@ -7,6 +7,9 @@ example origin in your WalletConnect project, and restart the server.
 
 `index.html` uses the real SDK and WalletConnect relay. It requests account
 access only after the Connect button; it never requests a signature or transaction.
+This minimal example requires another explicit connection after reload; core
+recovers the saved approval without another permission prompt. Passive
+restoration with `provider.isAuthorized()` is demonstrated in the ethers and viem examples.
 
 `fixture.html` uses the same SDK dialog with an explicitly synthetic transport.
 Its inert QR cannot pair any wallet. It is useful for responsive presentation,

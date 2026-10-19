@@ -1,5 +1,84 @@
 # Verification record
 
+## Verification after integrating main — 2026-10-17
+
+After integrating the session, adapter and dialog fixes from main commit `d199d82`, `npm run test:all` passed against integration commit `65e9be0`. The [matrix record](evidence/2026-10-17/post-rebase/framework-matrix.json) identifies the full commit, 109 source/build input hashes, root configuration hashes, exact installed versions and all seven SDK tarballs. The [check output](evidence/2026-10-17/post-rebase/framework-checks.log) preserves the successful command and individual test results with temporary paths sanitized. Final documentation generation and freshness checks passed after adding this record.
+
+| Check | Outcome | Scope |
+| --- | --- | --- |
+| SDK build and type check | **Passed** | All seven SDK packages and the core test files. |
+| Core unit suite | **68 passed** | Includes the lifecycle and dialog regressions from main. |
+| Packed examples | **12 builds/type contracts and 110 runtime tests passed** | Vanilla (7), wagmi v2 (10), wagmi v3 (10), RainbowKit (13), Onboard (4), AppKit (11), ConnectKit (12), ethers (5), viem (5), thirdweb (9), Dynamic (8), Privy (16). |
+| Browser examples | **48 scenarios passed** | All twelve examples at 1280×720 and 390×844, using Playwright 1.64.1 / Chromium 156.0.8078.4. [Browser record](evidence/2026-10-17/post-rebase/browser.json). |
+| Documentation | **Passed** | Generated bundle freshness and links across 29 documents. |
+
+The browser runner checks the SDK dialog inside its shadow root, including focus, Escape cancellation and retry. All 24 injected-wallet scenarios make exactly one permission request and zero signing/transaction requests. Vanilla and Onboard still require an explicit Connect after reload, but core now recovers the saved approval without another permission prompt; the other examples restore automatically. Disconnect removes listeners and prevents automatic restoration on the next reload.
+
+These are local synthetic checks with external HTTP/WebSocket traffic blocked. Live platform authentication, real wallet pairing, signatures, transactions and physical-device/network compatibility remain unverified. Packages remain unpublished and undeployed. CI preserves the Node.js 22.12.0/24 build, type and core checks and runs the packed/browser suite on Node.js 24; this local record does not establish a remote CI result. The earlier records below retain their original source and scope.
+
+## Earlier complete example suite — 2026-10-17
+
+`npm run test:all` completed successfully against the working tree based on `fc8774a6a3231a4c1af143091dc8f34f517b2054`. The command builds and type-checks all seven SDK packages, runs core tests and documentation checks, then validates all twelve packed examples and their browser flows. [Matrix evidence](evidence/2026-10-17/complete-suite/framework-matrix.json) records 109 source/build input hashes, root configuration hashes, exact installed versions and packed artifacts. [Check output](evidence/2026-10-17/complete-suite/framework-checks.log) preserves the passing results with temporary paths sanitized. These checks ran locally before committing the changes. Packages remain unpublished and undeployed; this record does not establish a merge or remote CI result.
+
+| Check | Outcome | Scope |
+| --- | --- | --- |
+| SDK build and type check | **Passed** | All seven SDK packages. |
+| Core unit suite | **40 passed** | Synthetic discovery, provider, transport and modal behavior. |
+| Packed examples | **12 builds/type contracts and 79 runtime tests passed** | Vanilla (7), wagmi v2 (4), wagmi v3 (4), RainbowKit (7), Onboard (3), AppKit (5), ConnectKit (6), ethers (5), viem (5), thirdweb (9), Dynamic (8), Privy (16). |
+| Browser examples | **48 scenarios passed** | All twelve examples, two scenarios each at 1280×720 and 390×844, using Playwright 1.64.1 / Chromium 156.0.8078.4. [Browser evidence](evidence/2026-10-17/complete-suite/browser.json). |
+| Documentation | **Passed** | Generated bundle freshness and link checks across 29 documents. |
+| CI configuration | **Updated** | Installs Playwright Chromium and invokes `npm run test:all`; no remote CI execution is claimed. |
+
+The expanded browser run exposed a RainbowKit example issue: its default generic Browser Wallet entry could restore the same injected approval alongside the Robinhood connector. Disconnecting Robinhood then left the generic connection active. The example now retains that entry's branding while using a targetless wagmi injected connector, which restores only after that entry was explicitly selected. The regression test verifies both rejection of Robinhood-only approval and successful explicit generic connection. The status line now distinguishes `reconnecting` from `connected`, and the native account menu disconnect/reload path passes in both viewports.
+
+The browser suite checks no permission request on page load, explicit synthetic connection, reload behavior, disconnect and listener cleanup. Ten examples restore approved state without another permission request. Vanilla and Onboard deliberately require a second explicit connection after reload; neither prompts automatically. The second scenario verifies one SDK dialog with blocked remote traffic, contained keyboard focus, Escape cancellation and explicit retry through each host's controls. Unknown/missing case selections and incomplete scenario counts fail the runner. The final browser pass repeats all 48 scenarios against the same packed builds after allowing chooser animations to finish before captures.
+
+All external HTTP/WebSocket traffic is blocked; Dynamic uses the local public-configuration fixtures described below. The synthetic signing/transaction guard records zero requests in all 24 injected-wallet scenarios. No real wallet, live platform authentication, signature, transaction or network certification is established. Screenshots contain only disconnected pages/choosers before approval: [RainbowKit](evidence/2026-10-17/complete-suite/rainbowkit-chooser-390.png), [Onboard](evidence/2026-10-17/complete-suite/onboard-chooser-390.png), [Vanilla](evidence/2026-10-17/complete-suite/vanilla-1280.png), [Dynamic](evidence/2026-10-17/complete-suite/dynamic-chooser-390.png), [Privy](evidence/2026-10-17/complete-suite/privy-390.png).
+
+Reproduce with `npx playwright install chromium` followed by `npm run test:all`; an installed Chrome browser can instead use `BROWSER_CHANNEL=chrome npm run test:all`. For selected examples, use `node scripts/framework-matrix.mjs rainbowkit onboard --browser`. See [CONTRIBUTING.md](../CONTRIBUTING.md#validate-a-change) for separate commands and the earlier records below for integration baselines and remaining verification limits.
+
+## Expanded platform integrations — 2026-10-17
+
+The earlier platform run verified the working tree based on `fc8774a6a3231a4c1af143091dc8f34f517b2054`, including AppKit, ConnectKit, ethers, viem and the new thirdweb, Dynamic and Privy packages. At the time of this run, the changes were not committed, merged, published or deployed. The [matrix evidence](evidence/2026-10-17/platform-integrations/framework-matrix.json) records 100 runtime/build input hashes, the root manifests, exact installed top-level versions and all seven packed SDK hashes. Temporary paths are sanitized; `originalReportSha256` ties this record to the original matrix report used by the browser checks.
+
+| Check | Outcome | Scope |
+| --- | --- | --- |
+| SDK build and type check | **Passed** | All seven SDK packages, including the three new adapters/helpers. |
+| Core unit suite | **40 passed** | Synthetic discovery, provider, transport and modal checks; core source is unchanged. |
+| Packed consumers | **11 builds/type contracts and 71 runtime tests passed** | Fresh isolated installs: wagmi v2 (4), wagmi v3 (4), RainbowKit (6), Onboard (3), AppKit (5), ConnectKit (6), ethers (5), viem (5), thirdweb (9), Dynamic (8), Privy (16). [Check output](evidence/2026-10-17/platform-integrations/framework-checks.log). |
+| Browser integration checks | **28 scenarios passed** | Seven examples at 1280×720 and 390×844; two scenarios per viewport. [Browser record](evidence/2026-10-17/platform-integrations/browser.json). |
+| Agent documentation | **Generation and link/freshness checks passed** | Canonical guides, `llms.txt` and generated `llms-full.txt` cover the new packages and their limits. |
+
+The added baselines are **thirdweb 5.122.0**, **Dynamic React 5.12.0** (`sdk-react-core`, `ethereum-core`, `wallet-connector-core`) and **Privy React 3.50.0**, with React / React DOM **19.3.1**. Dynamic and Privy use viem **2.57.7**. Existing AppKit, ConnectKit, ethers and viem baselines are listed in the earlier record below and were rechecked in this full matrix. Dynamic uses bundler module resolution for its upstream declarations. Inherited dependency/peer warnings are described in [dependency notes](dependency-notes.md); no new dependency audit or security certification is claimed.
+
+thirdweb is tested as a standard Wallet with a custom connection button and active-wallet hooks. Dynamic is tested as a custom connector in its React SDK's native wallet chooser, in connect-only mode. Privy uses the public headless `useLoginWithSiwe` flow after a separate core connection; it does not register this wallet in Privy's chooser or `useWallets()`. Packed tests cover server imports/rendering, account and chain events, cancellation and late approval, rejection without automatic retries, disconnect/reconnect, saved approval and listener cleanup. Privy additionally uses deliberately invalid synthetic signatures and in-process callbacks to verify stale sign-in suppression, immediate listener cleanup and logout after a late authentication callback. No signature is sent to a platform.
+
+Browser checks run the packed production builds in Chrome **155.0.8059.82** through Playwright **1.64.1**. Each example passes synthetic injected connection, reload recovery without another permission request, disconnect and listener cleanup; the second scenario covers a blocked remote transport, one SDK dialog, contained keyboard focus, Escape cancellation and explicit retry. External HTTP and WebSocket traffic is blocked. Dynamic receives local synthetic public configuration, an unrelated wallet-book entry and an empty nonce list so its real chooser can render; no platform authentication response is simulated. A synthetic guard rejects and counts signing/transaction requests, and the final count is zero in every injected-wallet scenario. Privy's sign-in button is never clicked. Narrow viewports are desktop-browser layout checks, not physical mobile-device results.
+
+Reproduce with `npm run build`, `npm run typecheck`, `npm test`, `node scripts/framework-matrix.mjs`, then `BROWSER_CHANNEL=chrome node scripts/browser-integrations.mjs /path/to/matrix/report.json`. See [CONTRIBUTING.md](../CONTRIBUTING.md#validate-a-change) for browser setup. The browser record includes hashes for both the runner and its platform fixtures. Captures contain only disconnected pages/choosers: [Dynamic desktop](evidence/2026-10-17/platform-integrations/dynamic-chooser-1280.png), [Dynamic narrow viewport](evidence/2026-10-17/platform-integrations/dynamic-chooser-390.png), [thirdweb desktop](evidence/2026-10-17/platform-integrations/thirdweb-1280.png), [Privy narrow viewport](evidence/2026-10-17/platform-integrations/privy-390.png).
+
+Live Dynamic/Privy authentication, thirdweb's built-in chooser, physical Robinhood Wallet pairing, actual signatures/transactions and network certification remain unverified. The evidence below is historical and retains its original scope.
+
+## Additional frontend integrations — 2026-10-17
+
+The initial frontend run verified the working tree based on `fc8774a6a3231a4c1af143091dc8f34f517b2054`, including the new `robinhoodWalletForConnectKit` export and four runnable examples. It is not a claim that these changes are already merged, published or deployed. [Matrix evidence](evidence/2026-10-17/frontend-integrations/framework-matrix.json) records the base commit, modified-working-tree flag, input/source hashes, exact installed top-level versions and packed SDK hashes. Temporary paths are sanitized; `originalReportSha256` identifies the original matrix report consumed by the browser check.
+
+| Check | Outcome | Scope |
+| --- | --- | --- |
+| SDK build and type check | **Passed** | All four existing SDK packages; one new thin ConnectKit factory reuses the wagmi lifecycle. |
+| Core unit suite | **40 passed** | Synthetic provider, transport, discovery and modal checks. |
+| Packed consumers | **8 builds/type contracts and 38 runtime tests passed** | wagmi v2 (4), wagmi v3 (4), RainbowKit (6), Onboard (3), AppKit (5), ConnectKit (6), ethers (5), viem (5). [Check output](evidence/2026-10-17/frontend-integrations/framework-checks.log). |
+| Browser integration checks | **16 scenarios passed** | Each new example at 1280×720 and 390×844: synthetic injected connection/reload/disconnect/cleanup, plus one SDK dialog, keyboard cancellation and retry with external traffic blocked. [Browser record](evidence/2026-10-17/frontend-integrations/browser.json). |
+| Agent documentation | **Generation and link/freshness checks passed** | Updated canonical guides, `llms.txt` and generated `llms-full.txt`. |
+
+The new baselines are AppKit and its wagmi adapter **1.8.24** with wagmi **3.7.7** / core **3.6.5** / React **19.3.1**; ConnectKit **1.9.2** with wagmi **2.19.5** / core **2.22.1** / React **18.3.1**; ethers **6.17.0**; and viem **2.57.7**. Both wagmi consumers use viem **2.57.7**. AppKit's wagmi v2 combination failed on an upstream optional dependency's `@wagmi/core/tempo` import and is not part of the supported example. ConnectKit's helper supplies its required EIP-1193 chooser routing without changing Robinhood provider discovery; an unrelated injected provider is explicitly rejected by a regression test.
+
+Reproduce the packed matrix with `node scripts/framework-matrix.mjs`, then run `node scripts/browser-integrations.mjs /path/to/matrix/report.json` using Playwright Chromium (or `BROWSER_CHANNEL=chrome` for installed Chrome). The [contributor guide](../CONTRIBUTING.md#validate-a-change) includes setup. Browser tests block external HTTP and WebSocket traffic, approve only a synthetic injected wallet, and capture only disconnected pages/choosers before account or pairing material exists. These results do not add live-relay, physical-device, signature, transaction or chain-certification evidence. Dependency audits for the new consumers were not refreshed; the historical audit below remains scoped to its original installs.
+
+Disconnected chooser captures: [AppKit desktop](evidence/2026-10-17/frontend-integrations/appkit-chooser-1280.png), [ConnectKit narrow viewport](evidence/2026-10-17/frontend-integrations/connectkit-chooser-390.png).
+
+## Original delivery evidence
+
 Verification recorded on **2026-10-17**. The original delivery was verified at source `f6958cf6798c0c7e35961e2ee2779af855239249`, merged as `c117311a621af2f7819bdf6a407115733feccd3e` with an identical Git tree. The AI follow-up review changes were verified on their own tree before merge; rows and sections marked follow-up refer to those checks. A supplemental merge review then corrected two additional lifecycle regressions; see the separate merge-review record below. A command listed under reproduction is an instruction, not evidence that it has passed.
 
 The repository was subsequently renamed to `vexi-v1/robinhood-wallet-connector`, and repository URLs were corrected in package metadata and documentation. Provider and adapter source did not change. Recorded tarball hashes identify the tested artifacts before that metadata correction; newly packed artifacts can have different hashes.

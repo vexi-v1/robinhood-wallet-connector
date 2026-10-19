@@ -1,0 +1,537 @@
+{
+  "generatedAt": "2026-10-17T13:41:31.658Z",
+  "browser": "156.0.8078.4",
+  "channel": "playwright-chromium",
+  "scriptSha256": "642c55db166eb6e91a403a98b3cd843805742e13506f004a478eb8cf3f0fc354",
+  "platformFixturesSha256": "4743aa6213d78f23f873a2498bbe80b61f3d0f167bb56d43fdcc667f17984c9d",
+  "matrixReportSha256": "5d44d28308922bb8a3b30c54704364673cb192972da70799bf05878fdd04043a",
+  "externalTraffic": "blocked; Dynamic public configuration is fulfilled with local synthetic responses",
+  "physicalWallets": "not tested",
+  "results": [
+    {
+      "name": "vanilla",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "explicit reconnection restores approval without another permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "vanilla",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "vanilla",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "explicit reconnection restores approval without another permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "vanilla",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "wagmi-v2",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "wagmi-v2",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "wagmi-v2",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "wagmi-v2",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "wagmi-v3",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "wagmi-v3",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "wagmi-v3",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "wagmi-v3",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "rainbowkit",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "rainbowkit",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "rainbowkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "rainbowkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "onboard",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "explicit reconnection restores approval without another permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "onboard",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "onboard",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "explicit reconnection restores approval without another permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "onboard",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "appkit",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "appkit",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "appkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "appkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "connectkit",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "connectkit",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "connectkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "connectkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "ethers",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "ethers",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "ethers",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "ethers",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "viem",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "viem",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "viem",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "viem",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "thirdweb",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "thirdweb",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "thirdweb",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "thirdweb",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "dynamic",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "dynamic",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "dynamic",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "privy",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "privy",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "privy",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload, disconnect and listener cleanup",
+      "reload": "approved state restored without a permission request",
+      "permissionRequests": 1,
+      "sensitiveRequests": 0,
+      "status": "passed"
+    },
+    {
+      "name": "privy",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    }
+  ],
+  "originalReportSha256": "c4a3810976602d50fb363ee90c1106f90e88da4c3b41a95756d364757a6bbd56",
+  "summary": {
+    "scenariosPassed": 48,
+    "failed": 0,
+    "examples": [
+      "vanilla",
+      "wagmi-v2",
+      "wagmi-v3",
+      "rainbowkit",
+      "onboard",
+      "appkit",
+      "connectkit",
+      "ethers",
+      "viem",
+      "thirdweb",
+      "dynamic",
+      "privy"
+    ]
+  },
+  "playwright": "1.64.1",
+  "signaturesAndTransactions": "Synthetic guard configured to reject and count signing/transaction requests; zero in every injected-wallet scenario. No real wallets or live authentication."
+}

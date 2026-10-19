@@ -1,0 +1,176 @@
+{
+  "generatedAt": "2026-10-17T07:47:56.611Z",
+  "browser": "155.0.8059.82",
+  "channel": "chrome",
+  "scriptSha256": "6f4c3fa2d8d560cc54cd93e543ca065c0b1d469fe6c732a386283ac9eef7d1da",
+  "matrixReportSha256": "ae929bbe4fafd7376fbac9abeb2deaf40f6197eed13cb15890114ee25ffc6164",
+  "externalTraffic": "blocked",
+  "physicalWallets": "not tested",
+  "results": [
+    {
+      "name": "appkit",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "appkit",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "appkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "appkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "connectkit",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "connectkit",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "connectkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "connectkit",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "ethers",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "ethers",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "ethers",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "ethers",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "viem",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "viem",
+      "viewport": {
+        "width": 1280,
+        "height": 720
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    },
+    {
+      "name": "viem",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "synthetic connection, reload recovery, disconnect and listener cleanup",
+      "status": "passed"
+    },
+    {
+      "name": "viem",
+      "viewport": {
+        "width": 390,
+        "height": 844
+      },
+      "scenario": "blocked remote transport, one SDK dialog, keyboard focus, cancellation and retry",
+      "status": "passed"
+    }
+  ],
+  "summary": {
+    "scenariosPassed": 16,
+    "failed": 0,
+    "examples": [
+      "appkit",
+      "connectkit",
+      "ethers",
+      "viem"
+    ]
+  },
+  "playwright": "1.64.1",
+  "screenshots": {
+    "appkit-chooser-1280.png": {
+      "state": "disconnected chooser before synthetic approval",
+      "sha256": "9eb9e43f337a4238251eb03d8d5f04b0555c2b1dc3ae5ed0ad079b47678286b9"
+    },
+    "connectkit-chooser-390.png": {
+      "state": "disconnected chooser before synthetic approval",
+      "sha256": "118537ebd81ddb61cb7e76dcc08f52938bcf2ec20d8d555f2d3811d5fd004a47"
+    }
+  }
+}

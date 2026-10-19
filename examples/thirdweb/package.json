@@ -1,0 +1,24 @@
+{
+  "name": "robinhood-example-thirdweb",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host 127.0.0.1"
+  },
+  "dependencies": {
+    "@vexi/robinhood-wallet": "file:../../packages/core",
+    "@vexi/robinhood-wallet-thirdweb": "file:../../packages/thirdweb",
+    "react": "19.3.1",
+    "react-dom": "19.3.1",
+    "thirdweb": "5.122.0"
+  },
+  "devDependencies": {
+    "typescript": "5.9.3",
+    "vite": "8.3.4",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0"
+  }
+}

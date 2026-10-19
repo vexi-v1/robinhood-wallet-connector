@@ -6,6 +6,8 @@ import { readFile } from 'node:fs/promises';
 const manifest = JSON.parse(await readFile(new URL('./package.json', import.meta.url), 'utf8'));
 const isOnboard = Boolean(manifest.dependencies['@web3-onboard/core']);
 const isRainbowKit = Boolean(manifest.dependencies['@rainbow-me/rainbowkit']);
+const isAppKit = Boolean(manifest.dependencies['@reown/appkit-adapter-wagmi']);
+const isConnectKit = Boolean(manifest.dependencies.connectkit);
 const account = '0x0000000000000000000000000000000000000001';
 const metadata = { name: 'Synthetic framework consumer', description: 'No real wallet or funds', url: 'https://example.test', icons: [] };
 const projectId = '00000000000000000000000000000000';
@@ -46,7 +48,25 @@ function installWallet(wallet = new InjectedWallet()) {
   fakeWindow.ethereum = wallet;
   fakeWindow.location = { origin: 'https://example.test' };
   globalThis.window = fakeWindow;
+  const storage = new Map();
+  globalThis.localStorage = {
+    getItem: (key) => storage.get(key) ?? null,
+    setItem: (key, value) => storage.set(key, value),
+    removeItem: (key) => storage.delete(key),
+  };
   return wallet;
+}
+
+async function createConsumerConfig(chains) {
+  const { createConfig, http } = await import('@wagmi/core');
+  const { robinhoodWallet, robinhoodWalletForConnectKit } = await import('@vexi/robinhood-wallet-wagmi');
+  const factory = isConnectKit ? robinhoodWalletForConnectKit : robinhoodWallet;
+  const options = { chains, connectors: [factory({ projectId, metadata, showModal: false, discoveryTimeoutMs: 1 })], transports: Object.fromEntries(chains.map((chain) => [chain.id, http()])), multiInjectedProviderDiscovery: false, storage: null };
+  if (isAppKit) {
+    const { WagmiAdapter } = await import('@reown/appkit-adapter-wagmi');
+    return new WagmiAdapter({ ...options, networks: chains, projectId }).wagmiConfig;
+  }
+  return createConfig(options);
 }
 
 test('packed entrypoints import without a browser or prompting a wallet', async () => {
@@ -60,10 +80,9 @@ test('packed entrypoints import without a browser or prompting a wallet', async 
 if (!isOnboard) {
   test('actual wagmi actions connect, propagate events, switch, disconnect, and reconnect', async () => {
     const wallet = installWallet();
-    const { createConfig, connect, disconnect, getAccount, http, switchChain } = await import('@wagmi/core');
+    const { connect, disconnect, getAccount, switchChain } = await import('@wagmi/core');
     const { mainnet, optimism } = await import('viem/chains');
-    const { robinhoodWallet } = await import('@vexi/robinhood-wallet-wagmi');
-    const config = createConfig({ chains: [mainnet, optimism], connectors: [robinhoodWallet({ projectId, metadata, showModal: false, discoveryTimeoutMs: 1 })], transports: { 1: http(), 10: http() }, multiInjectedProviderDiscovery: false, storage: null });
+    const config = await createConsumerConfig([mainnet, optimism]);
     const connector = config.connectors[0];
     assert.equal(await connector.getChainId(), 1);
     assert.equal(wallet.prompts, 0);
@@ -90,10 +109,9 @@ if (!isOnboard) {
     const wallet = installWallet();
     let approve;
     wallet.pendingApproval = new Promise((resolve) => { approve = resolve; });
-    const { createConfig, connect, getAccount, http } = await import('@wagmi/core');
+    const { connect, getAccount } = await import('@wagmi/core');
     const { mainnet } = await import('viem/chains');
-    const { robinhoodWallet } = await import('@vexi/robinhood-wallet-wagmi');
-    const config = createConfig({ chains: [mainnet], connectors: [robinhoodWallet({ projectId, metadata, showModal: false, discoveryTimeoutMs: 1 })], transports: { 1: http() }, multiInjectedProviderDiscovery: false, storage: null });
+    const config = await createConsumerConfig([mainnet]);
     const connector = config.connectors[0];
     const pending = connect(config, { connector });
     const rejected = assert.rejects(pending, /cancel|reject/i);
@@ -241,9 +259,125 @@ if (!isOnboard) {
     assert.equal(getAccount(config).status, 'connected');
     await connector.disconnect();
   });
+
+  test('a fresh packed connector restores approval without a permission prompt and clears listeners', async () => {
+    const wallet = installWallet();
+    const { connect, reconnect, disconnect, getAccount } = await import('@wagmi/core');
+    const { mainnet } = await import('viem/chains');
+    const first = await createConsumerConfig([mainnet]);
+    await connect(first, { connector: first.connectors[0] });
+    (await first.connectors[0].getProvider()).destroy();
+    assert.equal(wallet.listenerCount('accountsChanged'), 0);
+    const restored = await createConsumerConfig([mainnet]);
+    await reconnect(restored);
+    assert.equal(getAccount(restored).status, 'connected');
+    assert.equal(wallet.prompts, 1);
+    assert.equal(wallet.listenerCount('accountsChanged'), 1);
+    await disconnect(restored);
+    assert.equal(wallet.listenerCount('accountsChanged'), 0);
+    const loggedOut = await createConsumerConfig([mainnet]);
+    await reconnect(loggedOut);
+    assert.equal(getAccount(loggedOut).status, 'disconnected');
+    assert.equal(wallet.prompts, 1);
+    (await loggedOut.connectors[0].getProvider()).destroy();
+  });
+}
+
+if (isAppKit) {
+  test('actual AppKit example config is SSR-safe and its public adapter connects and disconnects', async () => {
+    delete globalThis.window;
+    delete globalThis.localStorage;
+    const { createAdapter } = await import('./src/config.ts');
+    const adapter = createAdapter({ projectId, metadata, showModal: false, discoveryTimeoutMs: 1 });
+    const connector = adapter.wagmiConfig.connectors.find((value) => value.id === 'robinhood');
+    assert.ok(connector);
+    const provider = await connector.getProvider();
+    assert.equal(provider.status, 'idle');
+    assert.equal(provider.transport, undefined);
+    assert.equal(await connector.isAuthorized(), false);
+    const wallet = installWallet();
+    const result = await adapter.connect({ id: connector.id, type: 'EXTERNAL', chainId: 1 });
+    assert.equal(result.address, account);
+    assert.equal(result.provider, provider);
+    assert.equal(wallet.prompts, 1);
+    await adapter.disconnect({ id: connector.id });
+    assert.equal(provider.connected, false);
+    assert.equal(wallet.listenerCount('accountsChanged'), 0);
+  });
+}
+
+if (isConnectKit) {
+  test('actual ConnectKit providers accept the example config during SSR without wallet permission', async () => {
+    delete globalThis.window;
+    delete globalThis.localStorage;
+    const { createWalletConfig } = await import('./src/config.ts');
+    const { createElement: h } = await import('react');
+    const { renderToString } = await import('react-dom/server');
+    const { QueryClient, QueryClientProvider } = await import('@tanstack/react-query');
+    const { WagmiProvider } = await import('wagmi');
+    const { ConnectKitButton, ConnectKitProvider } = await import('connectkit');
+    const config = createWalletConfig({ projectId, metadata });
+    const connector = config.connectors.find((value) => value.id === 'robinhood');
+    assert.equal(connector.type, 'injected');
+    const provider = await connector.getProvider();
+    const queryClient = new QueryClient();
+    try {
+      const rendered = renderToString(h(WagmiProvider, { config }, h(QueryClientProvider, { client: queryClient }, h(ConnectKitProvider, null, h('span', null, 'SSR host content'), h(ConnectKitButton, { showBalance: false })))));
+      // ConnectKit intentionally defers its button until the client mounts.
+      assert.match(rendered, /SSR host content/);
+      assert.equal(provider.status, 'idle');
+      assert.equal(provider.transport, undefined);
+      assert.ok(config.connectors.some((value) => value.id === 'injected'));
+      assert.equal(await connector.isAuthorized(), false);
+    } finally {
+      queryClient.clear();
+      provider.destroy();
+    }
+  });
+
+  test('ConnectKit routing hint never relabels or prompts an unrelated injected provider', async () => {
+    const wallet = installWallet();
+    wallet.isRobinhoodMobileWallet = false;
+    const { createWalletConfig } = await import('./src/config.ts');
+    const { connect } = await import('@wagmi/core');
+    const config = createWalletConfig({ projectId: '', metadata, showModal: false, discoveryTimeoutMs: 1 });
+    const connector = config.connectors.find((value) => value.id === 'robinhood');
+    await assert.rejects(connect(config, { connector }), /project ID/i);
+    assert.equal(wallet.prompts, 0);
+    const provider = await connector.getProvider();
+    assert.equal(provider.transport, undefined);
+    assert.equal(provider.status, 'idle');
+    provider.destroy();
+  });
 }
 
 if (isRainbowKit) {
+  test('the generic browser entry restores only its own explicit connection, not Robinhood approval', async () => {
+    const wallet = installWallet();
+    const { connectorsForWallets } = await import('@rainbow-me/rainbowkit');
+    const { createConfig, createStorage, connect, disconnect, http } = await import('@wagmi/core');
+    const { mainnet } = await import('viem/chains');
+    const { robinhoodWallet } = await import('@vexi/robinhood-wallet-rainbowkit');
+    const { browserWallet } = await import('./src/browser-wallet.ts');
+    const connectors = connectorsForWallets([{ groupName: 'Wallets', wallets: [robinhoodWallet, browserWallet] }], { projectId, appName: metadata.name, appUrl: metadata.url });
+    const config = createConfig({ chains: [mainnet], connectors, transports: { 1: http() }, multiInjectedProviderDiscovery: false, storage: createStorage({ storage: globalThis.localStorage }) });
+    const robinhood = config.connectors.find((connector) => connector.id === 'robinhood');
+    const browser = config.connectors.find((connector) => connector.id === 'injected');
+    assert.ok(robinhood); assert.ok(browser);
+    try {
+      await connect(config, { connector: robinhood });
+      assert.equal(await robinhood.isAuthorized(), true);
+      assert.equal(await browser.isAuthorized(), false);
+      assert.equal(wallet.prompts, 1);
+      await disconnect(config, { connector: robinhood });
+      await connect(config, { connector: browser });
+      assert.equal(await browser.isAuthorized(), true);
+      assert.equal(wallet.prompts, 2);
+      await disconnect(config, { connector: browser });
+      assert.equal(await browser.isAuthorized(), false);
+    } finally { (await robinhood.getProvider()).destroy(); }
+  });
+
   test('RainbowKit SSR configuration initializes and checks authorization without window', async () => {
     delete globalThis.window;
     const { connectorsForWallets } = await import('@rainbow-me/rainbowkit');
