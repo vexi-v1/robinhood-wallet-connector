@@ -87,7 +87,12 @@ export function robinhoodWalletConnectors(options: RobinhoodProviderOptions): ()
       this.didSetup = false;
     }
     override async endSession() {
-      try { await this.provider.disconnect(); }
+      try {
+        // Dynamic can expose a restored wallet before its connection promise settles.
+        // Finish that approved recovery before logout cancels pending connections.
+        if (this.provider.connected) await this.provider.connect().catch(() => undefined);
+        await this.provider.disconnect();
+      }
       finally { this.setActiveAccount(undefined); this.teardownEventListeners(); }
     }
     override async signMessage(message: string) {

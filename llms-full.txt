@@ -724,6 +724,8 @@ Configure the same enabled EVM networks in Dynamic and the Robinhood options. Th
 
 `getAddress()` / `connect()` are permission-bearing actions. `getConnectedAccounts()` only restores approved state; `init()` announces readiness without creating a transport. The connector exposes `provider`, `cancelConnect()` and `destroy()` for custom hosts. `endSession()` disconnects and clears listeners. Repeated setup/teardown is supported, and account/chain/disconnect events are translated to Dynamic events. viem wallet clients use `retryCount: 0`.
 
+If logout starts just after saved-session recovery adopts an approved connection, `endSession()` lets that recovery promise settle before clearing the session. Pending requests that have not received approval are still cancelled immediately; logout never requests a new approval.
+
 Dynamic calls its custom SDK routing flag `canConnectViaCustodialService`; the adapter sets that flag to make its own connection UI reachable. This is a framework routing convention, not a claim that Robinhood is custodial or that its mobile app is installed. Provider identity is still checked by the core.
 
 See the [runnable example](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/examples/dynamic/README.md), [upstream custom connector guide](https://github.com/dynamic-labs/public-wallet-connectors/blob/main/CONTRIBUTING.md) and [verification record](https://raw.githubusercontent.com/vexi-v1/robinhood-wallet-connector/main/docs/verification.md). The example uses connect-only mode. Dynamic authentication, embedded wallets, the newer JavaScript SDK, physical devices and actual signing are outside the verified surface.

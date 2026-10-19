@@ -190,6 +190,35 @@ test('destroy preserves approved recovery; disconnect clears it without new perm
   assert.equal(await third.restore(), false); third.destroy(); assertClean(injected);
 });
 
+if (platform === 'dynamic') test('logout lets an adopted recovery settle before clearing the session', async () => {
+  const injected = installWallet();
+  const first = await createConnection(); await first.connect(); first.destroy();
+  const connection = await createConnection();
+  const restore = connection.provider.isAuthorized.bind(connection.provider);
+  let finish;
+  const adopted = new Promise((resolve) => { finish = resolve; });
+  connection.provider.isAuthorized = async () => {
+    const authorized = await restore();
+    await adopted;
+    return authorized;
+  };
+  try {
+    const connecting = connection.connect();
+    // Observe a rejection immediately so the old behavior fails this test cleanly.
+    const outcome = connecting.then(() => undefined, (error) => error);
+    await until(() => connection.provider.connected);
+    const disconnecting = connection.disconnect();
+    finish();
+    await disconnecting;
+    assert.equal(await outcome, undefined, 'An already-approved recovery must not reject on logout');
+    assert.equal(connection.provider.connected, false);
+    assert.deepEqual(await connection.addresses(), []);
+    assert.equal(injected.prompts, 1);
+    assertClean(injected);
+    assert.equal(await connection.restore(), false);
+  } finally { finish(); connection.destroy(); }
+});
+
 test('an arbitrary injected provider is never relabeled as Robinhood', async () => {
   const injected = installWallet(); injected.isRobinhoodMobileWallet = false;
   const connection = await createConnection({ projectId: '' });
